@@ -7,7 +7,6 @@
 //
 
 #import "TLDayListViewController.h"
-#import "TLTaskListLayout.h"
 
 @interface TLDayListViewController ()
 
@@ -33,9 +32,30 @@ static NSString *CellIdentifier = @"Cell";
 {
     [super viewDidLoad];
     
+    UIPanGestureRecognizer *recognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(userDidPan:)];
+    [self.view addGestureRecognizer:recognizer];
+    
+    self.view.backgroundColor = [UIColor darkGrayColor];
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    // Assume we want to concentrate in the middle for now.
+    self.taskListLayout.concentrationPoint = CGRectGetMidY(self.view.bounds);
 }
 
 #pragma mark - Gesture Recognizer Methods
+
+-(void)userDidPan:(UIPanGestureRecognizer *)recognizer
+{
+    if (recognizer.state == UIGestureRecognizerStateChanged)
+    {
+        self.taskListLayout.concentrationPoint = [recognizer locationInView:self.view].y;
+    }
+}
+
 
 #pragma mark - UICollectionViewDataSource Methods
 
@@ -46,24 +66,35 @@ static NSString *CellIdentifier = @"Cell";
 
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-    return 20; 
+    // Assume we have a 1-hour appointment every 2 hours
+    return 12;
 }
 
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:CellIdentifier forIndexPath:indexPath];
     
-    cell.backgroundColor = [UIColor whiteColor];
+    cell.backgroundColor = [[UIColor blueColor] colorWithAlphaComponent:0.5f];
     
     return cell;
 }
 
-#pragma mark - UICollectionViewDelegateFlowLayout Methods
+#pragma mark - TLTaskListLayoutDelegate Methods
 
-- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section
+-(NSInteger)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minuteDurationForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (section == 0) return UIEdgeInsetsZero;
-    return UIEdgeInsetsMake(arc4random()%10, 0, 0, 0);
+    return 60;
 }
+
+-(NSInteger)collectionView:(UICollectionView *)collectionView layout:(TLTaskListLayout *)collectionViewLayout minuteStartTimeForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    return indexPath.section * 60 * 2;
+}
+
+//- (CGSize)collectionView:(UICollectionView *)collectionView layout:(TLTaskListLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    // Assume that we only have one appointment at a time (ie: full width).
+//    return CGSizeMake(CGRectGetWidth(self.view.bounds), floorf(self.taskListLayout.hourSize * 1.0f)); // Assume each appointment is one hour long
+//}
 
 @end

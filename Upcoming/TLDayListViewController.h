@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TLDayListViewController : UICollectionViewController
+#import "TLTaskListLayout.h"
+
+@interface TLDayListViewController : UICollectionViewController <TLTaskListLayoutDelegate>
 
 @end

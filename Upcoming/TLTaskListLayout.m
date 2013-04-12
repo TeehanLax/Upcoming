@@ -8,16 +8,23 @@
 
 #import "TLTaskListLayout.h"
 
+CGFloat kHourSize;
+
+@interface TLTaskListLayout ()
+
+@property (nonatomic, assign) CGFloat collectionViewHeight;
+@property (nonatomic, assign, readwrite) CGFloat hourSize;
+
+@property (nonatomic, weak) id<TLTaskListLayoutDelegate> layoutDelegate;
+
+@end
+
 @implementation TLTaskListLayout
 
 -(id)init
 {
     if (!(self = [super init])) return nil;
-    
-    self.itemSize = CGSizeMake(320, 10);
-    self.minimumInteritemSpacing = 0.0f;
-    self.sectionInset = UIEdgeInsetsZero;
-    
+        
     return self;
 }
 
@@ -26,33 +33,63 @@
     return self.collectionView.bounds.size;
 }
 
--(UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
+-(void)prepareLayout
 {
-    UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
+    [super prepareLayout];
+    
+    if ([self.collectionView.delegate conformsToProtocol:@protocol(TLTaskListLayoutDelegate)])
+    {
+        self.layoutDelegate = (id<TLTaskListLayoutDelegate>)(self.collectionView.delegate);
+    }
+    else
+    {
+        self.layoutDelegate = nil;
+    }
+    
+    self.collectionViewHeight = CGRectGetHeight(self.collectionView.bounds);
+    self.hourSize = self.collectionViewHeight / 24.0f; // We represent 24 hours
+}
+
+- (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    UICollectionViewLayoutAttributes *attributes = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
+    
+    NSInteger minuteDuration = [self.layoutDelegate collectionView:self.collectionView layout:self minuteDurationForItemAtIndexPath:indexPath];
+    CGFloat hourDuration = (CGFloat)minuteDuration / 60.0f;
+    CGFloat height = floorf(self.hourSize * hourDuration);
+    NSInteger minuteStartTime = [self.layoutDelegate collectionView:self.collectionView layout:self minuteStartTimeForItemAtIndexPath:indexPath];
+    CGFloat hourStartTime = (CGFloat)minuteStartTime / 60.0f;
+    CGFloat y = floorf(self.hourSize * hourStartTime);
+    
+    attributes.frame = CGRectMake(0, y, CGRectGetWidth(self.collectionView.bounds), height);
+    
+    NSLog(@"%@", indexPath);
     
     return attributes;
 }
 
--(NSArray*)layoutAttributesForElementsInRect:(CGRect)rect
+- (NSArray *)layoutAttributesForElementsInRect:(CGRect)rect
 {
-    NSArray* layoutAttributesArray = [super layoutAttributesForElementsInRect:rect];
+    NSInteger numberOfSections = [self.collectionView.dataSource numberOfSectionsInCollectionView:self.collectionView];
+    NSMutableArray* layoutAttributesArray = [NSMutableArray arrayWithCapacity:numberOfSections];
     
-    for (UICollectionViewLayoutAttributes *attributes in layoutAttributesArray)
+    for (NSInteger i = 0; i < numberOfSections; i++)
     {
-        if (attributes.representedElementCategory == UICollectionElementCategorySupplementaryView)
-        {
-            // Header
-            attributes.size = CGSizeMake(300, 20);
-            attributes.zIndex = 0;
-        }
-        else
-        {
-            // Cell
-            attributes.zIndex = 1;
-        }
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:i];
+        UICollectionViewLayoutAttributes *newAttributes = [self layoutAttributesForItemAtIndexPath:indexPath];
+        [layoutAttributesArray addObject:newAttributes];
     }
     
     return layoutAttributesArray;
+}
+
+#pragma mark - Overridden Properties
+
+-(void)setConcentrationPoint:(CGFloat)concentrationPoint
+{
+    _concentrationPoint = concentrationPoint;
+    
+    [self invalidateLayout];
 }
 
 @end
