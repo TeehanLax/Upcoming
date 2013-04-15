@@ -12,6 +12,7 @@
 
 @protocol TLTaskListLayoutDelegate <UICollectionViewDelegate>
 
+// Whether or not we actually have an event in this hour. 
 -(BOOL)collectionView:(UICollectionView *)collectionView layout:(TLTaskListLayout *)collectionViewLayout hasEventForHour:(NSInteger)hour;
 
 @end

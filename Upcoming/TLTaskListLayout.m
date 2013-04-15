@@ -7,7 +7,9 @@
 //
 
 #import "TLTaskListLayout.h"
+#import "TLHourDecorationView.h"
 
+static NSString *TLTaskListLayoutHourDecorationViewKind = @"TLTaskListLayoutHourDecorationViewKind";
 
 @interface TLTaskListLayout ()
 
@@ -27,6 +29,8 @@ static const CGFloat minHeight = 10;
 -(id)init
 {
     if (!(self = [super init])) return nil;
+    
+    [self registerClass:[TLHourDecorationView class] forDecorationViewOfKind:TLTaskListLayoutHourDecorationViewKind];
         
     return self;
 }
@@ -94,11 +98,19 @@ static const CGFloat minHeight = 10;
     return attributes;
 }
 
+// Documentation says we need to provide individual layout attributes, but it's lying.
+// No one calls this method ever. 
+- (UICollectionViewLayoutAttributes *)layoutAttributesForDecorationViewOfKind:(NSString*)decorationViewKind atIndexPath:(NSIndexPath *)indexPath
+{
+    return nil;
+}
+
 // This method is called every time the layout is invalidated. It should be as efficient as possible. 
 - (NSArray *)layoutAttributesForElementsInRect:(CGRect)rect
 {
     // Create a mutable array with 24 elements in it, representing the 24 hours of a day.
     NSMutableArray* layoutAttributesArray = [NSMutableArray arrayWithCapacity:24];
+    NSMutableArray *decorationViewAttributesArray = [NSMutableArray arrayWithCapacity:24];
 
     // We need to keep track of the total height so we can adjust the heights of all the items
     // later to 
@@ -110,6 +122,9 @@ static const CGFloat minHeight = 10;
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:i];
         UICollectionViewLayoutAttributes *newAttributes = [self layoutAttributesForItemAtIndexPath:indexPath];
         totalHeight += newAttributes.size.height;
+        
+        UICollectionViewLayoutAttributes *decorationViewLayoutAttributes = [UICollectionViewLayoutAttributes layoutAttributesForDecorationViewOfKind:TLTaskListLayoutHourDecorationViewKind withIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
+        [decorationViewAttributesArray addObject:decorationViewLayoutAttributes];
         
         // Populate the array.
         [layoutAttributesArray addObject:newAttributes];
@@ -133,9 +148,12 @@ static const CGFloat minHeight = 10;
     NSMutableArray *sectionsToRemove = [NSMutableArray arrayWithCapacity:24];
     
     // Stack the index paths up one by one. 
-    for (UICollectionViewLayoutAttributes *attributes in layoutAttributesArray)
+    for (NSInteger i = 0; i < 24; i++)
     {
+        UICollectionViewLayoutAttributes *attributes = layoutAttributesArray[i];
+        UICollectionViewLayoutAttributes *decorationViewAttributes = decorationViewAttributesArray[i];
         attributes.frame = CGRectMake(0, maxY, CGRectGetWidth(self.collectionView.bounds), attributes.size.height + heightToAdd);
+        decorationViewAttributes.frame = attributes.frame;
         maxY += (attributes.size.height);
         
         // Find out if we should keep this section.
@@ -152,10 +170,15 @@ static const CGFloat minHeight = 10;
         }
     }
     
-    // Finally, we need to remove sections not represented in collection view
-    [layoutAttributesArray removeObjectsInArray:sectionsToRemove];
+    NSMutableArray *arrayToReturn = [layoutAttributesArray mutableCopy];
     
-    return layoutAttributesArray;
+    // We need to remove sections not represented in collection view
+    [arrayToReturn removeObjectsInArray:sectionsToRemove];
+    
+    // Finally, add our decoration views.
+    [arrayToReturn addObjectsFromArray:decorationViewAttributesArray];
+    
+    return arrayToReturn;
 }
 
 #pragma mark - Overridden Properties

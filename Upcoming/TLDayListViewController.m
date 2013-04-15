@@ -69,13 +69,15 @@ static NSString *CellIdentifier = @"Cell";
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
+    // Always only one item per section. *ALWAYS*. 
     return 1;
 }
 
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-    // Assume we have a 1-hour appointment every hour
-    return 13;
+    // We *must* return a *minimum* of one section (for decoration views)
+    NSInteger numberOfSections = 0;
+    return MAX(numberOfSections, 1);
 }
 
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -91,6 +93,7 @@ static NSString *CellIdentifier = @"Cell";
 
 -(BOOL)collectionView:(UICollectionView *)collectionView layout:(TLTaskListLayout *)collectionViewLayout hasEventForHour:(NSInteger)hour
 {
+    return NO;
     if (hour % 2 == 0)
     {
         return YES;
