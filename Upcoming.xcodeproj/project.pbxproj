@@ -24,6 +24,7 @@
 		5EB4E58517187E1500EC8E1C /* TLHeaderViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5EB4E58317187E1500EC8E1C /* TLHeaderViewController.xib */; };
 		5ED60CC9171C54D600F55891 /* TLHourDecorationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ED60CC8171C54D600F55891 /* TLHourDecorationView.m */; };
 		5ED60CCB171C57E000F55891 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ED60CCA171C57E000F55891 /* QuartzCore.framework */; };
+		5ED60CCE171C6C8800F55891 /* TLTaskListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ED60CCD171C6C8800F55891 /* TLTaskListCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +54,8 @@
 		5ED60CC7171C54D600F55891 /* TLHourDecorationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLHourDecorationView.h; sourceTree = "<group>"; };
 		5ED60CC8171C54D600F55891 /* TLHourDecorationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLHourDecorationView.m; sourceTree = "<group>"; };
 		5ED60CCA171C57E000F55891 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		5ED60CCC171C6C8800F55891 /* TLTaskListCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLTaskListCell.h; sourceTree = "<group>"; };
+		5ED60CCD171C6C8800F55891 /* TLTaskListCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLTaskListCell.m; sourceTree = "<group>"; };
 		CB35EE43CD0E4DBFBCC0B9D3 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -157,6 +160,8 @@
 			children = (
 				5ED60CC7171C54D600F55891 /* TLHourDecorationView.h */,
 				5ED60CC8171C54D600F55891 /* TLHourDecorationView.m */,
+				5ED60CCC171C6C8800F55891 /* TLTaskListCell.h */,
+				5ED60CCD171C6C8800F55891 /* TLTaskListCell.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -253,6 +258,7 @@
 				5EB4E57C17187CF700EC8E1C /* TLRootViewController.m in Sources */,
 				5EB4E58417187E1500EC8E1C /* TLHeaderViewController.m in Sources */,
 				5ED60CC9171C54D600F55891 /* TLHourDecorationView.m in Sources */,
+				5ED60CCE171C6C8800F55891 /* TLTaskListCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

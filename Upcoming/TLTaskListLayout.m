@@ -23,7 +23,7 @@ static NSString *TLTaskListLayoutHourDecorationViewKind = @"TLTaskListLayoutHour
 @implementation TLTaskListLayout
 
 // These are only guidelines – the actual heights will vary.
-static const CGFloat maxHeight = 70;
+static const CGFloat maxHeight = 60;
 static const CGFloat minHeight = 15;
 
 -(id)init
@@ -87,7 +87,7 @@ static const CGFloat minHeight = 15;
     const CGFloat distributionConstant = 1.0013;
     
     // This is a modified verion of the formula for a bell curve.
-    CGFloat height = (maxHeight) / (powf(distributionConstant, (distance * distance))) + minHeight;
+    CGFloat height = (maxHeight) / (powf(distributionConstant, powf((distance * 0.5), 2.0f))) + minHeight;
     
     // This is the most import line in this method. We set the height and it'll be used in calculations in layoutAttributesForElementsInRect:
     attributes.size = CGSizeMake(CGRectGetWidth(self.collectionView.bounds), height);
@@ -153,7 +153,8 @@ static const CGFloat minHeight = 15;
         UICollectionViewLayoutAttributes *attributes = layoutAttributesArray[i];
         UICollectionViewLayoutAttributes *decorationViewAttributes = decorationViewAttributesArray[i];
         attributes.frame = CGRectMake(0, maxY, CGRectGetWidth(self.collectionView.bounds), attributes.size.height + heightToAdd);
-        decorationViewAttributes.frame = CGRectInset(attributes.frame, -1, 0);
+        decorationViewAttributes.frame = attributes.frame;
+        
         maxY += (attributes.size.height);
         
         // Find out if we should keep this section.

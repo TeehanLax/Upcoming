@@ -7,6 +7,7 @@
 //
 
 #import "TLDayListViewController.h"
+#import "TLTaskListCell.h"
 
 @interface TLDayListViewController ()
 
@@ -24,7 +25,7 @@ static NSString *CellIdentifier = @"Cell";
     UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:self.taskListLayout];
     collectionView.delegate = self;
     collectionView.dataSource = self;
-    [collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:CellIdentifier];
+    [collectionView registerClass:[TLTaskListCell class] forCellWithReuseIdentifier:CellIdentifier];
     self.view = collectionView;
 }
 
@@ -92,11 +93,10 @@ static NSString *CellIdentifier = @"Cell";
     return MAX(numberOfSections, 1);
 }
 
--(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+-(TLTaskListCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:CellIdentifier forIndexPath:indexPath];
+    TLTaskListCell *cell = (TLTaskListCell *)[collectionView dequeueReusableCellWithReuseIdentifier:CellIdentifier forIndexPath:indexPath];
     
-    cell.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:1.0f];
     
     return cell;
 }

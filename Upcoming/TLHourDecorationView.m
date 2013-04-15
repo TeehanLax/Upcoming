@@ -14,7 +14,7 @@
 {
     if (!(self = [super initWithFrame:frame])) return nil;
     
-    self.backgroundColor = [UIColor orangeColor];
+//    self.backgroundColor = [UIColor orangeColor];
     
     return self;
 }
@@ -22,6 +22,8 @@
 -(void)applyLayoutAttributes:(UICollectionViewLayoutAttributes *)layoutAttributes
 {
     [super applyLayoutAttributes:layoutAttributes];
+    
+    self.frame = CGRectIntegral(layoutAttributes.frame);
     
     [self setNeedsDisplay];
 }
@@ -34,7 +36,7 @@
     CGContextSetStrokeColorWithColor(context, [[UIColor whiteColor] CGColor]);
     
     CGContextBeginPath(context);
-    CGFloat dashes[] = {1,1};
+    CGFloat dashes[] = {1,2};
     
     CGContextSetLineDash(context, 0.0, dashes, 2);
     CGContextSetLineWidth(context, 0.5f);
