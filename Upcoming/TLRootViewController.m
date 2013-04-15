@@ -40,9 +40,11 @@ static const CGFloat headerHeight = 88.0f;
     [super loadView];
     
     self.dayListViewController.view.frame = CGRectMake(0, headerHeight, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - headerHeight);
+    self.dayListViewController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     [self.view addSubview:self.dayListViewController.view];
     
     self.headerViewController.view.frame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), headerHeight);
+    self.headerViewController.view.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin;
     [self.view addSubview:self.headerViewController.view];
 }
 

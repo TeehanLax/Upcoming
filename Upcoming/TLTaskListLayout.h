@@ -12,8 +12,7 @@
 
 @protocol TLTaskListLayoutDelegate <UICollectionViewDelegate>
 
--(NSInteger)collectionView:(UICollectionView *)collectionView layout:(TLTaskListLayout *)collectionViewLayout minuteDurationForItemAtIndexPath:(NSIndexPath *)indexPath;
--(NSInteger)collectionView:(UICollectionView *)collectionView layout:(TLTaskListLayout *)collectionViewLayout minuteStartTimeForItemAtIndexPath:(NSIndexPath *)indexPath;
+-(BOOL)collectionView:(UICollectionView *)collectionView layout:(TLTaskListLayout *)collectionViewLayout hasEventForHour:(NSInteger)hour;
 
 @end
 
