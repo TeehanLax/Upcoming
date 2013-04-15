@@ -10,6 +10,6 @@
 
 #import "TLTaskListLayout.h"
 
-@interface TLDayListViewController : UICollectionViewController <TLTaskListLayoutDelegate>
+@interface TLDayListViewController : UICollectionViewController <TLTaskListLayoutDelegate, UIGestureRecognizerDelegate>
 
 @end

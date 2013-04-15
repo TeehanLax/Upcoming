@@ -33,9 +33,8 @@ static NSString *CellIdentifier = @"Cell";
     [super viewDidLoad];
     
     UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(userDidPan:)];
+    panGestureRecognizer.delegate = self;
     [self.view addGestureRecognizer:panGestureRecognizer];
-    UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(userdidTap:)];
-    [self.view addGestureRecognizer:tapGestureRecognizer];
     
     self.view.backgroundColor = [UIColor darkGrayColor];
 }
@@ -50,20 +49,33 @@ static NSString *CellIdentifier = @"Cell";
 
 #pragma mark - Gesture Recognizer Methods
 
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    // Implemented to recognize a change in the pan gesture before it actually happens (ie: not recognized yet)
+    
+    CGPoint location = [touch locationInView:self.view];
+    BOOL containsPoint = CGRectContainsPoint(self.view.bounds, location);
+    
+    if (containsPoint)
+    {
+        self.taskListLayout.concentrationPoint = location.y;
+    }
+    
+    return containsPoint;
+}
+
 -(void)userDidPan:(UIPanGestureRecognizer *)recognizer
 {
-    //TODO: What if the location leaves self.view.bounds?
-//    if (recognizer.state == UIGestureRecognizerStateChanged)
+    if (recognizer.state == UIGestureRecognizerStateChanged)
     {
-        self.taskListLayout.concentrationPoint = [recognizer locationInView:self.view].y;
+        CGPoint location = [recognizer locationInView:self.view];
+        
+        if (CGRectContainsPoint(self.view.bounds, location))
+        {
+            self.taskListLayout.concentrationPoint = location.y;
+        }
     }
 }
-
--(void)userdidTap:(UITapGestureRecognizer *)recognizer
-{
-    self.taskListLayout.concentrationPoint = [recognizer locationInView:self.view].y;
-}
-
 
 #pragma mark - UICollectionViewDataSource Methods
 
@@ -76,7 +88,7 @@ static NSString *CellIdentifier = @"Cell";
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
     // We *must* return a *minimum* of one section (for decoration views)
-    NSInteger numberOfSections = 0;
+    NSInteger numberOfSections = 12;
     return MAX(numberOfSections, 1);
 }
 
@@ -84,7 +96,7 @@ static NSString *CellIdentifier = @"Cell";
 {
     UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:CellIdentifier forIndexPath:indexPath];
     
-    cell.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:0.5f];
+    cell.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:1.0f];
     
     return cell;
 }
@@ -93,7 +105,6 @@ static NSString *CellIdentifier = @"Cell";
 
 -(BOOL)collectionView:(UICollectionView *)collectionView layout:(TLTaskListLayout *)collectionViewLayout hasEventForHour:(NSInteger)hour
 {
-    return NO;
     if (hour % 2 == 0)
     {
         return YES;

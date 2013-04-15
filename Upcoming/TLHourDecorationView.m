@@ -15,19 +15,35 @@
     if (!(self = [super initWithFrame:frame])) return nil;
     
     self.backgroundColor = [UIColor orangeColor];
-    self.layer.borderColor = [[UIColor blackColor] CGColor];
-    self.layer.borderWidth = 0.5f;
     
     return self;
 }
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
+-(void)applyLayoutAttributes:(UICollectionViewLayoutAttributes *)layoutAttributes
+{
+    [super applyLayoutAttributes:layoutAttributes];
+    
+    [self setNeedsDisplay];
+}
+
 - (void)drawRect:(CGRect)rect
 {
-    // Drawing code
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetShouldAntialias(context, NO);
+    
+    CGContextSetStrokeColorWithColor(context, [[UIColor whiteColor] CGColor]);
+    
+    CGContextBeginPath(context);
+    CGFloat dashes[] = {1,1};
+    
+    CGContextSetLineDash(context, 0.0, dashes, 2);
+    CGContextSetLineWidth(context, 0.5f);
+    
+    CGContextMoveToPoint(context, CGRectGetMinX(self.bounds), CGRectGetMidY(self.bounds));
+    CGContextAddLineToPoint(context, CGRectGetMaxX(self.bounds), CGRectGetMidY(self.bounds));
+    
+    CGContextStrokePath(context);
 }
-*/
+
 
 @end

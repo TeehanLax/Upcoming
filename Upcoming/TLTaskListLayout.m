@@ -23,8 +23,8 @@ static NSString *TLTaskListLayoutHourDecorationViewKind = @"TLTaskListLayoutHour
 @implementation TLTaskListLayout
 
 // These are only guidelines – the actual heights will vary.
-static const CGFloat maxHeight = 88;
-static const CGFloat minHeight = 10;
+static const CGFloat maxHeight = 70;
+static const CGFloat minHeight = 15;
 
 -(id)init
 {
