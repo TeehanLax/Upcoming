@@ -153,7 +153,7 @@ static const CGFloat minHeight = 10;
         UICollectionViewLayoutAttributes *attributes = layoutAttributesArray[i];
         UICollectionViewLayoutAttributes *decorationViewAttributes = decorationViewAttributesArray[i];
         attributes.frame = CGRectMake(0, maxY, CGRectGetWidth(self.collectionView.bounds), attributes.size.height + heightToAdd);
-        decorationViewAttributes.frame = attributes.frame;
+        decorationViewAttributes.frame = CGRectInset(attributes.frame, -1, 0);
         maxY += (attributes.size.height);
         
         // Find out if we should keep this section.

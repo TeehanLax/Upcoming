@@ -23,6 +23,7 @@
 		5EB4E58417187E1500EC8E1C /* TLHeaderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EB4E58217187E1500EC8E1C /* TLHeaderViewController.m */; };
 		5EB4E58517187E1500EC8E1C /* TLHeaderViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5EB4E58317187E1500EC8E1C /* TLHeaderViewController.xib */; };
 		5ED60CC9171C54D600F55891 /* TLHourDecorationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ED60CC8171C54D600F55891 /* TLHourDecorationView.m */; };
+		5ED60CCB171C57E000F55891 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ED60CCA171C57E000F55891 /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +52,7 @@
 		5EB4E58317187E1500EC8E1C /* TLHeaderViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLHeaderViewController.xib; sourceTree = "<group>"; };
 		5ED60CC7171C54D600F55891 /* TLHourDecorationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLHourDecorationView.h; sourceTree = "<group>"; };
 		5ED60CC8171C54D600F55891 /* TLHourDecorationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLHourDecorationView.m; sourceTree = "<group>"; };
+		5ED60CCA171C57E000F55891 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		CB35EE43CD0E4DBFBCC0B9D3 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -59,6 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5ED60CCB171C57E000F55891 /* QuartzCore.framework in Frameworks */,
 				5EB4E5521717374E00EC8E1C /* UIKit.framework in Frameworks */,
 				5EB4E5541717374E00EC8E1C /* Foundation.framework in Frameworks */,
 				5EB4E5561717374E00EC8E1C /* CoreGraphics.framework in Frameworks */,
@@ -90,6 +93,7 @@
 		5EB4E5501717374E00EC8E1C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5ED60CCA171C57E000F55891 /* QuartzCore.framework */,
 				5EB4E5511717374E00EC8E1C /* UIKit.framework */,
 				5EB4E5531717374E00EC8E1C /* Foundation.framework */,
 				5EB4E5551717374E00EC8E1C /* CoreGraphics.framework */,

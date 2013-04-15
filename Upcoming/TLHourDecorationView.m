@@ -15,6 +15,8 @@
     if (!(self = [super initWithFrame:frame])) return nil;
     
     self.backgroundColor = [UIColor orangeColor];
+    self.layer.borderColor = [[UIColor blackColor] CGColor];
+    self.layer.borderWidth = 0.5f;
     
     return self;
 }
