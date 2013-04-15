@@ -8,7 +8,6 @@
 
 #import "TLTaskListLayout.h"
 
-CGFloat kHourSize;
 
 @interface TLTaskListLayout ()
 
@@ -21,6 +20,7 @@ CGFloat kHourSize;
 
 @implementation TLTaskListLayout
 
+// These are only guidelines – the actual heights will vary.
 static const CGFloat maxHeight = 88;
 static const CGFloat minHeight = 10;
 
@@ -33,6 +33,7 @@ static const CGFloat minHeight = 10;
 
 -(CGSize)collectionViewContentSize
 {
+    // We want to fill the bounds of the collection view exactly – no more and no less. 
     return self.collectionView.bounds.size;
 }
 
