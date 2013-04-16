@@ -132,10 +132,32 @@ static const CGFloat minHeight = 15;
     
     NSInteger concentrationSection = self.concentrationPoint / self.hourSize;
     NSLog(@"section: %d", concentrationSection);
+    UICollectionViewLayoutAttributes *concentrationAttributes = layoutAttributesArray[concentrationSection];
+    
+    if (CGRectGetMinY(concentrationAttributes.frame) < 0)
+    {
+        concentrationAttributes.frame = (CGRect){.origin.x = 0, .origin.y = 0, .size = concentrationAttributes.frame.size};
+    }
+    else if (CGRectGetMaxY(concentrationAttributes.frame) > self.collectionViewHeight)
+    {
+        concentrationAttributes.frame = (CGRect){.origin.x = 0, .origin.y = self.collectionViewHeight - CGRectGetHeight(concentrationAttributes.frame), .size = concentrationAttributes.size};
+    }
+    
+    CGFloat minY = CGRectGetMinY(concentrationAttributes.frame);
+    CGFloat maxY = CGRectGetMaxY(concentrationAttributes.frame);
     
     for (NSInteger i = concentrationSection - 1; i >= 0; i--)
     {
-        
+        UICollectionViewLayoutAttributes *attributes = layoutAttributesArray[i];
+        attributes.frame = (CGRect){.origin.x = 0, .origin.y = minY - CGRectGetHeight(attributes.frame), .size = attributes.size};
+        minY -= attributes.size.height;
+    }
+    
+    for (NSInteger i = concentrationSection + 1; i < 24; i++)
+    {
+        UICollectionViewLayoutAttributes *attributes = layoutAttributesArray[i];
+        attributes.frame = (CGRect){.origin.x = 0, .origin.y = maxY, .size = attributes.size};
+        maxY += attributes.size.height;
     }
     
 //    CGFloat collectionViewHeight = CGRectGetHeight(self.collectionView.bounds);
@@ -145,7 +167,7 @@ static const CGFloat minHeight = 15;
     {
         UICollectionViewLayoutAttributes *attributes = layoutAttributesArray[i];
         
-        //TODO: Yeah.
+        //TODO: Decoration view support
 //        UICollectionViewLayoutAttributes *decorationViewAttributes = decorationViewAttributesArray[i];
 //        
 //        decorationViewAttributes.frame = CGRectMake(0, decorationViewAttributes.indexPath.item * self.hourSize, CGRectGetWidth(self.collectionView.bounds), collectionViewHeight / 24.0f);
