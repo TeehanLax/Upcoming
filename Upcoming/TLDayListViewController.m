@@ -45,7 +45,7 @@ static NSString *CellIdentifier = @"Cell";
     [super viewDidAppear:animated];
     
     // Assume we want to concentrate in the middle for now.
-    self.taskListLayout.concentrationPoint = CGRectGetMidY(self.view.bounds);
+    self.taskListLayout.concentrationPoint = TLTaskListLayoutConcentrationPointNone;
 }
 
 #pragma mark - Gesture Recognizer Methods
@@ -75,6 +75,10 @@ static NSString *CellIdentifier = @"Cell";
         {
             self.taskListLayout.concentrationPoint = location.y;
         }
+    }
+    else if (recognizer.state == UIGestureRecognizerStateEnded)
+    {
+        self.taskListLayout.concentrationPoint = TLTaskListLayoutConcentrationPointNone;
     }
 }
 

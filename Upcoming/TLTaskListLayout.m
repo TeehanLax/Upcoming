@@ -9,6 +9,8 @@
 #import "TLTaskListLayout.h"
 #import "TLHourDecorationView.h"
 
+const CGFloat TLTaskListLayoutConcentrationPointNone = -1.0f;
+
 static NSString *TLTaskListLayoutHourDecorationViewKind = @"TLTaskListLayoutHourDecorationViewKind";
 
 @interface TLTaskListLayout ()
@@ -23,7 +25,7 @@ static NSString *TLTaskListLayoutHourDecorationViewKind = @"TLTaskListLayoutHour
 @implementation TLTaskListLayout
 
 // These are only guidelines – the actual heights will vary.
-static const CGFloat maxHeight = 60;
+static const CGFloat maxHeight = 88;
 static const CGFloat minHeight = 15;
 
 -(id)init
@@ -79,18 +81,21 @@ static const CGFloat minHeight = 15;
     // This frame is only a guess. We'll set the real frames in layoutAttributesForElementsInRect:
     attributes.frame = CGRectMake(0, y, CGRectGetWidth(self.collectionView.bounds), self.hourSize);
     
-    // We need to adjust our distance calculation because we're moving the frames around. 
-    CGFloat midY = y + self.hourSize / 4.0f;
-    CGFloat distance = fabsf(self.concentrationPoint - midY);
-
-    // Used to distribute or concentrate distributions of heights. Determined experimentally. 
-    const CGFloat distributionConstant = 1.0013;
-    
-    // This is a modified verion of the formula for a bell curve.
-    CGFloat height = (maxHeight) / (powf(distributionConstant, powf((distance * 0.5), 2.0f))) + minHeight;
-    
-    // This is the most import line in this method. We set the height and it'll be used in calculations in layoutAttributesForElementsInRect:
-    attributes.size = CGSizeMake(CGRectGetWidth(self.collectionView.bounds), height);
+    if (self.concentrationPoint != TLTaskListLayoutConcentrationPointNone)
+    {
+        // We need to adjust our distance calculation because we're moving the frames around.
+        CGFloat midY = y + self.hourSize / 4.0f;
+        CGFloat distance = fabsf(self.concentrationPoint - midY);
+        
+        // Used to distribute or concentrate distributions of heights. Determined experimentally.
+        const CGFloat distributionConstant = 1.0013;
+        
+        // This is a modified verion of the formula for a bell curve.
+        CGFloat height = (maxHeight) / (powf(distributionConstant, powf((distance * 0.5), 2.0f))) + minHeight;
+        
+        // This is the most import line in this method. We set the height and it'll be used in calculations in layoutAttributesForElementsInRect:
+        attributes.size = CGSizeMake(CGRectGetWidth(self.collectionView.bounds), height);
+    }
     
     // Something high so we can put decoration views behind it.
     attributes.zIndex = 50;
@@ -111,17 +116,12 @@ static const CGFloat minHeight = 15;
     // Create a mutable array with 24 elements in it, representing the 24 hours of a day.
     NSMutableArray* layoutAttributesArray = [NSMutableArray arrayWithCapacity:24];
     NSMutableArray *decorationViewAttributesArray = [NSMutableArray arrayWithCapacity:24];
-
-    // We need to keep track of the total height so we can adjust the heights of all the items
-    // later to 
-    CGFloat totalHeight = 0;
     
     // We'll calculate geometry for *all* 24 hours first then remove unwanted sections later
     for (NSInteger i = 0; i < 24; i++)
     {
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:i];
         UICollectionViewLayoutAttributes *newAttributes = [self layoutAttributesForItemAtIndexPath:indexPath];
-        totalHeight += newAttributes.size.height;
         
         UICollectionViewLayoutAttributes *decorationViewLayoutAttributes = [UICollectionViewLayoutAttributes layoutAttributesForDecorationViewOfKind:TLTaskListLayoutHourDecorationViewKind withIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
         [decorationViewAttributesArray addObject:decorationViewLayoutAttributes];
@@ -130,32 +130,25 @@ static const CGFloat minHeight = 15;
         [layoutAttributesArray addObject:newAttributes];
     }
     
+    NSInteger concentrationSection = self.concentrationPoint / self.hourSize;
+    NSLog(@"section: %d", concentrationSection);
     
-    CGFloat collectionViewHeight = CGRectGetHeight(self.collectionView.bounds);
-    CGFloat heightToAdd = 0;
-    
-    if (totalHeight > collectionViewHeight)
+    for (NSInteger i = concentrationSection - 1; i >= 0; i--)
     {
-        heightToAdd = - (totalHeight - collectionViewHeight) / 24.0f;
-    }
-    else if (totalHeight < collectionViewHeight)
-    {
-        heightToAdd = (collectionViewHeight - totalHeight) / 24.0f;
+        
     }
     
-    // Now that we have all the sizes calculated, "stack" the items one on top of each other
-    CGFloat maxY = 0.0f;
+//    CGFloat collectionViewHeight = CGRectGetHeight(self.collectionView.bounds);
+    
     NSMutableArray *sectionsToRemove = [NSMutableArray arrayWithCapacity:24];
-    
-    // Stack the index paths up one by one. 
     for (NSInteger i = 0; i < 24; i++)
     {
         UICollectionViewLayoutAttributes *attributes = layoutAttributesArray[i];
-        UICollectionViewLayoutAttributes *decorationViewAttributes = decorationViewAttributesArray[i];
-        attributes.frame = CGRectMake(0, maxY, CGRectGetWidth(self.collectionView.bounds), attributes.size.height + heightToAdd);
-        decorationViewAttributes.frame = attributes.frame;
         
-        maxY += (attributes.size.height);
+        //TODO: Yeah.
+//        UICollectionViewLayoutAttributes *decorationViewAttributes = decorationViewAttributesArray[i];
+//        
+//        decorationViewAttributes.frame = CGRectMake(0, decorationViewAttributes.indexPath.item * self.hourSize, CGRectGetWidth(self.collectionView.bounds), collectionViewHeight / 24.0f);
         
         // Find out if we should keep this section.
         // Note that we call this with the *original* index path, not the adjusted one (below).

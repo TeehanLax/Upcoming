@@ -20,13 +20,13 @@
 {
     if (!(self = [super initWithFrame:frame])) return nil;
     
-    self.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0.8f alpha:1.0f];
+    self.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0.8f alpha:0.5f];
     
     self.textLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.textLabel.backgroundColor = [UIColor clearColor];
     self.textLabel.minimumScaleFactor = 0.1f;
     self.textLabel.textColor = [UIColor whiteColor];
-//    [self.contentView addSubview:self.textLabel];
+    [self.contentView addSubview:self.textLabel];
     
     self.textLabel.text = @"Some appointment";
     

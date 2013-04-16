@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+extern const CGFloat TLTaskListLayoutConcentrationPointNone;
+
 @class TLTaskListLayout;
 
 @protocol TLTaskListLayoutDelegate <UICollectionViewDelegate>
