@@ -88,7 +88,7 @@ static const CGFloat minHeight = 15;
         CGFloat distance = fabsf(self.concentrationPoint - midY);
         
         // Used to distribute or concentrate distributions of heights. Determined experimentally.
-        const CGFloat distributionConstant = 1.0013;
+        const CGFloat distributionConstant = 1.13;
         
         // This is a modified verion of the formula for a bell curve.
         CGFloat height = (maxHeight) / (powf(distributionConstant, powf((distance * 0.5), 2.0f))) + minHeight;
@@ -116,12 +116,17 @@ static const CGFloat minHeight = 15;
     // Create a mutable array with 24 elements in it, representing the 24 hours of a day.
     NSMutableArray* layoutAttributesArray = [NSMutableArray arrayWithCapacity:24];
     NSMutableArray *decorationViewAttributesArray = [NSMutableArray arrayWithCapacity:24];
+
+    // We need to keep track of the total height so we can adjust the heights of all the items
+    // later to 
+    CGFloat totalHeight = 0;
     
     // We'll calculate geometry for *all* 24 hours first then remove unwanted sections later
     for (NSInteger i = 0; i < 24; i++)
     {
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:i];
         UICollectionViewLayoutAttributes *newAttributes = [self layoutAttributesForItemAtIndexPath:indexPath];
+        totalHeight += newAttributes.size.height;
         
         UICollectionViewLayoutAttributes *decorationViewLayoutAttributes = [UICollectionViewLayoutAttributes layoutAttributesForDecorationViewOfKind:TLTaskListLayoutHourDecorationViewKind withIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
         [decorationViewAttributesArray addObject:decorationViewLayoutAttributes];
@@ -130,47 +135,38 @@ static const CGFloat minHeight = 15;
         [layoutAttributesArray addObject:newAttributes];
     }
     
-    NSInteger concentrationSection = self.concentrationPoint / self.hourSize;
-    NSLog(@"section: %d", concentrationSection);
-    UICollectionViewLayoutAttributes *concentrationAttributes = layoutAttributesArray[concentrationSection];
+    CGFloat collectionViewHeight = CGRectGetHeight(self.collectionView.bounds);
+    CGFloat heightToAdd = 0;
     
-    if (CGRectGetMinY(concentrationAttributes.frame) < 0)
+    if (totalHeight > collectionViewHeight)
     {
-        concentrationAttributes.frame = (CGRect){.origin.x = 0, .origin.y = 0, .size = concentrationAttributes.frame.size};
+        heightToAdd = - (totalHeight - collectionViewHeight) / 24.0f;
     }
-    else if (CGRectGetMaxY(concentrationAttributes.frame) > self.collectionViewHeight)
+    else if (totalHeight < collectionViewHeight)
     {
-        concentrationAttributes.frame = (CGRect){.origin.x = 0, .origin.y = self.collectionViewHeight - CGRectGetHeight(concentrationAttributes.frame), .size = concentrationAttributes.size};
-    }
-    
-    CGFloat minY = CGRectGetMinY(concentrationAttributes.frame);
-    CGFloat maxY = CGRectGetMaxY(concentrationAttributes.frame);
-    
-    for (NSInteger i = concentrationSection - 1; i >= 0; i--)
-    {
-        UICollectionViewLayoutAttributes *attributes = layoutAttributesArray[i];
-        attributes.frame = (CGRect){.origin.x = 0, .origin.y = minY - CGRectGetHeight(attributes.frame), .size = attributes.size};
-        minY -= attributes.size.height;
+        heightToAdd = (collectionViewHeight - totalHeight) / 24.0f;
     }
     
-    for (NSInteger i = concentrationSection + 1; i < 24; i++)
-    {
-        UICollectionViewLayoutAttributes *attributes = layoutAttributesArray[i];
-        attributes.frame = (CGRect){.origin.x = 0, .origin.y = maxY, .size = attributes.size};
-        maxY += attributes.size.height;
-    }
-    
-//    CGFloat collectionViewHeight = CGRectGetHeight(self.collectionView.bounds);
-    
+    // Now that we have all the sizes calculated, "stack" the items one on top of each other
+    CGFloat maxY = 0.0f;
     NSMutableArray *sectionsToRemove = [NSMutableArray arrayWithCapacity:24];
+    
+    // Stack the index paths up one by one. 
     for (NSInteger i = 0; i < 24; i++)
     {
         UICollectionViewLayoutAttributes *attributes = layoutAttributesArray[i];
+        UICollectionViewLayoutAttributes *decorationViewAttributes = decorationViewAttributesArray[i];
+        attributes.frame = CGRectMake(0, maxY, CGRectGetWidth(self.collectionView.bounds), attributes.size.height + heightToAdd);
+        decorationViewAttributes.frame = attributes.frame;
         
-        //TODO: Decoration view support
-//        UICollectionViewLayoutAttributes *decorationViewAttributes = decorationViewAttributesArray[i];
-//        
-//        decorationViewAttributes.frame = CGRectMake(0, decorationViewAttributes.indexPath.item * self.hourSize, CGRectGetWidth(self.collectionView.bounds), collectionViewHeight / 24.0f);
+        if (CGRectContainsPoint(attributes.frame, CGPointMake(1, self.concentrationPoint)))
+        {
+            CGRect frame = attributes.frame;
+            frame.origin.x += 10; 
+            attributes.frame = frame;
+        }
+        
+        maxY += (attributes.size.height);
         
         // Find out if we should keep this section.
         // Note that we call this with the *original* index path, not the adjusted one (below).
