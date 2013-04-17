@@ -10,4 +10,6 @@
 
 @interface TLHeaderViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
+-(void)scrollTableViewToTop;
+
 @end

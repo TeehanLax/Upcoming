@@ -94,4 +94,9 @@
     [eventManager toggleCalendarWithIdentifier:calendar.calendarIdentifier];
 }
 
+-(void)scrollTableViewToTop
+{
+    [self.calendarTableView scrollRectToVisible:CGRectMake(1, 1, 1, 1) animated:NO];
+}
+
 @end

@@ -68,6 +68,7 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
         {
             self.dayListViewController.view.userInteractionEnabled = YES;
             [self.dayListOverlayView removeFromSuperview];
+            [self.headerViewController scrollTableViewToTop];
         }
     }];
     
