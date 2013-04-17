@@ -25,7 +25,7 @@ static NSString *TLTaskListLayoutHourDecorationViewKind = @"TLTaskListLayoutHour
 @implementation TLTaskListLayout
 
 // These are only guidelines – the actual heights will vary.
-static const CGFloat maxHeight = 88;
+static const CGFloat maxHeight = 35;
 static const CGFloat minHeight = 15;
 
 -(id)init
@@ -88,7 +88,7 @@ static const CGFloat minHeight = 15;
         CGFloat distance = fabsf(self.concentrationPoint - midY);
         
         // Used to distribute or concentrate distributions of heights. Determined experimentally.
-        const CGFloat distributionConstant = 1.13;
+        const CGFloat distributionConstant = 1.05;
         
         // This is a modified verion of the formula for a bell curve.
         CGFloat height = (maxHeight) / (powf(distributionConstant, powf((distance * 0.5), 2.0f))) + minHeight;

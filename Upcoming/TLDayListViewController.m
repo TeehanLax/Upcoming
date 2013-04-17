@@ -9,9 +9,13 @@
 #import "TLDayListViewController.h"
 #import "TLTaskListCell.h"
 
+#import <EXTScope.h>
+
 @interface TLDayListViewController ()
 
 @property (nonatomic, strong) TLTaskListLayout *taskListLayout;
+@property (nonatomic, strong) UITapGestureRecognizer *individualTaskPanGestureRecognizer;
+@property (nonatomic, strong) UIPanGestureRecognizer *taskListPanGestureRecognizer;
 
 @end
 
@@ -33,9 +37,20 @@ static NSString *CellIdentifier = @"Cell";
 {
     [super viewDidLoad];
     
-    UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(userDidPan:)];
-    panGestureRecognizer.delegate = self;
-    [self.view addGestureRecognizer:panGestureRecognizer];
+    self.taskListPanGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(userDidPan:)];
+    self.taskListPanGestureRecognizer.delegate = self;
+    [self.view addGestureRecognizer:self.taskListPanGestureRecognizer];
+    
+    self.individualTaskPanGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(userDidTapTask:)];
+    self.individualTaskPanGestureRecognizer.delegate = self;
+    [self.view addGestureRecognizer:self.individualTaskPanGestureRecognizer];
+    
+    @weakify(self);
+    [UIView animateWithDuration:0.5 animations:^{
+        @strongify(self);
+    }];
+    
+//    [self.taskListPanGestureRecognizer requireGestureRecognizerToFail:self.individualTaskPanGestureRecognizer];
     
     self.view.backgroundColor = [UIColor darkGrayColor];
 }
@@ -50,20 +65,41 @@ static NSString *CellIdentifier = @"Cell";
 
 #pragma mark - Gesture Recognizer Methods
 
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
-{
-    // Implemented to recognize a change in the pan gesture before it actually happens (ie: not recognized yet)
-    
-    CGPoint location = [touch locationInView:self.view];
-    BOOL containsPoint = CGRectContainsPoint(self.view.bounds, location);
-    
-    if (containsPoint)
-    {
-        self.taskListLayout.concentrationPoint = location.y;
-    }
-    
-    return containsPoint;
-}
+//- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
+//{
+//    return YES;
+//}
+
+//- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+//{
+//    if (gestureRecognizer == self.individualTaskPanGestureRecognizer)
+//    {
+//        CGPoint velocity = [self.individualTaskPanGestureRecognizer velocityInView:self.view];
+//        return velocity.x >= velocity.y;
+//    }
+//    else
+//    {
+//        CGPoint velocity = [self.taskListPanGestureRecognizer velocityInView:self.view];
+//        return velocity.x < velocity.y;
+//    }
+//    
+//    return YES;
+//}
+
+//- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+//{
+//    // Implemented to recognize a change in the pan gesture before it actually happens (ie: not recognized yet)
+//    
+//    CGPoint location = [touch locationInView:self.view];
+//    BOOL containsPoint = CGRectContainsPoint(self.view.bounds, location);
+//    
+//    if (containsPoint)
+//    {
+//        self.taskListLayout.concentrationPoint = location.y;
+//    }
+//    
+//    return containsPoint;
+//}
 
 -(void)userDidPan:(UIPanGestureRecognizer *)recognizer
 {
@@ -76,9 +112,22 @@ static NSString *CellIdentifier = @"Cell";
             self.taskListLayout.concentrationPoint = location.y;
         }
     }
-    else if (recognizer.state == UIGestureRecognizerStateEnded)
+}
+
+-(void)userDidTapTask:(UITapGestureRecognizer *)recognizer
+{
+    if (recognizer.state == UIGestureRecognizerStateRecognized)
     {
-        self.taskListLayout.concentrationPoint = TLTaskListLayoutConcentrationPointNone;
+        CGPoint location = [recognizer locationInView:self.view];
+        
+        if (fabs(location.y - self.taskListLayout.concentrationPoint) < self.taskListLayout.hourSize)
+        {
+            NSLog(@"Panning task.");
+        }
+        else
+        {
+            self.taskListLayout.concentrationPoint = location.y;
+        }
     }
 }
 
