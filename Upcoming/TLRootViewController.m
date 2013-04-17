@@ -209,6 +209,8 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
     
     RAC(self.tapGestureRecognizer.enabled) = menuIsDownSignal;
     
+    const CGFloat kMoveDownThreshold = 30.0f;
+    
     self.panDownGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
         UIPanGestureRecognizer *recognizer = (UIPanGestureRecognizer *)sender;
         
@@ -224,7 +226,7 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
         }
         else if (state == UIGestureRecognizerStateEnded)
         {
-            BOOL movingDown = ([recognizer velocityInView:self.view].y > 0);
+            BOOL movingDown = ([recognizer velocityInView:self.view].y > 0 && translation.y > kMoveDownThreshold);
             [UIView animateWithDuration:0.25f animations:^{
                 
                 if (movingDown)
@@ -283,9 +285,21 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
             }];
         }
     }];
+    self.panUpGestureRecognizer.delegate = self;
     self.panUpGestureRecognizer.enabled = NO;
     [self.headerViewController.view addGestureRecognizer:self.panUpGestureRecognizer];
 }
 
+-(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
+{
+    if (gestureRecognizer == self.panUpGestureRecognizer)
+    {
+        return CGRectContainsPoint(CGRectMake(0, CGRectGetHeight(self.headerViewController.view.bounds) - kHeaderHeight, CGRectGetWidth(self.view.bounds), kHeaderHeight), [touch locationInView:self.view]);
+    }
+    else
+    {
+        return YES;
+    }
+}
 
 @end
