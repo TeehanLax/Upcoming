@@ -23,9 +23,12 @@ static const CGFloat kHeaderHeight = 72.0f;
 
 @property (nonatomic, strong) UIView *dayListOverlayView;
 
+@property (nonatomic, strong) UIPanGestureRecognizer *panDownGestureRecognizer;
+@property (nonatomic, strong) UIPanGestureRecognizer *panUpGestureRecognizer;
 @property (nonatomic, strong) UITapGestureRecognizer *tapGestureRecognizer;
 
 @property (nonatomic, strong) RACSubject *downwardPanSubject;
+@property (nonatomic, strong) RACSubject *upwardPanSubject;
 @property (nonatomic, strong) RACSubject *dayListMovementSubject;
 @property (nonatomic, strong) RACSubject *headerMovementSubject;
 @property (nonatomic, strong) RACSubject *dayListOverlaySubject;
@@ -72,11 +75,11 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
     [self.headerMovementSubject subscribeNext:^(id x) {
         @strongify(self);
         
-        CGFloat translation = [x floatValue];
+        CGFloat ratio = [x floatValue];
         
-        CGRect frame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight + translation);
+        CGRect frame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight + ratio * kMaximumTranslationThreshold);
         
-        if (translation < 0)
+        if (ratio < 0)
         {
             frame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight);
         }
@@ -99,7 +102,6 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
         }
         
         self.dayListViewController.view.transform = transform;
-        self.dayListOverlayView.transform = transform;
     }];
     
     self.downwardPanSubject = [RACSubject subject];
@@ -115,7 +117,7 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
         }
         else if (verticalTranslation <= kMaximumTranslationThreshold)
         {
-            effectiveRatio = MIN(fabsf(verticalTranslation / kMaximumTranslationThreshold), 1);
+            effectiveRatio = fabsf(verticalTranslation / kMaximumTranslationThreshold);
         }
         else
         {
@@ -125,6 +127,35 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
         }
         
         [self.dayListMovementSubject sendNext:@(effectiveRatio)];
+        [self.headerMovementSubject sendNext:@(effectiveRatio)];
+    }];
+    
+    self.upwardPanSubject = [RACSubject subject];
+    [self.upwardPanSubject subscribeNext:^(NSNumber *translation) {
+        @strongify(self);
+        
+        CGFloat verticalTranslation = [translation floatValue];
+
+        CGFloat effectiveRatio = 1.0f;
+        
+        if (verticalTranslation >= 0)
+        {
+            CGFloat overshoot = verticalTranslation;
+            CGFloat y = 2 * sqrtf(overshoot + 1) - 2;
+            effectiveRatio = 1.0f + (y / kMaximumTranslationThreshold);
+
+        }
+        else if (verticalTranslation > -kMaximumTranslationThreshold)
+        {
+            effectiveRatio = fabsf((verticalTranslation + kMaximumTranslationThreshold) / kMaximumTranslationThreshold);
+        }
+        else
+        {
+            effectiveRatio = 0.0f;
+        }
+
+        [self.dayListMovementSubject sendNext:@(effectiveRatio)];
+        [self.headerMovementSubject sendNext:@(effectiveRatio)];
     }];
     
     return self;
@@ -160,22 +191,25 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
         
         [UIView animateWithDuration:0.25f animations:^{
             [self.downwardPanSubject sendNext:@(0)];
-            [self.headerMovementSubject sendNext:@(0)];
         } completion:^(BOOL finished) {
             [self.dayListOverlaySubject sendNext:@(NO)];
+            self.panDownGestureRecognizer.enabled = YES;
+            self.panUpGestureRecognizer.enabled = NO;
         }];
     }];
-    
+    self.tapGestureRecognizer.enabled = NO;
     [self.view addGestureRecognizer:self.tapGestureRecognizer];
     
-    RAC(self.tapGestureRecognizer.enabled) = [RACSignal combineLatest:@[RACAble(self.headerViewController.view.frame)]
-                                                               reduce:^(NSValue *frameValue){
-                                                                   CGRect frame = [frameValue CGRectValue];
-                                                                   
-                                                                   return @(CGRectGetHeight(frame) >= kMaximumTranslationThreshold);
-                                                               }];
+    RACSignal *menuIsDownSignal = [RACSignal combineLatest:@[RACAble(self.headerViewController.view.frame)]
+                                                    reduce:^(NSValue *frameValue){
+                                                        CGRect frame = [frameValue CGRectValue];
+                                                        
+                                                        return @(CGRectGetMaxY(frame) >= kMaximumTranslationThreshold);
+                                                    }];
     
-    UIPanGestureRecognizer *panDownGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
+    RAC(self.tapGestureRecognizer.enabled) = menuIsDownSignal;
+    
+    self.panDownGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
         UIPanGestureRecognizer *recognizer = (UIPanGestureRecognizer *)sender;
         
         CGPoint translation = [recognizer translationInView:self.view];
@@ -187,7 +221,6 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
         else if (state == UIGestureRecognizerStateChanged)
         {
             [self.downwardPanSubject sendNext:@(translation.y)];
-            [self.headerMovementSubject sendNext:@(translation.y)];
         }
         else if (state == UIGestureRecognizerStateEnded)
         {
@@ -197,12 +230,12 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
                 if (movingDown)
                 {
                     [self.downwardPanSubject sendNext:@(kMaximumTranslationThreshold)];
-                    [self.headerMovementSubject sendNext:@(kMaximumTranslationThreshold)];
+                    self.panDownGestureRecognizer.enabled = NO;
+                    self.panUpGestureRecognizer.enabled = YES;
                 }
                 else
                 {
                     [self.downwardPanSubject sendNext:@(0)];
-                    [self.headerMovementSubject sendNext:@(0)];
                 }
             } completion:^(BOOL finished) {
                 if (!movingDown)
@@ -213,7 +246,45 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
         }
     }];
     
-    [self.headerViewController.view addGestureRecognizer:panDownGestureRecognizer];
+    [self.headerViewController.view addGestureRecognizer:self.panDownGestureRecognizer];
+    
+    self.panUpGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
+        UIPanGestureRecognizer *recognizer = (UIPanGestureRecognizer *)sender;
+        
+        CGPoint translation = [recognizer translationInView:self.view];
+        
+        if (state == UIGestureRecognizerStateBegan)
+        {
+        }
+        else if (state == UIGestureRecognizerStateChanged)
+        {
+            [self.upwardPanSubject sendNext:@(translation.y)];
+        }
+        else if (state == UIGestureRecognizerStateEnded)
+        {
+            BOOL movingDown = ([recognizer velocityInView:self.view].y > 0);
+            [UIView animateWithDuration:0.25f animations:^{
+                
+                if (movingDown)
+                {
+                    [self.upwardPanSubject sendNext:@(0)];
+                }
+                else
+                {
+                    [self.upwardPanSubject sendNext:@(-kMaximumTranslationThreshold)];
+                }
+            } completion:^(BOOL finished) {
+                if (!movingDown)
+                {
+                    [self.dayListOverlaySubject sendNext:@(NO)];
+                    self.panDownGestureRecognizer.enabled = YES;
+                    self.panUpGestureRecognizer.enabled = NO;
+                }
+            }];
+        }
+    }];
+    self.panUpGestureRecognizer.enabled = NO;
+    [self.headerViewController.view addGestureRecognizer:self.panUpGestureRecognizer];
 }
 
 
