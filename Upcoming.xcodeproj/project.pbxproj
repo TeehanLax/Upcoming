@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		58CAD422C26D45918EB422B5 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DF8D172A92B477D8A55BFE7 /* libPods.a */; };
+		5E21DED7171EFCE700231263 /* EKEventManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E21DED6171EFCE700231263 /* EKEventManager.m */; };
+		5E21DEDB171F19C000231263 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DED9171F19C000231263 /* EventKit.framework */; };
+		5E21DEDC171F19C000231263 /* EventKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DEDA171F19C000231263 /* EventKitUI.framework */; };
 		5EB4E5521717374E00EC8E1C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EB4E5511717374E00EC8E1C /* UIKit.framework */; };
 		5EB4E5541717374E00EC8E1C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EB4E5531717374E00EC8E1C /* Foundation.framework */; };
 		5EB4E5561717374E00EC8E1C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EB4E5551717374E00EC8E1C /* CoreGraphics.framework */; };
@@ -29,6 +32,10 @@
 
 /* Begin PBXFileReference section */
 		0DF8D172A92B477D8A55BFE7 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		5E21DED5171EFCE700231263 /* EKEventManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EKEventManager.h; sourceTree = "<group>"; };
+		5E21DED6171EFCE700231263 /* EKEventManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EKEventManager.m; sourceTree = "<group>"; };
+		5E21DED9171F19C000231263 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
+		5E21DEDA171F19C000231263 /* EventKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKitUI.framework; path = System/Library/Frameworks/EventKitUI.framework; sourceTree = SDKROOT; };
 		5EB4E54E1717374E00EC8E1C /* Upcoming.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Upcoming.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5EB4E5511717374E00EC8E1C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		5EB4E5531717374E00EC8E1C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -64,6 +71,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5E21DEDB171F19C000231263 /* EventKit.framework in Frameworks */,
+				5E21DEDC171F19C000231263 /* EventKitUI.framework in Frameworks */,
 				5ED60CCB171C57E000F55891 /* QuartzCore.framework in Frameworks */,
 				5EB4E5521717374E00EC8E1C /* UIKit.framework in Frameworks */,
 				5EB4E5541717374E00EC8E1C /* Foundation.framework in Frameworks */,
@@ -75,6 +84,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5E21DED8171EFCED00231263 /* EventManager */ = {
+			isa = PBXGroup;
+			children = (
+				5E21DED5171EFCE700231263 /* EKEventManager.h */,
+				5E21DED6171EFCE700231263 /* EKEventManager.m */,
+			);
+			name = EventManager;
+			sourceTree = "<group>";
+		};
 		5EB4E5451717374E00EC8E1C = {
 			isa = PBXGroup;
 			children = (
@@ -96,6 +114,8 @@
 		5EB4E5501717374E00EC8E1C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5E21DED9171F19C000231263 /* EventKit.framework */,
+				5E21DEDA171F19C000231263 /* EventKitUI.framework */,
 				5ED60CCA171C57E000F55891 /* QuartzCore.framework */,
 				5EB4E5511717374E00EC8E1C /* UIKit.framework */,
 				5EB4E5531717374E00EC8E1C /* Foundation.framework */,
@@ -110,6 +130,7 @@
 			children = (
 				5EB4E5601717374E00EC8E1C /* TLAppDelegate.h */,
 				5EB4E5611717374E00EC8E1C /* TLAppDelegate.m */,
+				5E21DED8171EFCED00231263 /* EventManager */,
 				5EB4E57D17187DEF00EC8E1C /* View Controllers */,
 				5ED60CC5171C54B900F55891 /* Collection View Extensions */,
 				5EB4E5581717374E00EC8E1C /* Supporting Files */,
@@ -259,6 +280,7 @@
 				5EB4E58417187E1500EC8E1C /* TLHeaderViewController.m in Sources */,
 				5ED60CC9171C54D600F55891 /* TLHourDecorationView.m in Sources */,
 				5ED60CCE171C6C8800F55891 /* TLTaskListCell.m in Sources */,
+				5E21DED7171EFCE700231263 /* EKEventManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

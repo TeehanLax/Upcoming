@@ -45,11 +45,6 @@ static NSString *CellIdentifier = @"Cell";
     self.individualTaskPanGestureRecognizer.delegate = self;
     [self.view addGestureRecognizer:self.individualTaskPanGestureRecognizer];
     
-    @weakify(self);
-    [UIView animateWithDuration:0.5 animations:^{
-        @strongify(self);
-    }];
-    
 //    [self.taskListPanGestureRecognizer requireGestureRecognizerToFail:self.individualTaskPanGestureRecognizer];
     
     self.view.backgroundColor = [UIColor darkGrayColor];
@@ -142,7 +137,7 @@ static NSString *CellIdentifier = @"Cell";
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
     // We *must* return a *minimum* of one section (for decoration views)
-    NSInteger numberOfSections = 12;
+    NSInteger numberOfSections = 0;
     return MAX(numberOfSections, 1);
 }
 
@@ -158,6 +153,7 @@ static NSString *CellIdentifier = @"Cell";
 
 -(BOOL)collectionView:(UICollectionView *)collectionView layout:(TLTaskListLayout *)collectionViewLayout hasEventForHour:(NSInteger)hour
 {
+    return NO;
     if (hour % 2 == 0)
     {
         return YES;

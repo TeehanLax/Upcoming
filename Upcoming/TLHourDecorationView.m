@@ -14,7 +14,7 @@
 {
     if (!(self = [super initWithFrame:frame])) return nil;
     
-    self.backgroundColor = [UIColor orangeColor];
+    self.backgroundColor = [UIColor clearColor];
     
     return self;
 }
@@ -25,27 +25,14 @@
     
     self.frame = CGRectIntegral(layoutAttributes.frame);
     
-    [self setNeedsDisplay];
+    if (layoutAttributes.indexPath.row % 2 == 0)
+    {
+        self.backgroundColor = [UIColor colorWithWhite:246.0/255.0 alpha:1.0f];
+    }
+    else
+    {
+        self.backgroundColor = [UIColor whiteColor];
+    }
 }
-
-- (void)drawRect:(CGRect)rect
-{
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetShouldAntialias(context, NO);
-    
-    CGContextSetStrokeColorWithColor(context, [[UIColor whiteColor] CGColor]);
-    
-    CGContextBeginPath(context);
-    CGFloat dashes[] = {1,2};
-    
-    CGContextSetLineDash(context, 0.0, dashes, 2);
-    CGContextSetLineWidth(context, 0.5f);
-    
-    CGContextMoveToPoint(context, CGRectGetMinX(self.bounds), CGRectGetMidY(self.bounds));
-    CGContextAddLineToPoint(context, CGRectGetMaxX(self.bounds), CGRectGetMidY(self.bounds));
-    
-    CGContextStrokePath(context);
-}
-
 
 @end

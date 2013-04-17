@@ -11,7 +11,7 @@
 #import "TLDayListViewController.h"
 #import "TLHeaderViewController.h"
 
-static const CGFloat headerHeight = 88.0f;
+static const CGFloat headerHeight = 72.0f;
 
 @interface TLRootViewController ()
 
