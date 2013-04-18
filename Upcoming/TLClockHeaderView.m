@@ -26,7 +26,58 @@
     // First, draw the clock.
     CGContextSaveGState(context);
     {
+        CGContextSetLineWidth(context, 4); // set the line width
+        CGContextSetLineCap(context, kCGLineCapRound);
+
+        CGFloat height = CGRectGetHeight(self.bounds);
+        CGRect clockRect = CGRectMake(0, 0, height, height);
         
+        // get the circle centre
+        CGPoint center = CGPointMake(CGRectGetMidX(clockRect), CGRectGetMidY(clockRect));
+        CGFloat radius = 15.0f;
+        
+        CGContextSaveGState(context);
+        {
+            CGFloat startAngle = -((float)M_PI / 2); // 90 degrees
+            CGFloat endAngle = ((2 * (float)M_PI) + startAngle);
+            CGContextAddArc(context, center.x, center.y, radius + 4, startAngle, endAngle, 0);
+            CGContextStrokePath(context); // draw
+        }
+        CGContextRestoreGState(context);
+        
+        // Draw the hour hand.
+        CGContextSaveGState(context);
+        {
+            CGFloat radius = 5.0f;
+            
+            CGFloat angle = (self.timeRatio * 24 / 12.0f) * M_PI * 2.0f - M_PI_2;
+            
+            CGFloat x = center.x + radius * cos(angle);
+            CGFloat y = center.y + radius * sin(angle);
+            
+            CGContextMoveToPoint(context, center.x, center.y);
+            CGContextAddLineToPoint(context, x, y);
+            
+            CGContextStrokePath(context);
+        }
+        CGContextRestoreGState(context);
+        
+        // Draw the minute hand.
+        CGContextSaveGState(context);
+        {
+            CGFloat radius = 10.0f;
+            
+            CGFloat angle = (float)(minutes) / 60.0f * M_PI * 2.0f - M_PI_2;
+            
+            CGFloat x = center.x + radius * cos(angle);
+            CGFloat y = center.y + radius * sin(angle);
+            
+            CGContextMoveToPoint(context, center.x, center.y);
+            CGContextAddLineToPoint(context, x, y);
+            
+            CGContextStrokePath(context);
+        }
+        CGContextRestoreGState(context);
     }
     CGContextRestoreGState(context);
     

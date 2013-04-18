@@ -194,7 +194,7 @@ const CGFloat kHeaderHeight = 72.0f;
         } completion:^(BOOL finished) {
             self.headerClockView.alpha = 1.0f;
             self.headerClockView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerClockView.frame));
-            [UIView animateWithDuration:0.2f delay:0.2f options:UIViewAnimationOptionCurveEaseOut animations:^{
+            [UIView animateWithDuration:0.2f delay:0.05f options:UIViewAnimationOptionCurveEaseOut animations:^{
                 self.headerClockView.transform = CGAffineTransformMakeTranslation(0, 10);
             } completion:^(BOOL finished) {
                 [UIView animateWithDuration:0.1f animations:^{
@@ -214,7 +214,7 @@ const CGFloat kHeaderHeight = 72.0f;
             self.headerClockView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
         } completion:^(BOOL finished) {
             self.headerClockView.alpha = 0.0f;
-            [UIView animateWithDuration:0.2f delay:0.2f options:UIViewAnimationOptionCurveEaseOut animations:^{
+            [UIView animateWithDuration:0.2f delay:0.05f options:UIViewAnimationOptionCurveEaseOut animations:^{
                 self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, 10);
             } completion:^(BOOL finished) {
                 [UIView animateWithDuration:0.1f animations:^{
