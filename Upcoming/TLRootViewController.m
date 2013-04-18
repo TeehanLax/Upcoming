@@ -88,9 +88,6 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
         }
     }];
     
-    // Bind the userInteractionEnabled property to our dayListOverlaySubject
-    RAC(self.dayListViewController.view.userInteractionEnabled) = self.dayListOverlaySubject;
-    
     // This subject is responsible for moving the actual header up and down
     self.headerMovementSubject = [RACSubject subject];
     [self.headerMovementSubject subscribeNext:^(id x) {
@@ -198,6 +195,7 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
         self.panDownGestureRecognizer.enabled = !menuIsOpen;
         self.panUpGestureRecognizer.enabled = menuIsOpen;
         self.tapGestureRecognizer.enabled = menuIsOpen;
+        self.dayListViewController.view.userInteractionEnabled = !menuIsOpen;
     }];
     
     return self;
