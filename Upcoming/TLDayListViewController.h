@@ -10,6 +10,17 @@
 
 #import "TLTaskListLayout.h"
 
+@class TLDayListViewController;
+
+@protocol TLDayListViewControllerDelegate <NSObject>
+
+-(void)userDidBeginInteractingWithDayListView:(TLDayListViewController *)controller;
+-(void)userDidEndInteractingWithDayListView:(TLDayListViewController *)controller;
+
+@end
+
 @interface TLDayListViewController : UICollectionViewController <TLTaskListLayoutDelegate, UIGestureRecognizerDelegate>
+
+@property (nonatomic, weak) id<TLDayListViewControllerDelegate> delegate;
 
 @end

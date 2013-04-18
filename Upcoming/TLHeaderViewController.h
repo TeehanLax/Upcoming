@@ -13,5 +13,7 @@ extern const CGFloat kHeaderHeight;
 @interface TLHeaderViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
 -(void)scrollTableViewToTop;
+-(void)hideHeaderView;
+-(void)showHeaderView;
 
 @end

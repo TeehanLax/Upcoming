@@ -8,7 +8,6 @@
 
 #import "TLRootViewController.h"
 
-#import "TLDayListViewController.h"
 #import "TLHeaderViewController.h"
 
 #import <BlocksKit.h>
@@ -58,6 +57,7 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
     
     // Set up our view controllers.
     self.dayListViewController = [[TLDayListViewController alloc] init];
+    self.dayListViewController.delegate = self;
     [self addChildViewController:self.dayListViewController];
     
     self.headerViewController = [[TLHeaderViewController alloc] initWithNibName:@"TLHeaderViewController" bundle:nil];
@@ -171,7 +171,6 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
             CGFloat overshoot = verticalTranslation;
             CGFloat y = 2 * sqrtf(overshoot + 1) - 2;
             effectiveRatio = 1.0f + (y / kMaximumTranslationThreshold);
-
         }
         else if (verticalTranslation > -kMaximumTranslationThreshold)
         {
@@ -332,6 +331,18 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
         // Otherwise return YES.
         return YES;
     }
+}
+
+#pragma mark - TLDayListViewControllerDelegate Methods
+
+-(void)userDidBeginInteractingWithDayListView:(TLDayListViewController *)controller
+{
+    [self.headerViewController hideHeaderView];
+}
+
+-(void)userDidEndInteractingWithDayListView:(TLDayListViewController *)controller
+{
+    [self.headerViewController showHeaderView];
 }
 
 @end

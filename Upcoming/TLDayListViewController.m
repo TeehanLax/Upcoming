@@ -30,7 +30,7 @@ static NSString *CellIdentifier = @"Cell";
     collectionView.delegate = self;
     collectionView.dataSource = self;
     [collectionView registerClass:[TLTaskListCell class] forCellWithReuseIdentifier:CellIdentifier];
-    self.view = collectionView;
+    self.collectionView = collectionView;
 }
 
 - (void)viewDidLoad
@@ -45,8 +45,6 @@ static NSString *CellIdentifier = @"Cell";
     self.individualTaskPanGestureRecognizer.delegate = self;
     [self.view addGestureRecognizer:self.individualTaskPanGestureRecognizer];
     
-//    [self.taskListPanGestureRecognizer requireGestureRecognizerToFail:self.individualTaskPanGestureRecognizer];
-    
     self.view.backgroundColor = [UIColor darkGrayColor];
 }
 
@@ -60,45 +58,13 @@ static NSString *CellIdentifier = @"Cell";
 
 #pragma mark - Gesture Recognizer Methods
 
-//- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
-//{
-//    return YES;
-//}
-
-//- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
-//{
-//    if (gestureRecognizer == self.individualTaskPanGestureRecognizer)
-//    {
-//        CGPoint velocity = [self.individualTaskPanGestureRecognizer velocityInView:self.view];
-//        return velocity.x >= velocity.y;
-//    }
-//    else
-//    {
-//        CGPoint velocity = [self.taskListPanGestureRecognizer velocityInView:self.view];
-//        return velocity.x < velocity.y;
-//    }
-//    
-//    return YES;
-//}
-
-//- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
-//{
-//    // Implemented to recognize a change in the pan gesture before it actually happens (ie: not recognized yet)
-//    
-//    CGPoint location = [touch locationInView:self.view];
-//    BOOL containsPoint = CGRectContainsPoint(self.view.bounds, location);
-//    
-//    if (containsPoint)
-//    {
-//        self.taskListLayout.concentrationPoint = location.y;
-//    }
-//    
-//    return containsPoint;
-//}
-
 -(void)userDidPan:(UIPanGestureRecognizer *)recognizer
 {
-    if (recognizer.state == UIGestureRecognizerStateChanged)
+    if (recognizer.state == UIGestureRecognizerStateBegan)
+    {
+        [self.delegate userDidBeginInteractingWithDayListView:self];
+    }
+    else if (recognizer.state == UIGestureRecognizerStateChanged)
     {
         CGPoint location = [recognizer locationInView:self.view];
         
@@ -106,6 +72,10 @@ static NSString *CellIdentifier = @"Cell";
         {
             self.taskListLayout.concentrationPoint = location.y;
         }
+    }
+    else if (recognizer.state == UIGestureRecognizerStateEnded)
+    {
+        [self.delegate userDidEndInteractingWithDayListView:self];
     }
 }
 
