@@ -335,14 +335,19 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
 
 #pragma mark - TLDayListViewControllerDelegate Methods
 
--(void)userDidBeginInteractingWithDayListView:(TLDayListViewController *)controller
+-(void)userDidBeginInteractingWithDayListViewController:(TLDayListViewController *)controller
 {
     [self.headerViewController hideHeaderView];
 }
 
--(void)userDidEndInteractingWithDayListView:(TLDayListViewController *)controller
+-(void)userDidEndInteractingWithDayListViewController:(TLDayListViewController *)controller
 {
     [self.headerViewController showHeaderView];
+}
+
+-(void)userDidInteractWithDayListView:(TLDayListViewController *)controller updatingTimeRatio:(CGFloat)timeRatio
+{
+    [self.headerViewController updateTimeRatio:timeRatio];
 }
 
 @end

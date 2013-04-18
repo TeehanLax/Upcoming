@@ -8,6 +8,7 @@
 
 #import "TLHeaderViewController.h"
 #import "EKEventManager.h"
+#import "TLClockHeaderView.h"
 #import "TLCalendarSelectCell.h"
 
 #import <EXTScope.h>
@@ -19,7 +20,7 @@ const CGFloat kHeaderHeight = 72.0f;
 @property (nonatomic, weak) IBOutlet UITableView *calendarTableView;
 
 @property (nonatomic, weak) IBOutlet UIView *headerDetailView;
-@property (nonatomic, weak) IBOutlet UIView *headerClockView;
+@property (nonatomic, weak) IBOutlet TLClockHeaderView *headerClockView;
 
 @property (nonatomic, weak) IBOutlet UILabel *meetingNameLabel;
 @property (nonatomic, weak) IBOutlet UILabel *meetingLocationLabel;
@@ -222,6 +223,11 @@ const CGFloat kHeaderHeight = 72.0f;
             }];
         }];
     }];
+}
+
+-(void)updateTimeRatio:(CGFloat)timeRatio
+{
+    self.headerClockView.timeRatio = timeRatio;
 }
 
 @end

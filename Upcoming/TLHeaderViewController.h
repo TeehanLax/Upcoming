@@ -15,5 +15,6 @@ extern const CGFloat kHeaderHeight;
 -(void)scrollTableViewToTop;
 -(void)hideHeaderView;
 -(void)showHeaderView;
+-(void)updateTimeRatio:(CGFloat)timeRatio;
 
 @end

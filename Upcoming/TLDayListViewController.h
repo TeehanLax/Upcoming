@@ -14,8 +14,10 @@
 
 @protocol TLDayListViewControllerDelegate <NSObject>
 
--(void)userDidBeginInteractingWithDayListView:(TLDayListViewController *)controller;
--(void)userDidEndInteractingWithDayListView:(TLDayListViewController *)controller;
+-(void)userDidBeginInteractingWithDayListViewController:(TLDayListViewController *)controller;
+-(void)userDidEndInteractingWithDayListViewController:(TLDayListViewController *)controller;
+
+-(void)userDidInteractWithDayListView:(TLDayListViewController *)controller updatingTimeRatio:(CGFloat)timeRatio;
 
 @end
 

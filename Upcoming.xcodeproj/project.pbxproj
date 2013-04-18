@@ -26,6 +26,7 @@
 		5EB4E58417187E1500EC8E1C /* TLHeaderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EB4E58217187E1500EC8E1C /* TLHeaderViewController.m */; };
 		5EB4E58517187E1500EC8E1C /* TLHeaderViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5EB4E58317187E1500EC8E1C /* TLHeaderViewController.xib */; };
 		5EB951B117203DE600A5089B /* TLCalendarSelectCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EB951B017203DE600A5089B /* TLCalendarSelectCell.m */; };
+		5ECEA3EB1720809C00DD6626 /* TLClockHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ECEA3EA1720809C00DD6626 /* TLClockHeaderView.m */; };
 		5ED60CC9171C54D600F55891 /* TLHourDecorationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ED60CC8171C54D600F55891 /* TLHourDecorationView.m */; };
 		5ED60CCB171C57E000F55891 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ED60CCA171C57E000F55891 /* QuartzCore.framework */; };
 		5ED60CCE171C6C8800F55891 /* TLTaskListCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ED60CCD171C6C8800F55891 /* TLTaskListCell.m */; };
@@ -61,6 +62,8 @@
 		5EB4E58317187E1500EC8E1C /* TLHeaderViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLHeaderViewController.xib; sourceTree = "<group>"; };
 		5EB951AF17203DE600A5089B /* TLCalendarSelectCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLCalendarSelectCell.h; sourceTree = "<group>"; };
 		5EB951B017203DE600A5089B /* TLCalendarSelectCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLCalendarSelectCell.m; sourceTree = "<group>"; };
+		5ECEA3E91720809C00DD6626 /* TLClockHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLClockHeaderView.h; sourceTree = "<group>"; };
+		5ECEA3EA1720809C00DD6626 /* TLClockHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLClockHeaderView.m; sourceTree = "<group>"; };
 		5ED60CC7171C54D600F55891 /* TLHourDecorationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLHourDecorationView.h; sourceTree = "<group>"; };
 		5ED60CC8171C54D600F55891 /* TLHourDecorationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLHourDecorationView.m; sourceTree = "<group>"; };
 		5ED60CCA171C57E000F55891 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -175,6 +178,8 @@
 			children = (
 				5EB951AF17203DE600A5089B /* TLCalendarSelectCell.h */,
 				5EB951B017203DE600A5089B /* TLCalendarSelectCell.m */,
+				5ECEA3E91720809C00DD6626 /* TLClockHeaderView.h */,
+				5ECEA3EA1720809C00DD6626 /* TLClockHeaderView.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -295,6 +300,7 @@
 				5ED60CCE171C6C8800F55891 /* TLTaskListCell.m in Sources */,
 				5E21DED7171EFCE700231263 /* EKEventManager.m in Sources */,
 				5EB951B117203DE600A5089B /* TLCalendarSelectCell.m in Sources */,
+				5ECEA3EB1720809C00DD6626 /* TLClockHeaderView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
