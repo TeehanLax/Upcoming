@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+extern const CGFloat kHeaderHeight;
+
 @interface TLHeaderViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
 -(void)scrollTableViewToTop;

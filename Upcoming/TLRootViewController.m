@@ -14,8 +14,6 @@
 #import <BlocksKit.h>
 #import <EXTScope.h>
 
-static const CGFloat kHeaderHeight = 72.0f;
-
 @interface TLRootViewController ()
 
 @property (nonatomic, strong) TLDayListViewController *dayListViewController;
@@ -177,7 +175,7 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
     
     [self.view addSubview:self.dayListViewController.view];
     
-    self.headerViewController.view.frame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight);
+    self.headerViewController.view.frame = CGRectMake(0, -kMaximumTranslationThreshold, CGRectGetWidth(self.view.bounds), kHeaderHeight + kMaximumTranslationThreshold);
     [self.view addSubview:self.headerViewController.view];
 }
 
@@ -198,7 +196,9 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
             self.panUpGestureRecognizer.enabled = NO;
         }];
     }];
+    self.tapGestureRecognizer.delegate = self;
     self.tapGestureRecognizer.enabled = NO;
+//    self.tapGestureRecognizer.delaysTouchesBegan = YES;
     [self.view addGestureRecognizer:self.tapGestureRecognizer];
     
     RACSignal *menuIsDownSignal = [RACSignal combineLatest:@[RACAble(self.headerViewController.view.frame)]
@@ -296,6 +296,11 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
     if (gestureRecognizer == self.panUpGestureRecognizer)
     {
         return CGRectContainsPoint(CGRectMake(0, CGRectGetHeight(self.headerViewController.view.bounds) - kHeaderHeight, CGRectGetWidth(self.view.bounds), kHeaderHeight), [touch locationInView:self.view]);
+    }
+    else if (gestureRecognizer == self.tapGestureRecognizer)
+    {
+        CGFloat menuHeight = kHeaderHeight + kMaximumTranslationThreshold;
+        return CGRectContainsPoint(CGRectMake(0, menuHeight, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - menuHeight), [touch locationInView:self.view]);
     }
     else
     {
