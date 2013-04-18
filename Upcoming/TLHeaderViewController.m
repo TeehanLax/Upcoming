@@ -8,6 +8,7 @@
 
 #import "TLHeaderViewController.h"
 #import "EKEventManager.h"
+#import "TLCalendarSelectCell.h"
 
 #import <EXTScope.h>
 
@@ -100,6 +101,28 @@ const CGFloat kHeaderHeight = 72.0f;
     return source.title;
 }
 
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 37;
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(tableView.bounds), [self tableView:tableView heightForHeaderInSection:section])];
+    
+    header.backgroundColor = [UIColor clearColor];
+    
+    const CGFloat leftMargin = 10.0f;
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectInset(header.bounds, leftMargin, 0)];
+    [label setText:[self tableView:tableView titleForHeaderInSection:section]];
+    label.backgroundColor = [UIColor clearColor];
+    label.textColor = [UIColor whiteColor];
+    
+    [header addSubview:label];
+    
+    return header;
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     EKSource *source = [EKEventManager sharedInstance].sources[section];
@@ -107,9 +130,11 @@ const CGFloat kHeaderHeight = 72.0f;
     return [[source calendarsForEntityType:EKEntityTypeEvent] count];
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
     return [[EKEventManager sharedInstance].sources count];
 }
+
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"Cell";
@@ -117,7 +142,7 @@ const CGFloat kHeaderHeight = 72.0f;
     
     if (!cell)
     {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        cell = [[TLCalendarSelectCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     
     EKEventManager *eventManager = [EKEventManager sharedInstance];
@@ -137,7 +162,6 @@ const CGFloat kHeaderHeight = 72.0f;
 
     return cell;
 }
-
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
