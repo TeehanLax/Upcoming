@@ -12,6 +12,9 @@
 		5E21DEDB171F19C000231263 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DED9171F19C000231263 /* EventKit.framework */; };
 		5E21DEDC171F19C000231263 /* EventKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DEDA171F19C000231263 /* EventKitUI.framework */; };
 		5EA3D48C1726DD4D00D9764F /* UIColor+CustomizedColors.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EA3D48B1726DD4D00D9764F /* UIColor+CustomizedColors.m */; };
+		5EA3D48F1726E00400D9764F /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EA3D48E1726E00400D9764F /* CoreImage.framework */; };
+		5EA3D4941726FCC500D9764F /* UIImage+Blur.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EA3D4931726FCC500D9764F /* UIImage+Blur.m */; };
+		5EA3D4971726FD9E00D9764F /* TLProfiling.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EA3D4961726FD9E00D9764F /* TLProfiling.m */; };
 		5EB4E5521717374E00EC8E1C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EB4E5511717374E00EC8E1C /* UIKit.framework */; };
 		5EB4E5541717374E00EC8E1C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EB4E5531717374E00EC8E1C /* Foundation.framework */; };
 		5EB4E5561717374E00EC8E1C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EB4E5551717374E00EC8E1C /* CoreGraphics.framework */; };
@@ -41,6 +44,11 @@
 		5E21DEDA171F19C000231263 /* EventKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKitUI.framework; path = System/Library/Frameworks/EventKitUI.framework; sourceTree = SDKROOT; };
 		5EA3D48A1726DD4D00D9764F /* UIColor+CustomizedColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+CustomizedColors.h"; sourceTree = "<group>"; };
 		5EA3D48B1726DD4D00D9764F /* UIColor+CustomizedColors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+CustomizedColors.m"; sourceTree = "<group>"; };
+		5EA3D48E1726E00400D9764F /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
+		5EA3D4921726FCC500D9764F /* UIImage+Blur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Blur.h"; sourceTree = "<group>"; };
+		5EA3D4931726FCC500D9764F /* UIImage+Blur.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Blur.m"; sourceTree = "<group>"; };
+		5EA3D4951726FD9E00D9764F /* TLProfiling.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLProfiling.h; sourceTree = "<group>"; };
+		5EA3D4961726FD9E00D9764F /* TLProfiling.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLProfiling.m; sourceTree = "<group>"; };
 		5EB4E54E1717374E00EC8E1C /* Upcoming.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Upcoming.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5EB4E5511717374E00EC8E1C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		5EB4E5531717374E00EC8E1C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -80,6 +88,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5EA3D48F1726E00400D9764F /* CoreImage.framework in Frameworks */,
 				5E21DEDB171F19C000231263 /* EventKit.framework in Frameworks */,
 				5E21DEDC171F19C000231263 /* EventKitUI.framework in Frameworks */,
 				5ED60CCB171C57E000F55891 /* QuartzCore.framework in Frameworks */,
@@ -107,6 +116,8 @@
 			children = (
 				5EA3D48A1726DD4D00D9764F /* UIColor+CustomizedColors.h */,
 				5EA3D48B1726DD4D00D9764F /* UIColor+CustomizedColors.m */,
+				5EA3D4921726FCC500D9764F /* UIImage+Blur.h */,
+				5EA3D4931726FCC500D9764F /* UIImage+Blur.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -132,6 +143,7 @@
 		5EB4E5501717374E00EC8E1C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5EA3D48E1726E00400D9764F /* CoreImage.framework */,
 				5E21DED9171F19C000231263 /* EventKit.framework */,
 				5E21DEDA171F19C000231263 /* EventKitUI.framework */,
 				5ED60CCA171C57E000F55891 /* QuartzCore.framework */,
@@ -161,6 +173,8 @@
 		5EB4E5581717374E00EC8E1C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				5EA3D4951726FD9E00D9764F /* TLProfiling.h */,
+				5EA3D4961726FD9E00D9764F /* TLProfiling.m */,
 				5EB4E5591717374E00EC8E1C /* Upcoming-Info.plist */,
 				5EB4E55A1717374E00EC8E1C /* InfoPlist.strings */,
 				5EB4E55D1717374E00EC8E1C /* main.m */,
@@ -315,6 +329,8 @@
 				5EB951B117203DE600A5089B /* TLCalendarSelectCell.m in Sources */,
 				5ECEA3EB1720809C00DD6626 /* TLClockHeaderView.m in Sources */,
 				5EA3D48C1726DD4D00D9764F /* UIColor+CustomizedColors.m in Sources */,
+				5EA3D4941726FCC500D9764F /* UIImage+Blur.m in Sources */,
+				5EA3D4971726FD9E00D9764F /* TLProfiling.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

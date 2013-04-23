@@ -10,6 +10,9 @@
 
 #import "TLHeaderViewController.h"
 
+#import "UIImage+Blur.h"
+#import "TLProfiling.h"
+
 #import <BlocksKit.h>
 #import <EXTScope.h>
 
@@ -20,7 +23,7 @@
 @property (nonatomic, strong) TLDayListViewController *dayListViewController;
 
 // This is an overlay view added to our view hierarchy when the header menu is pulled down.
-@property (nonatomic, strong) UIView *dayListOverlayView;
+@property (nonatomic, strong) UIImageView *dayListOverlayView;
 
 // Gesture recognizers to reveal/hide the headeer menu.
 @property (nonatomic, strong) UIPanGestureRecognizer *panDownGestureRecognizer;
@@ -32,7 +35,7 @@
 // Used to receive translations from the upward pan gesture recognizer.
 @property (nonatomic, strong) RACSubject *upwardPanSubject;
 // Used to receive ratios of translation for shrinking the day list view controller's view.
-@property (nonatomic, strong) RACSubject *dayListMovementSubject;
+@property (nonatomic, strong) RACSubject *dayListBlurSubject;
 // Used to receive ratios of translation for moving the header view controller's view.
 @property (nonatomic, strong) RACSubject *headerMovementSubject;
 // Used to receive ratios of translation for changing the alpha of the overlay view which covers the day list view
@@ -51,6 +54,8 @@ static const CGFloat kMaximumTranslationThreshold = 320.0f;
 // The shrink percentage of the day list VC's view while the menu is open.
 static const CGFloat kMaximumShrinkTranslation = 0.1f;
 
+
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     if (!(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) return nil;
@@ -64,7 +69,7 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
     [self addChildViewController:self.headerViewController];
     
     // Keep this view around for later
-    self.dayListOverlayView = [[UIView alloc] initWithFrame:self.dayListViewController.view.frame];
+    self.dayListOverlayView = [[UIImageView alloc] init];
     self.dayListOverlayView.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.4f];
     self.dayListOverlayView.frame = self.view.frame;
     self.dayListOverlayView.alpha = 0.0f;
@@ -79,10 +84,19 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
         @strongify(self);
         if ([x boolValue])
         {
+            // Using 0.5 scale here because after blurring, we won't need the extra pixels.
+            UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 1.0);
+            [self.dayListViewController.view.layer renderInContext:UIGraphicsGetCurrentContext()];
+            UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            
+            self.dayListOverlayView.image = [UIImage darkenedAndBlurredImageForImage:image];
+            
             [self.view insertSubview:self.dayListOverlayView aboveSubview:self.dayListViewController.view];
         }
         else
         {
+            self.dayListOverlayView.image = nil;
             [self.dayListOverlayView removeFromSuperview];
             [self.headerViewController scrollTableViewToTop];
         }
@@ -101,31 +115,23 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
         CGRect frame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight + ratio * kMaximumTranslationThreshold);
         
         if (ratio < 0)
-        {
+        {            
             frame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight);
         }
+        
         
         self.headerViewController.view.frame = frame;
     }];
     
     // This subject is repsonisble for shrinking the day list view controller's view via a CAAffineTransform.
-    self.dayListMovementSubject = [RACSubject subject];
-    [self.dayListMovementSubject subscribeNext:^(id x) {
+    self.dayListBlurSubject = [RACSubject subject];
+    [self.dayListBlurSubject subscribeNext:^(id x) {
         @strongify(self);
         
         // This is the ratio of the movement. 0 is full sized and 1 is fully shrunk.
         CGFloat ratio = [x floatValue];
         
         self.dayListOverlayView.alpha = ratio;
-        
-        CGAffineTransform transform = CGAffineTransformIdentity;
-        
-        if (ratio > 0.01)
-        {
-            transform = CGAffineTransformMakeScale(1.0f - ratio * kMaximumShrinkTranslation, 1.0f - ratio * kMaximumShrinkTranslation);
-        }
-        
-        self.dayListViewController.view.transform = transform;
     }];
     
     // This subject is responsible for receiving translations from a gesture recognizers and turning
@@ -152,7 +158,7 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
             effectiveRatio = 1.0f + (y / kMaximumTranslationThreshold);
         }
         
-        [self.dayListMovementSubject sendNext:@(effectiveRatio)];
+        [self.dayListBlurSubject sendNext:@(effectiveRatio)];
         [self.headerMovementSubject sendNext:@(effectiveRatio)];
     }];
     
@@ -181,7 +187,7 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
             effectiveRatio = 0.0f;
         }
 
-        [self.dayListMovementSubject sendNext:@(effectiveRatio)];
+        [self.dayListBlurSubject sendNext:@(effectiveRatio)];
         [self.headerMovementSubject sendNext:@(effectiveRatio)];
     }];
     
@@ -207,12 +213,6 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
     // We'll set up the shadow for the day list view controller here, before it has to shrink.
     self.dayListViewController.view.frame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds));
     self.dayListViewController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight;
-    self.dayListViewController.view.layer.shadowColor = [[UIColor blackColor] CGColor];
-    self.dayListViewController.view.layer.shadowOpacity = 1.0f;
-    self.dayListViewController.view.layer.shadowOffset = CGSizeMake(0, 1);
-    self.dayListViewController.view.layer.shadowPath = [[UIBezierPath bezierPathWithRect:self.dayListViewController.view.bounds] CGPath];
-    self.dayListViewController.view.layer.shadowRadius = 5.0f;
-    self.dayListViewController.view.layer.masksToBounds = NO;
     // Add the day list view controller's view to our hierarchy
     [self.view addSubview:self.dayListViewController.view];
     
@@ -224,8 +224,6 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
 -(void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    self.view.backgroundColor = [UIColor colorWithWhite:33.0f/255.0f alpha:1.0f];
     
     // Set up our gesture recognizers.
     // These mostly grab their translations and feed them into the appropriate subjects.

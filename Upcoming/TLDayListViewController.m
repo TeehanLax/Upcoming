@@ -108,7 +108,7 @@ static NSString *CellIdentifier = @"Cell";
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
     // We *must* return a *minimum* of one section (for decoration views)
-    NSInteger numberOfSections = 0;
+    NSInteger numberOfSections = 12;
     return MAX(numberOfSections, 1);
 }
 
@@ -124,7 +124,6 @@ static NSString *CellIdentifier = @"Cell";
 
 -(BOOL)collectionView:(UICollectionView *)collectionView layout:(TLTaskListLayout *)collectionViewLayout hasEventForHour:(NSInteger)hour
 {
-    return NO;
     if (hour % 2 == 0)
     {
         return YES;
