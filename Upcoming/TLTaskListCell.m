@@ -30,11 +30,6 @@
     
     self.textLabel.text = @"Some appointment";
     
-    CIFilter *blur = [CIFilter filterWithName:@"CIGaussianBlur"];
-    [blur setDefaults];
-    [blur setValue:@(10.0f) forKey:@"inputRadius"];
-    self.contentView.layer.filters = @[blur];
-    
     return self;
 }
 
