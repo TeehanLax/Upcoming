@@ -184,10 +184,12 @@ const CGFloat kHeaderHeight = 72.0f;
     [self.calendarTableView scrollRectToVisible:CGRectMake(1, 1, 1, 1) animated:NO];
 }
 
+static CGFloat pullDownDistance = 7.0f;
+
 -(void)hideHeaderView
 {
     [UIView animateWithDuration:0.1f animations:^{
-        self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, 10);
+        self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
     } completion:^(BOOL finished) {
         [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionCurveEaseIn animations:^{ 
             self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
@@ -195,7 +197,7 @@ const CGFloat kHeaderHeight = 72.0f;
             self.headerClockView.alpha = 1.0f;
             self.headerClockView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerClockView.frame));
             [UIView animateWithDuration:0.2f delay:0.05f options:UIViewAnimationOptionCurveEaseOut animations:^{
-                self.headerClockView.transform = CGAffineTransformMakeTranslation(0, 10);
+                self.headerClockView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
             } completion:^(BOOL finished) {
                 [UIView animateWithDuration:0.1f animations:^{
                     self.headerClockView.transform = CGAffineTransformIdentity;
@@ -207,18 +209,21 @@ const CGFloat kHeaderHeight = 72.0f;
 
 -(void)showHeaderView
 {
+    [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     [UIView animateWithDuration:0.1f animations:^{
-        self.headerClockView.transform = CGAffineTransformMakeTranslation(0, 10);
+        self.headerClockView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
     } completion:^(BOOL finished) {
         [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
             self.headerClockView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
         } completion:^(BOOL finished) {
             self.headerClockView.alpha = 0.0f;
             [UIView animateWithDuration:0.2f delay:0.05f options:UIViewAnimationOptionCurveEaseOut animations:^{
-                self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, 10);
+                self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
             } completion:^(BOOL finished) {
                 [UIView animateWithDuration:0.1f animations:^{
                     self.headerDetailView.transform = CGAffineTransformIdentity;
+                } completion:^(BOOL finished) {
+                    [[UIApplication sharedApplication] endIgnoringInteractionEvents];
                 }];
             }];
         }];
