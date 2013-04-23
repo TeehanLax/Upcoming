@@ -63,6 +63,11 @@ const CGFloat kHeaderHeight = 72.0f;
     // Set up the table view mask
     [self setupTableViewMask];
     
+    // Set our custom colours
+    self.meetingNameLabel.textColor = [UIColor headerTextColor];
+    self.meetingLocationLabel.textColor = [UIColor headerTextColor];
+    self.meetingTimeLabel.textColor = [UIColor headerTextColor];
+    
     // Remove the default table view background
     UIView *backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
     backgroundView.backgroundColor = [UIColor clearColor];

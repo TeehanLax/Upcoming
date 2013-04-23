@@ -14,7 +14,7 @@
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     
-    UIColor *color = [UIColor colorWithWhite:85.0f/255.0f alpha:1.0f];
+    UIColor *color = [UIColor headerTextColor];
     [color set];
     
     NSInteger hours = floorf(self.timeRatio * 24);

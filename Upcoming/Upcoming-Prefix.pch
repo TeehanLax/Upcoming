@@ -16,4 +16,6 @@
 #import <ReactiveCocoa.h>
 #import <QuartzCore/QuartzCore.h>
 
+#import "UIColor+CustomizedColors.h"
+
 #endif

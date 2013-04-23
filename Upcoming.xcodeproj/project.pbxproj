@@ -11,6 +11,7 @@
 		5E21DED7171EFCE700231263 /* EKEventManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E21DED6171EFCE700231263 /* EKEventManager.m */; };
 		5E21DEDB171F19C000231263 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DED9171F19C000231263 /* EventKit.framework */; };
 		5E21DEDC171F19C000231263 /* EventKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DEDA171F19C000231263 /* EventKitUI.framework */; };
+		5EA3D48C1726DD4D00D9764F /* UIColor+CustomizedColors.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EA3D48B1726DD4D00D9764F /* UIColor+CustomizedColors.m */; };
 		5EB4E5521717374E00EC8E1C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EB4E5511717374E00EC8E1C /* UIKit.framework */; };
 		5EB4E5541717374E00EC8E1C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EB4E5531717374E00EC8E1C /* Foundation.framework */; };
 		5EB4E5561717374E00EC8E1C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EB4E5551717374E00EC8E1C /* CoreGraphics.framework */; };
@@ -38,6 +39,8 @@
 		5E21DED6171EFCE700231263 /* EKEventManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EKEventManager.m; sourceTree = "<group>"; };
 		5E21DED9171F19C000231263 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 		5E21DEDA171F19C000231263 /* EventKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKitUI.framework; path = System/Library/Frameworks/EventKitUI.framework; sourceTree = SDKROOT; };
+		5EA3D48A1726DD4D00D9764F /* UIColor+CustomizedColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+CustomizedColors.h"; sourceTree = "<group>"; };
+		5EA3D48B1726DD4D00D9764F /* UIColor+CustomizedColors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+CustomizedColors.m"; sourceTree = "<group>"; };
 		5EB4E54E1717374E00EC8E1C /* Upcoming.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Upcoming.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5EB4E5511717374E00EC8E1C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		5EB4E5531717374E00EC8E1C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -99,6 +102,15 @@
 			name = EventManager;
 			sourceTree = "<group>";
 		};
+		5EA3D48D1726DD5200D9764F /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				5EA3D48A1726DD4D00D9764F /* UIColor+CustomizedColors.h */,
+				5EA3D48B1726DD4D00D9764F /* UIColor+CustomizedColors.m */,
+			);
+			name = Categories;
+			sourceTree = "<group>";
+		};
 		5EB4E5451717374E00EC8E1C = {
 			isa = PBXGroup;
 			children = (
@@ -140,6 +152,7 @@
 				5E21DED8171EFCED00231263 /* EventManager */,
 				5EB4E57D17187DEF00EC8E1C /* View Controllers */,
 				5ED60CC5171C54B900F55891 /* Collection View Extensions */,
+				5EA3D48D1726DD5200D9764F /* Categories */,
 				5EB4E5581717374E00EC8E1C /* Supporting Files */,
 			);
 			path = Upcoming;
@@ -301,6 +314,7 @@
 				5E21DED7171EFCE700231263 /* EKEventManager.m in Sources */,
 				5EB951B117203DE600A5089B /* TLCalendarSelectCell.m in Sources */,
 				5ECEA3EB1720809C00DD6626 /* TLClockHeaderView.m in Sources */,
+				5EA3D48C1726DD4D00D9764F /* UIColor+CustomizedColors.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
