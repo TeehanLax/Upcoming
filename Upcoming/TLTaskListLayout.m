@@ -7,6 +7,7 @@
 //
 
 #import "TLTaskListLayout.h"
+#import "TLHeaderViewController.h"
 #import "TLHourDecorationView.h"
 
 const CGFloat TLTaskListLayoutConcentrationPointNone = -1.0f;
@@ -148,7 +149,7 @@ static const CGFloat minHeight = 15;
     }
     
     // Now that we have all the sizes calculated, "stack" the items one on top of each other
-    CGFloat maxY = 0.0f;
+    CGFloat maxY = kHeaderHeight;
     NSMutableArray *sectionsToRemove = [NSMutableArray arrayWithCapacity:24];
     
     // Stack the index paths up one by one. 

@@ -45,7 +45,7 @@ static NSString *CellIdentifier = @"Cell";
     self.individualTaskPanGestureRecognizer.delegate = self;
     [self.view addGestureRecognizer:self.individualTaskPanGestureRecognizer];
     
-    self.view.backgroundColor = [UIColor darkGrayColor];
+    self.collectionView.backgroundColor = [UIColor whiteColor];
 }
 
 -(void)viewDidAppear:(BOOL)animated

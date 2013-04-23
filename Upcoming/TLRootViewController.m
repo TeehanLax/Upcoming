@@ -205,7 +205,7 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
     [super loadView];
     
     // We'll set up the shadow for the day list view controller here, before it has to shrink.
-    self.dayListViewController.view.frame = CGRectMake(0, kHeaderHeight, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - kHeaderHeight);
+    self.dayListViewController.view.frame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds));
     self.dayListViewController.view.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     self.dayListViewController.view.layer.shadowColor = [[UIColor blackColor] CGColor];
     self.dayListViewController.view.layer.shadowOpacity = 1.0f;

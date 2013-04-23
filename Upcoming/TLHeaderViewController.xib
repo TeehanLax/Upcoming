@@ -191,7 +191,6 @@
 						<string key="NSFrame">{{0, 320}, {320, 76}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<reference key="IBUIBackgroundColor" ref="90356494"/>
 						<float key="IBUIAlpha">0.0</float>
@@ -202,10 +201,7 @@
 				<reference key="NSSuperview"/>
 				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="560678449"/>
-				<object class="NSColor" key="IBUIBackgroundColor">
-					<int key="NSColorSpace">3</int>
-					<bytes key="NSWhite">MC4xMwA</bytes>
-				</object>
+				<reference key="IBUIBackgroundColor" ref="90356494"/>
 				<bool key="IBUIClipsSubviews">YES</bool>
 				<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 			</object>
@@ -405,7 +401,7 @@
 					<string key="superclassName">UIViewController</string>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="calendarTableView">UITableView</string>
-						<string key="headerClockView">UIView</string>
+						<string key="headerClockView">TLClockHeaderView</string>
 						<string key="headerDetailView">UIView</string>
 						<string key="meetingLocationLabel">UILabel</string>
 						<string key="meetingNameLabel">UILabel</string>
@@ -419,7 +415,7 @@
 						</object>
 						<object class="IBToOneOutletInfo" key="headerClockView">
 							<string key="name">headerClockView</string>
-							<string key="candidateClassName">UIView</string>
+							<string key="candidateClassName">TLClockHeaderView</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="headerDetailView">
 							<string key="name">headerDetailView</string>
