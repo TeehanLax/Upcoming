@@ -55,10 +55,13 @@
     
     // Create a gradient from white to red
     CGFloat colors [] = {
-        0.0, 0.0, 0.0, 1.0,
-        1.0, 0.0, 0.0, 1.0
+        47.0f/255.0f, 64.0f/255.0f, 89.0f/255.0f, 1.0,
+        67.0f/255.0f, 131.0f/255.0f, 161.0f/255.0f, 1.0,
+        101.0f/255.0f, 175.0f/255.0f, 216.0f/255.0f, 1.0,
+        179.0f/255.0f, 201.0f/255.0f, 186.0f/255.0f, 1.0,
+        151.0f/255.0f, 93.0f/255.0f, 76.0f/255.0f, 1.0
     };
-    NSInteger numberOfColors = 2;
+    NSInteger numberOfColors = 5;
     
     // Draw the linear gradient
     CGContextSaveGState(context);
@@ -72,6 +75,7 @@
         
         CGContextDrawLinearGradient(context, gradient, startPoint, endPoint, 0);
         CGGradientRelease(gradient), gradient = NULL;
+        CGColorSpaceRelease(baseSpace);
     }
     CGContextRestoreGState(context);
 }
