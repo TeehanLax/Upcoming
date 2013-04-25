@@ -198,9 +198,9 @@ const CGFloat kHeaderHeight = 72.0f;
 
 static CGFloat pullDownDistance = 7.0f;
 
-static CGFloat pullDownAnimationDuration = 0.1f;
-static CGFloat pullUpAnimationDuration = 0.2f;
-static CGFloat fallDownAnimationDuration = 0.2f;
+static CGFloat pullDownAnimationDuration = 0.075f;
+static CGFloat pullUpAnimationDuration = 0.15f;
+static CGFloat fallDownAnimationDuration = 0.15f;
 static CGFloat interAnimationDelay = 0.05f;
 
 -(void)hideHeaderView
