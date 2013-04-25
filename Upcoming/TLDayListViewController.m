@@ -8,6 +8,7 @@
 
 #import "TLDayListViewController.h"
 #import "TLTaskListCell.h"
+#import "TLBackgroundGradientView.h"
 
 #import <EXTScope.h>
 
@@ -16,6 +17,8 @@
 @property (nonatomic, strong) TLTaskListLayout *taskListLayout;
 @property (nonatomic, strong) UITapGestureRecognizer *individualTaskPanGestureRecognizer;
 @property (nonatomic, strong) UIPanGestureRecognizer *taskListPanGestureRecognizer;
+
+@property (nonatomic, strong) TLBackgroundGradientView *backgroundGradientView;
 
 @end
 
@@ -37,6 +40,9 @@ static NSString *CellIdentifier = @"Cell";
 {
     [super viewDidLoad];
     
+    self.backgroundGradientView = [[TLBackgroundGradientView alloc] initWithFrame:self.view.bounds];
+    self.collectionView.backgroundView = self.backgroundGradientView;
+    
     self.taskListPanGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(userDidPan:)];
     self.taskListPanGestureRecognizer.delegate = self;
     [self.view addGestureRecognizer:self.taskListPanGestureRecognizer];
@@ -45,7 +51,7 @@ static NSString *CellIdentifier = @"Cell";
     self.individualTaskPanGestureRecognizer.delegate = self;
     [self.view addGestureRecognizer:self.individualTaskPanGestureRecognizer];
     
-    self.collectionView.backgroundColor = [UIColor whiteColor];
+    self.collectionView.backgroundColor = [UIColor clearColor];
 }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -63,6 +69,7 @@ static NSString *CellIdentifier = @"Cell";
     if (recognizer.state == UIGestureRecognizerStateBegan)
     {
         [self.delegate userDidBeginInteractingWithDayListViewController:self];
+        self.backgroundGradientView.drawInnserShadow = YES;
     }
     else if (recognizer.state == UIGestureRecognizerStateChanged)
     {
@@ -77,6 +84,7 @@ static NSString *CellIdentifier = @"Cell";
     else if (recognizer.state == UIGestureRecognizerStateEnded)
     {
         [self.delegate userDidEndInteractingWithDayListViewController:self];
+        self.backgroundGradientView.drawInnserShadow = NO;
     }
 }
 

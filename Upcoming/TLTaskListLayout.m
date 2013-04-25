@@ -8,11 +8,8 @@
 
 #import "TLTaskListLayout.h"
 #import "TLHeaderViewController.h"
-#import "TLHourDecorationView.h"
 
 const CGFloat TLTaskListLayoutConcentrationPointNone = -1.0f;
-
-static NSString *TLTaskListLayoutHourDecorationViewKind = @"TLTaskListLayoutHourDecorationViewKind";
 
 @interface TLTaskListLayout ()
 
@@ -33,8 +30,6 @@ static const CGFloat minHeight = 15;
 {
     if (!(self = [super init])) return nil;
     
-    [self registerClass:[TLHourDecorationView class] forDecorationViewOfKind:TLTaskListLayoutHourDecorationViewKind];
-        
     return self;
 }
 
@@ -116,7 +111,6 @@ static const CGFloat minHeight = 15;
 {
     // Create a mutable array with 24 elements in it, representing the 24 hours of a day.
     NSMutableArray* layoutAttributesArray = [NSMutableArray arrayWithCapacity:24];
-    NSMutableArray *decorationViewAttributesArray = [NSMutableArray arrayWithCapacity:24];
 
     // We need to keep track of the total height so we can adjust the heights of all the items
     // later to 
@@ -128,9 +122,6 @@ static const CGFloat minHeight = 15;
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:i];
         UICollectionViewLayoutAttributes *newAttributes = [self layoutAttributesForItemAtIndexPath:indexPath];
         totalHeight += newAttributes.size.height;
-        
-        UICollectionViewLayoutAttributes *decorationViewLayoutAttributes = [UICollectionViewLayoutAttributes layoutAttributesForDecorationViewOfKind:TLTaskListLayoutHourDecorationViewKind withIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
-        [decorationViewAttributesArray addObject:decorationViewLayoutAttributes];
         
         // Populate the array.
         [layoutAttributesArray addObject:newAttributes];
@@ -156,9 +147,7 @@ static const CGFloat minHeight = 15;
     for (NSInteger i = 0; i < 24; i++)
     {
         UICollectionViewLayoutAttributes *attributes = layoutAttributesArray[i];
-        UICollectionViewLayoutAttributes *decorationViewAttributes = decorationViewAttributesArray[i];
         attributes.frame = CGRectMake(0, maxY, CGRectGetWidth(self.collectionView.bounds), attributes.size.height + heightToAdd);
-        decorationViewAttributes.frame = attributes.frame;
         
         if (CGRectContainsPoint(attributes.frame, CGPointMake(1, self.concentrationPoint)))
         {
@@ -187,9 +176,6 @@ static const CGFloat minHeight = 15;
     
     // We need to remove sections not represented in collection view
     [arrayToReturn removeObjectsInArray:sectionsToRemove];
-    
-    // Finally, add our decoration views.
-    [arrayToReturn addObjectsFromArray:decorationViewAttributesArray];
     
     return arrayToReturn;
 }

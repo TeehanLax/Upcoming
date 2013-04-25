@@ -12,7 +12,7 @@
 
 +(UIColor *)headerTextColor
 {
-    return [UIColor colorWithHue:0.0f saturation:0.0f brightness:0.33f alpha:1.0f];
+    return [UIColor colorWithHue:0.0f saturation:0.0f brightness:1.0f alpha:1.0f];
 }
 
 @end
