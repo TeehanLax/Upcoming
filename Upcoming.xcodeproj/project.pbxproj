@@ -13,8 +13,8 @@
 		5E2EF7B5172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7B4172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m */; };
 		5E2EF7BA172AC51100737A75 /* TLPastViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7B7172AC51100737A75 /* TLPastViewController.m */; };
 		5E2EF7BB172AC51100737A75 /* TLFutureViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7B9172AC51100737A75 /* TLFutureViewController.m */; };
-		5E2EF7BD172AC51700737A75 /* TLViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E2EF7BC172AC51700737A75 /* TLViewController.xib */; };
-		5E2EF7C0172AC53500737A75 /* TLViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7BF172AC53500737A75 /* TLViewController.m */; };
+		5E2EF7BD172AC51700737A75 /* TLEventViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E2EF7BC172AC51700737A75 /* TLEventViewController.xib */; };
+		5E2EF7C0172AC53500737A75 /* TLEventViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7BF172AC53500737A75 /* TLEventViewController.m */; };
 		5E7207DF172AC3560067B19E /* EKEventManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E7207DE172AC3560067B19E /* EKEventManager.m */; };
 		5EA3D48C1726DD4D00D9764F /* UIColor+CustomizedColors.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EA3D48B1726DD4D00D9764F /* UIColor+CustomizedColors.m */; };
 		5EA3D48F1726E00400D9764F /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EA3D48E1726E00400D9764F /* CoreImage.framework */; };
@@ -48,9 +48,9 @@
 		5E2EF7B7172AC51100737A75 /* TLPastViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLPastViewController.m; sourceTree = "<group>"; };
 		5E2EF7B8172AC51100737A75 /* TLFutureViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLFutureViewController.h; sourceTree = "<group>"; };
 		5E2EF7B9172AC51100737A75 /* TLFutureViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLFutureViewController.m; sourceTree = "<group>"; };
-		5E2EF7BC172AC51700737A75 /* TLViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLViewController.xib; sourceTree = "<group>"; };
-		5E2EF7BE172AC53500737A75 /* TLViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLViewController.h; sourceTree = "<group>"; };
-		5E2EF7BF172AC53500737A75 /* TLViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLViewController.m; sourceTree = "<group>"; };
+		5E2EF7BC172AC51700737A75 /* TLEventViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLEventViewController.xib; sourceTree = "<group>"; };
+		5E2EF7BE172AC53500737A75 /* TLEventViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLEventViewController.h; sourceTree = "<group>"; };
+		5E2EF7BF172AC53500737A75 /* TLEventViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLEventViewController.m; sourceTree = "<group>"; };
 		5E7207DD172AC3560067B19E /* EKEventManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EKEventManager.h; sourceTree = "<group>"; };
 		5E7207DE172AC3560067B19E /* EKEventManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EKEventManager.m; sourceTree = "<group>"; };
 		5EA3D48A1726DD4D00D9764F /* UIColor+CustomizedColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+CustomizedColors.h"; sourceTree = "<group>"; };
@@ -75,8 +75,6 @@
 		5EB4E5631717374E00EC8E1C /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		5EB4E5651717374E00EC8E1C /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		5EB4E5671717374E00EC8E1C /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
-		5EB4E5691717374E00EC8E1C /* TLDayListViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TLDayListViewController.h; sourceTree = "<group>"; };
-		5EB4E56A1717374E00EC8E1C /* TLDayListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TLDayListViewController.m; sourceTree = "<group>"; };
 		5EB4E57A17187CF700EC8E1C /* TLRootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLRootViewController.h; sourceTree = "<group>"; };
 		5EB4E57B17187CF700EC8E1C /* TLRootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLRootViewController.m; sourceTree = "<group>"; };
 		5EB4E58117187E1500EC8E1C /* TLHeaderViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLHeaderViewController.h; sourceTree = "<group>"; };
@@ -202,11 +200,9 @@
 				5EB4E58117187E1500EC8E1C /* TLHeaderViewController.h */,
 				5EB4E58217187E1500EC8E1C /* TLHeaderViewController.m */,
 				5EB4E58317187E1500EC8E1C /* TLHeaderViewController.xib */,
-				5EB4E5691717374E00EC8E1C /* TLDayListViewController.h */,
-				5EB4E56A1717374E00EC8E1C /* TLDayListViewController.m */,
-				5E2EF7BE172AC53500737A75 /* TLViewController.h */,
-				5E2EF7BF172AC53500737A75 /* TLViewController.m */,
-				5E2EF7BC172AC51700737A75 /* TLViewController.xib */,
+				5E2EF7BE172AC53500737A75 /* TLEventViewController.h */,
+				5E2EF7BF172AC53500737A75 /* TLEventViewController.m */,
+				5E2EF7BC172AC51700737A75 /* TLEventViewController.xib */,
 				5E2EF7B6172AC51100737A75 /* TLPastViewController.h */,
 				5E2EF7B7172AC51100737A75 /* TLPastViewController.m */,
 				5E2EF7B8172AC51100737A75 /* TLFutureViewController.h */,
@@ -286,7 +282,7 @@
 				5EB4E5661717374E00EC8E1C /* Default@2x.png in Resources */,
 				5EB4E5681717374E00EC8E1C /* Default-568h@2x.png in Resources */,
 				5EB4E58517187E1500EC8E1C /* TLHeaderViewController.xib in Resources */,
-				5E2EF7BD172AC51700737A75 /* TLViewController.xib in Resources */,
+				5E2EF7BD172AC51700737A75 /* TLEventViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -328,7 +324,7 @@
 				5E2EF7B5172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m in Sources */,
 				5E2EF7BA172AC51100737A75 /* TLPastViewController.m in Sources */,
 				5E2EF7BB172AC51100737A75 /* TLFutureViewController.m in Sources */,
-				5E2EF7C0172AC53500737A75 /* TLViewController.m in Sources */,
+				5E2EF7C0172AC53500737A75 /* TLEventViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

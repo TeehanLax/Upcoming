@@ -10,7 +10,20 @@
 #import "TLPastViewController.h"
 #import "TLFutureViewController.h"
 
-@interface TLViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate>
+@class TLDayListViewController;
+
+@protocol TLEventViewControllerDelegate <NSObject>
+
+-(void)userDidBeginInteractingWithDayListViewController:(TLDayListViewController *)controller;
+-(void)userDidEndInteractingWithDayListViewController:(TLDayListViewController *)controller;
+
+-(void)userDidInteractWithDayListView:(TLDayListViewController *)controller updatingTimeRatio:(CGFloat)timeRatio;
+
+@end
+
+@interface TLEventViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate>
+
+@property (nonatomic, weak) id<TLEventViewControllerDelegate> delegate;
 
 @property (nonatomic, strong) IBOutlet UICollectionView *pastView;
 @property (nonatomic, strong) IBOutlet UICollectionView *currentView;

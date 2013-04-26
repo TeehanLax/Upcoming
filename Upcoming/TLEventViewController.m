@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 Teehan+Lax. All rights reserved.
 //
 
-#import "TLViewController.h"
+#import "TLEventViewController.h"
 #import "TLTouchDownGestureRecognizer.h"
 #import <QuartzCore/QuartzCore.h>
 
@@ -17,13 +17,13 @@ static NSString *kPastCellIdentifier = @"PastCell";
 static NSString *kCurrentCellIdentifier = @"CurrentCell";
 static NSString *kFutureCellIdentifier = @"FutureCell";
 
-@interface TLViewController ()
+@interface TLEventViewController ()
 
 //- (NSInteger)currentHour;
 
 @end
 
-@implementation TLViewController {
+@implementation TLEventViewController {
     NSInteger currentHour;
     NSInteger lastHour;
     BOOL isPanning;

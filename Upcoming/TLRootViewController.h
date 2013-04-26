@@ -8,10 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-#import "TLDayListViewController.h"
+#import "TLEventViewController.h"
 
-#import "TLViewController.h"
-
-@interface TLRootViewController : UIViewController <UIGestureRecognizerDelegate, TLDayListViewControllerDelegate>
+@interface TLRootViewController : UIViewController <UIGestureRecognizerDelegate, TLEventViewControllerDelegate>
 
 @end
