@@ -109,7 +109,11 @@ static NSString *kFutureCellIdentifier = @"FutureCell";
         self.futureView.frame = futureRect;
     } else {
         CGPoint location = [recognizer locationInView:self.view];
-        [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:((location.y - HEADER_HEIGHT) / (CGRectGetHeight(self.view.bounds) - HEADER_HEIGHT))];
+        
+        if (CGRectContainsPoint(CGRectOffset(self.view.bounds, 0, HEADER_HEIGHT), location))
+        {
+            [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:((location.y - HEADER_HEIGHT) / (CGRectGetHeight(self.view.bounds) - HEADER_HEIGHT))];
+        }
         
         CGFloat offset = location.y - (CURRENT_VIEW_HEIGHT / 2);
         if (offset < HEADER_HEIGHT) offset = HEADER_HEIGHT;
