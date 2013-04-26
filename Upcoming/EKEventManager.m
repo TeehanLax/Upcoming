@@ -119,12 +119,11 @@ NSString * const EKEventManagerSourcesKeyPath = @"sources";
     
     for (EKSource *source in [EKEventManager sharedInstance].store.sources)
     {
-        NSSet *calendarSet = [source calendarsForEntityType:EKEntityTypeEvent];
-        if ([calendarSet count] > 0) {
+        if ([source.calendars count] > 0) {
             [_sources addObject:source];
             if (!hasCalendars) {
                 // load defaults
-                NSArray *calendars = [calendarSet allObjects];
+                NSArray *calendars = [source.calendars allObjects];
                 for (EKCalendar *calendar in calendars) {
                     if (![_selectedCalendars containsObject:calendar.calendarIdentifier]) {
                         [_selectedCalendars addObject:calendar.calendarIdentifier];

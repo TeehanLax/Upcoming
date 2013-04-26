@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-#import "TLTaskListLayout.h"
+//#import "TLTaskListLayout.h"
 
 @class TLDayListViewController;
 
@@ -21,7 +21,7 @@
 
 @end
 
-@interface TLDayListViewController : UICollectionViewController <TLTaskListLayoutDelegate, UIGestureRecognizerDelegate>
+@interface TLDayListViewController : UICollectionViewController <UIGestureRecognizerDelegate>
 
 @property (nonatomic, weak) id<TLDayListViewControllerDelegate> delegate;
 

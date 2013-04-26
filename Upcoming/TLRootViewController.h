@@ -10,6 +10,8 @@
 
 #import "TLDayListViewController.h"
 
+#import "ECViewController.h"
+
 @interface TLRootViewController : UIViewController <UIGestureRecognizerDelegate, TLDayListViewControllerDelegate>
 
 @end
