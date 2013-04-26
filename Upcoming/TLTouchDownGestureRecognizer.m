@@ -6,10 +6,10 @@
 //  Copyright (c) 2013 Teehan+Lax. All rights reserved.
 //
 
-#import "TouchDownGestureRecognizer.h"
+#import "TLTouchDownGestureRecognizer.h"
 #import <UIKit/UIGestureRecognizerSubclass.h>
 
-@implementation TouchDownGestureRecognizer
+@implementation TLTouchDownGestureRecognizer
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
     if (self.state == UIGestureRecognizerStatePossible) {

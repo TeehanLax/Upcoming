@@ -6,13 +6,13 @@
 //  Copyright (c) 2013 Teehan+Lax. All rights reserved.
 //
 
-#import "ECPastViewController.h"
+#import "TLPastViewController.h"
 
-@interface ECPastViewController ()
+@interface TLPastViewController ()
 
 @end
 
-@implementation ECPastViewController
+@implementation TLPastViewController
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     return 24;

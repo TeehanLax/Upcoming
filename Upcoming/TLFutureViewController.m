@@ -6,13 +6,13 @@
 //  Copyright (c) 2013 Teehan+Lax. All rights reserved.
 //
 
-#import "ECFutureViewController.h"
+#import "TLFutureViewController.h"
 
-@interface ECFutureViewController ()
+@interface TLFutureViewController ()
 
 @end
 
-@implementation ECFutureViewController
+@implementation TLFutureViewController
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     return 24;

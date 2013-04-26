@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 Teehan+Lax. All rights reserved.
 //
 
-#import "ECViewController.h"
-#import "TouchDownGestureRecognizer.h"
+#import "TLViewController.h"
+#import "TLTouchDownGestureRecognizer.h"
 #import <QuartzCore/QuartzCore.h>
 
 #define HEADER_HEIGHT 72.f
@@ -17,13 +17,13 @@ static NSString *kPastCellIdentifier = @"PastCell";
 static NSString *kCurrentCellIdentifier = @"CurrentCell";
 static NSString *kFutureCellIdentifier = @"FutureCell";
 
-@interface ECViewController ()
+@interface TLViewController ()
 
 //- (NSInteger)currentHour;
 
 @end
 
-@implementation ECViewController {
+@implementation TLViewController {
     NSInteger currentHour;
     NSInteger lastHour;
     BOOL isPanning;
@@ -40,12 +40,12 @@ static NSString *kFutureCellIdentifier = @"FutureCell";
     [self.currentView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:kCurrentCellIdentifier];
     [self.futureView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:kFutureCellIdentifier];
     
-    TouchDownGestureRecognizer *touchDown = [[TouchDownGestureRecognizer alloc] initWithTarget:self action:@selector(touchDownHandler:)];
+    TLTouchDownGestureRecognizer *touchDown = [[TLTouchDownGestureRecognizer alloc] initWithTarget:self action:@selector(touchDownHandler:)];
     [self.view addGestureRecognizer:touchDown];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    self.pastViewController = [[ECPastViewController alloc] init];
+    self.pastViewController = [[TLPastViewController alloc] init];
     self.pastViewController.expanded = NO;
     self.pastViewController.parentHeight = self.view.bounds.size.height - HEADER_HEIGHT;
     NSLog(@"PARENT HEIGHT: %f", self.pastViewController.parentHeight);
@@ -53,7 +53,7 @@ static NSString *kFutureCellIdentifier = @"FutureCell";
     self.pastView.dataSource = self.pastViewController;
     [self.pastView reloadData];
     
-    self.futureViewController = [[ECFutureViewController alloc] init];
+    self.futureViewController = [[TLFutureViewController alloc] init];
     self.futureViewController.expanded = NO;
     self.futureViewController.parentHeight = self.view.frame.size.height - HEADER_HEIGHT;
     self.futureView.delegate = self.futureViewController;
@@ -73,7 +73,7 @@ static NSString *kFutureCellIdentifier = @"FutureCell";
     self.futureView.frame = futureRect;
 }
 
-- (void)touchDownHandler:(TouchDownGestureRecognizer *)recognizer {
+- (void)touchDownHandler:(TLTouchDownGestureRecognizer *)recognizer {
     if (recognizer.state == UIGestureRecognizerStateBegan) {
         self.currentView.hidden = NO;
         self.pastViewController.expanded = YES;

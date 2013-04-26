@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TouchDownGestureRecognizer : UIGestureRecognizer
+@interface TLTouchDownGestureRecognizer : UIGestureRecognizer
 
 @end

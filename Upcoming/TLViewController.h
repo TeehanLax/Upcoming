@@ -7,16 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ECPastViewController.h"
-#import "ECFutureViewController.h"
+#import "TLPastViewController.h"
+#import "TLFutureViewController.h"
 
-@interface ECViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate>
+@interface TLViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate>
 
 @property (nonatomic, strong) IBOutlet UICollectionView *pastView;
 @property (nonatomic, strong) IBOutlet UICollectionView *currentView;
 @property (nonatomic, strong) IBOutlet UICollectionView *futureView;
 
-@property (nonatomic, strong) ECPastViewController *pastViewController;
-@property (nonatomic, strong) ECFutureViewController *futureViewController;
+@property (nonatomic, strong) TLPastViewController *pastViewController;
+@property (nonatomic, strong) TLFutureViewController *futureViewController;
 
 @end

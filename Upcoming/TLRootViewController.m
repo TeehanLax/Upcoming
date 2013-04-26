@@ -20,7 +20,7 @@
 
 // Two view controllers: one for the header and one for the day list.
 @property (nonatomic, strong) TLHeaderViewController *headerViewController;
-@property (nonatomic, strong) ECViewController *dayListViewController;
+@property (nonatomic, strong) TLViewController *dayListViewController;
 
 // This is an overlay view added to our view hierarchy when the header menu is pulled down.
 @property (nonatomic, strong) UIImageView *dayListOverlayView;
@@ -61,7 +61,7 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
     if (!(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) return nil;
     
     // Set up our view controllers.
-    self.dayListViewController = [[ECViewController alloc] initWithNibName:@"ECViewController" bundle:nil];
+    self.dayListViewController = [[TLViewController alloc] initWithNibName:@"TLViewController" bundle:nil];
 //    self.dayListViewController.delegate = self;
     [self addChildViewController:self.dayListViewController];
     
