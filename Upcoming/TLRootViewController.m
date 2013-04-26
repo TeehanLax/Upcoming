@@ -84,13 +84,16 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
         @strongify(self);
         if ([x boolValue])
         {
-            // Using 0.5 scale here because after blurring, we won't need the extra pixels.
+            // Using 1.0 scale here because after blurring, we won't need the extra (Retina) pixels.
+            
             UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 1.0);
             [self.dayListViewController.view.layer renderInContext:UIGraphicsGetCurrentContext()];
             UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();
             
+            TL_PROFILE_START
             self.dayListOverlayView.image = [UIImage darkenedAndBlurredImageForImage:image];
+            TL_PROFILE_END
             
             [self.view insertSubview:self.dayListOverlayView aboveSubview:self.dayListViewController.view];
         }
@@ -194,9 +197,14 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
     // This subject is responsible for mapping this value to other signals and state (ugh). 
     self.menuFinishedTransitionSubject = [RACReplaySubject subject];
     [self.menuFinishedTransitionSubject subscribeNext:^(NSNumber *menuIsOpenNumber) {
-        [self.dayListOverlaySubject sendNext:menuIsOpenNumber];
         
         BOOL menuIsOpen = menuIsOpenNumber.boolValue;
+        
+        if (!menuIsOpen)
+        {
+            [self.dayListOverlaySubject sendNext:menuIsOpenNumber];
+        }
+        
         self.panDownGestureRecognizer.enabled = !menuIsOpen;
         self.panUpGestureRecognizer.enabled = menuIsOpen;
         self.tapGestureRecognizer.enabled = menuIsOpen;
