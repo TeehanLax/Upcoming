@@ -85,7 +85,7 @@
     CGContextSaveGState(context);
     {
         NSString *timeString = [NSString stringWithFormat:@"%d:%02d", hours, minutes];
-        UIFont *font = [UIFont systemFontOfSize:50];
+        UIFont *font = [[UIFont tl_appFont] fontWithSize:50];
         CGSize timeSize = [timeString sizeWithFont:font];
         CGFloat rightMargin = 10.0f;
         CGRect timeRect = CGRectMake(CGRectGetWidth(self.bounds) - timeSize.width - rightMargin, (CGRectGetHeight(self.bounds) - timeSize.height) / 2.0f, timeSize.width, timeSize.height);
