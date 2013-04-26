@@ -13,7 +13,7 @@
 
 + (UIImage *)darkenedAndBlurredImageForImage:(UIImage *)image
 {
-    CIImage *inputImage = [[CIImage alloc] initWithImage:image];
+    CIImage *inputImage = [[[CIImage alloc] initWithImage:image] imageByApplyingTransform:CGAffineTransformMakeScale(0.25f, 0.25f)];
     
     CIContext *context = [CIContext contextWithOptions:nil];
     
@@ -32,7 +32,7 @@
     //Third, blur the image
     CIFilter *blurFilter = [CIFilter filterWithName:@"CIGaussianBlur"];
     [blurFilter setDefaults];
-    [blurFilter setValue:@(3.0) forKey:@"inputRadius"];
+    [blurFilter setValue:@(0.5f) forKey:@"inputRadius"];
     [blurFilter setValue:darkenedImage forKey:kCIInputImageKey];
     CIImage *blurredImage = [blurFilter outputImage];
     
