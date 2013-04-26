@@ -15,5 +15,9 @@
     return [UIFont fontWithName:@"Avenir Next" size:[UIFont systemFontSize]];
 }
 
++(UIFont *)tl_mediumAppFont
+{
+    return [UIFont fontWithName:@"Avenir Next-Medium" size:[UIFont systemFontSize]];
+}
 
 @end

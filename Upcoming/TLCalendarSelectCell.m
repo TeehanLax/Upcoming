@@ -30,7 +30,7 @@
 {
     self.backgroundColor = [UIColor darkGrayColor];
     self.textLabel.textColor = [UIColor whiteColor];
-    self.textLabel.font = [UIFont tl_appFont];
+    self.textLabel.font = [[UIFont tl_appFont] fontWithSize:14];
     self.contentView.backgroundColor = [UIColor clearColor];
     
     UIView *selectedBackgroundView = [[UIView alloc] initWithFrame:self.bounds];

@@ -11,5 +11,6 @@
 @interface UIFont (AppFonts)
 
 +(UIFont *)tl_appFont;
++(UIFont *)tl_mediumAppFont;
 
 @end
