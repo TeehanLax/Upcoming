@@ -10,6 +10,8 @@
 
 @interface TLBackgroundGradientView ()
 
+@property (nonatomic, strong) CAGradientLayer *gradientLayer;
+
 @property (nonatomic, strong) UIImageView *innerShadowView;
 
 @end
@@ -42,32 +44,50 @@
     NSArray *locationsArray = @[@(0.0f), @(0.34f), @(0.64f), @(0.76f), @(0.95f)];
     NSArray *colorsArray = kNormalColors;
     
-    CAGradientLayer *gradientLayer = [CAGradientLayer layer];
-    gradientLayer.frame = self.bounds;
-    gradientLayer.backgroundColor = [[UIColor clearColor] CGColor];
-    gradientLayer.colors = colorsArray;
-    gradientLayer.locations = locationsArray;
+    self.gradientLayer = [CAGradientLayer layer];
+    self.gradientLayer.frame = self.bounds;
+    self.gradientLayer.backgroundColor = [[UIColor clearColor] CGColor];
+    self.gradientLayer.colors = colorsArray;
+    self.gradientLayer.locations = locationsArray;
     
-    [self.layer addSublayer:gradientLayer];
-    
-    double delayInSeconds = 2.0;
-    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+    [self.layer addSublayer:self.gradientLayer];
         
-        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"colors"];
-        animation.fromValue = kNormalColors;
-        animation.toValue = kAlertColors;
-        animation.timingFunction =[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-        animation.duration = 4.0f;
-        
-        gradientLayer.colors = kAlertColors;
-        [gradientLayer addAnimation:animation forKey:nil];
-        
-    });
-    
     return self;
 }
 
+-(void)setAlertRatio:(CGFloat)ratio animated:(BOOL)animated
+{
+    NSArray *fromColors = self.gradientLayer.colors;
+    NSArray *normalColorsArray = kNormalColors;
+    NSArray *alertColorsArray = kAlertColors;
+ 
+    NSMutableArray *toColors = [NSMutableArray arrayWithCapacity:fromColors.count];
+    
+    for (NSInteger i = 0; i < fromColors.count; i++)
+    {
+        UIColor *alertColor = [UIColor colorWithCGColor:(CGColorRef)(alertColorsArray[i])];
+        UIColor *normalColor = [UIColor colorWithCGColor:(CGColorRef)(normalColorsArray[i])];;
+        
+        UIColor *newColor = [UIColor interpolatedColorWithRatio:ratio color:normalColor color:alertColor];
+        [toColors insertObject:(id)[newColor CGColor] atIndex:i];
+    }
+    
+    if (animated)
+    {
+        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"colors"];
+        animation.fromValue = fromColors;
+        animation.toValue = toColors;
+        animation.timingFunction =[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+        animation.duration = 1.0f;
+        
+        self.gradientLayer.colors = toColors;
+        [self.gradientLayer addAnimation:animation forKey:@"colors"];
+    }
+    else
+    {
+        self.gradientLayer.colors = toColors;
+    }
+}
 
 @end
 
