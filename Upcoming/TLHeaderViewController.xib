@@ -77,6 +77,18 @@
 						</object>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 					</object>
+					<object class="IBUIView" id="262687019">
+						<reference key="NSNextResponder" ref="191373211"/>
+						<int key="NSvFlags">266</int>
+						<array class="NSMutableArray" key="NSSubviews"/>
+						<string key="NSFrame">{{0, 320}, {320, 76}}</string>
+						<reference key="NSSuperview" ref="191373211"/>
+						<reference key="NSWindow"/>
+						<string key="NSReuseIdentifierKey">_NS:9</string>
+						<reference key="IBUIBackgroundColor" ref="90356494"/>
+						<float key="IBUIAlpha">0.0</float>
+						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
+					</object>
 					<object class="IBUIView" id="599738804">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">266</int>
@@ -99,16 +111,22 @@
 								<bool key="IBUIUserInteractionEnabled">NO</bool>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 								<string key="IBUIText">5</string>
+								<object class="NSColor" key="IBUITextColor" id="406746317">
+									<int key="NSColorSpace">3</int>
+									<bytes key="NSWhite">MQA</bytes>
+								</object>
 								<nil key="IBUIHighlightedColor"/>
 								<int key="IBUIBaselineAdjustment">0</int>
 								<int key="IBUITextAlignment">1</int>
 								<object class="IBUIFontDescription" key="IBUIFontDescription">
-									<int key="type">1</int>
-									<double key="pointSize">32</double>
+									<string key="name">AvenirNext-Regular</string>
+									<string key="family">Avenir Next</string>
+									<int key="traits">0</int>
+									<double key="pointSize">27</double>
 								</object>
 								<object class="NSFont" key="IBUIFont">
-									<string key="NSName">Helvetica</string>
-									<double key="NSSize">32</double>
+									<string key="NSName">AvenirNext-UltraLight</string>
+									<double key="NSSize">27</double>
 									<int key="NSfFlags">16</int>
 								</object>
 								<bool key="IBUIAdjustsFontSizeToFit">NO</bool>
@@ -116,7 +134,7 @@
 							<object class="IBUILabel" id="856544825">
 								<reference key="NSNextResponder" ref="599738804"/>
 								<int key="NSvFlags">266</int>
-								<string key="NSFrame">{{14, 14}, {216, 25}}</string>
+								<string key="NSFrame">{{14, 12}, {216, 25}}</string>
 								<reference key="NSSuperview" ref="599738804"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="540100323"/>
@@ -128,14 +146,17 @@
 								<bool key="IBUIUserInteractionEnabled">NO</bool>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 								<string key="IBUIText">Some Meeting</string>
+								<reference key="IBUITextColor" ref="406746317"/>
 								<nil key="IBUIHighlightedColor"/>
 								<int key="IBUIBaselineAdjustment">0</int>
 								<object class="IBUIFontDescription" key="IBUIFontDescription">
-									<int key="type">1</int>
+									<string key="name">AvenirNext-Medium</string>
+									<string key="family">Avenir Next</string>
+									<int key="traits">0</int>
 									<double key="pointSize">16</double>
 								</object>
 								<object class="NSFont" key="IBUIFont">
-									<string key="NSName">Helvetica</string>
+									<string key="NSName">AvenirNext-UltraLight</string>
 									<double key="NSSize">16</double>
 									<int key="NSfFlags">16</int>
 								</object>
@@ -144,10 +165,10 @@
 							<object class="IBUILabel" id="540100323">
 								<reference key="NSNextResponder" ref="599738804"/>
 								<int key="NSvFlags">266</int>
-								<string key="NSFrame">{{14, 36}, {207, 20}}</string>
+								<string key="NSFrame">{{14, 34}, {207, 20}}</string>
 								<reference key="NSSuperview" ref="599738804"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="979912093"/>
+								<reference key="NSNextKeyView" ref="852070847"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<reference key="IBUIBackgroundColor" ref="174329450"/>
 								<bool key="IBUIOpaque">NO</bool>
@@ -155,16 +176,53 @@
 								<int key="IBUIContentMode">7</int>
 								<bool key="IBUIUserInteractionEnabled">NO</bool>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-								<string key="IBUIText">An office</string>
+								<string key="IBUIText">Eastside Boardroom</string>
+								<reference key="IBUITextColor" ref="406746317"/>
 								<nil key="IBUIHighlightedColor"/>
 								<int key="IBUIBaselineAdjustment">0</int>
 								<object class="IBUIFontDescription" key="IBUIFontDescription">
-									<int key="type">1</int>
-									<double key="pointSize">13</double>
+									<string key="name">AvenirNext-Regular</string>
+									<string key="family">Avenir Next</string>
+									<int key="traits">0</int>
+									<double key="pointSize">14</double>
 								</object>
 								<object class="NSFont" key="IBUIFont">
-									<string key="NSName">Helvetica</string>
-									<double key="NSSize">13</double>
+									<string key="NSName">AvenirNext-UltraLight</string>
+									<double key="NSSize">14</double>
+									<int key="NSfFlags">16</int>
+								</object>
+								<bool key="IBUIAdjustsFontSizeToFit">NO</bool>
+							</object>
+							<object class="IBUILabel" id="852070847">
+								<reference key="NSNextResponder" ref="599738804"/>
+								<int key="NSvFlags">266</int>
+								<string key="NSFrame">{{14, 53}, {207, 20}}</string>
+								<reference key="NSSuperview" ref="599738804"/>
+								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView" ref="979912093"/>
+								<string key="NSReuseIdentifierKey">_NS:9</string>
+								<reference key="IBUIBackgroundColor" ref="90356494"/>
+								<bool key="IBUIOpaque">NO</bool>
+								<bool key="IBUIClipsSubviews">YES</bool>
+								<int key="IBUIContentMode">7</int>
+								<bool key="IBUIUserInteractionEnabled">NO</bool>
+								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
+								<string key="IBUIText">10:00 am - 11:00 am</string>
+								<object class="NSColor" key="IBUITextColor">
+									<int key="NSColorSpace">3</int>
+									<bytes key="NSWhite">MSAwLjUAA</bytes>
+								</object>
+								<nil key="IBUIHighlightedColor"/>
+								<int key="IBUIBaselineAdjustment">0</int>
+								<object class="IBUIFontDescription" key="IBUIFontDescription">
+									<string key="name">AvenirNext-DemiBold</string>
+									<string key="family">Avenir Next</string>
+									<int key="traits">2</int>
+									<double key="pointSize">14</double>
+								</object>
+								<object class="NSFont" key="IBUIFont">
+									<string key="NSName">AvenirNext-Heavy</string>
+									<double key="NSSize">14</double>
 									<int key="NSfFlags">16</int>
 								</object>
 								<bool key="IBUIAdjustsFontSizeToFit">NO</bool>
@@ -176,18 +234,6 @@
 						<reference key="NSNextKeyView" ref="856544825"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<reference key="IBUIBackgroundColor" ref="90356494"/>
-						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-					</object>
-					<object class="IBUIView" id="262687019">
-						<reference key="NSNextResponder" ref="191373211"/>
-						<int key="NSvFlags">266</int>
-						<array class="NSMutableArray" key="NSSubviews"/>
-						<string key="NSFrame">{{0, 320}, {320, 76}}</string>
-						<reference key="NSSuperview" ref="191373211"/>
-						<reference key="NSWindow"/>
-						<string key="NSReuseIdentifierKey">_NS:9</string>
-						<reference key="IBUIBackgroundColor" ref="90356494"/>
-						<float key="IBUIAlpha">0.0</float>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 					</object>
 				</array>
@@ -333,6 +379,7 @@
 							<reference ref="540100323"/>
 							<reference ref="856544825"/>
 							<reference ref="979912093"/>
+							<reference ref="852070847"/>
 						</array>
 						<reference key="parent" ref="191373211"/>
 					</object>
@@ -357,6 +404,11 @@
 						<array class="NSMutableArray" key="children"/>
 						<reference key="parent" ref="191373211"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">48</int>
+						<reference key="object" ref="852070847"/>
+						<reference key="parent" ref="599738804"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -370,6 +422,7 @@
 				<string key="41.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="43.CustomClassName">TLClockHeaderView</string>
 				<string key="43.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
+				<string key="48.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="5.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="6.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="8.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -378,7 +431,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">47</int>
+			<int key="maxID">48</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
