@@ -51,13 +51,10 @@ const CGFloat kHeaderHeight = 72.0f;
     [super viewDidLoad];
     
     // Update our header labels with the next event whenever it changes. 
-    @weakify(self);
+//    @weakify(self);
     [[RACAbleWithStart([EKEventManager sharedInstance], nextEvent) deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(EKEvent *event) {
-        @strongify(self);
+//        @strongify(self);
         NSLog(@"New Event: %@", event);
-        
-        self.meetingNameLabel.text = event.title;
-        self.meetingLocationLabel.text = event.location;
     }];
     
     // Set up the table view mask
@@ -124,6 +121,7 @@ const CGFloat kHeaderHeight = 72.0f;
     const CGFloat leftMargin = 10.0f;
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectInset(header.bounds, leftMargin, 0)];
     [label setText:[self tableView:tableView titleForHeaderInSection:section]];
+    label.font = [UIFont tl_appFont];
     label.backgroundColor = [UIColor clearColor];
     label.textColor = [UIColor whiteColor];
     

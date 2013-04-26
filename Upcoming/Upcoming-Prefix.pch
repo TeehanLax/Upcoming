@@ -17,5 +17,6 @@
 #import <QuartzCore/QuartzCore.h>
 
 #import "UIColor+CustomizedColors.h"
+#import "UIFont+AppFonts.h"
 
 #endif
