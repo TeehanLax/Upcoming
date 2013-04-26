@@ -61,7 +61,7 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
     if (!(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) return nil;
     
     // Set up our view controllers.
-    self.dayListViewController = [[TLEventViewController alloc] initWithNibName:@"TLViewController" bundle:nil];
+    self.dayListViewController = [[TLEventViewController alloc] initWithNibName:@"TLEventViewController" bundle:nil];
     self.dayListViewController.delegate = self;
     [self addChildViewController:self.dayListViewController];
     
