@@ -10,6 +10,4 @@
 
 @interface TLBackgroundGradientView : UIView
 
-@property (nonatomic, assign) BOOL drawInnserShadow;
-
 @end

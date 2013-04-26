@@ -160,11 +160,11 @@ const CGFloat kHeaderHeight = 72.0f;
     cell.textLabel.text = calendar.title;
     if ([eventManager.selectedCalendars containsObject:calendar.calendarIdentifier])
     {
-        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+        cell.accessoryView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"checkmark"]];
     }
     else
     {
-        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.accessoryView = nil;
     }
 
     return cell;
