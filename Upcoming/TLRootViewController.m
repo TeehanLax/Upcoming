@@ -62,7 +62,7 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
     
     // Set up our view controllers.
     self.dayListViewController = [[TLEventViewController alloc] initWithNibName:@"TLViewController" bundle:nil];
-//    self.dayListViewController.delegate = self;
+    self.dayListViewController.delegate = self;
     [self addChildViewController:self.dayListViewController];
     
     self.headerViewController = [[TLHeaderViewController alloc] initWithNibName:@"TLHeaderViewController" bundle:nil];
@@ -333,17 +333,17 @@ static const CGFloat kMaximumShrinkTranslation = 0.1f;
 
 #pragma mark - TLDayListViewControllerDelegate Methods
 
--(void)userDidBeginInteractingWithDayListViewController:(TLDayListViewController *)controller
+-(void)userDidBeginInteractingWithDayListViewController:(TLEventViewController *)controller
 {
     [self.headerViewController hideHeaderView];
 }
 
--(void)userDidEndInteractingWithDayListViewController:(TLDayListViewController *)controller
+-(void)userDidEndInteractingWithDayListViewController:(TLEventViewController *)controller
 {
     [self.headerViewController showHeaderView];
 }
 
--(void)userDidInteractWithDayListView:(TLDayListViewController *)controller updatingTimeRatio:(CGFloat)timeRatio
+-(void)userDidInteractWithDayListView:(TLEventViewController *)controller updatingTimeRatio:(CGFloat)timeRatio
 {
     [self.headerViewController updateTimeRatio:timeRatio];
 }

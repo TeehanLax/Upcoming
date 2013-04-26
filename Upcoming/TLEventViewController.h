@@ -10,14 +10,14 @@
 #import "TLPastViewController.h"
 #import "TLFutureViewController.h"
 
-@class TLDayListViewController;
+@class TLEventViewController;
 
 @protocol TLEventViewControllerDelegate <NSObject>
 
--(void)userDidBeginInteractingWithDayListViewController:(TLDayListViewController *)controller;
--(void)userDidEndInteractingWithDayListViewController:(TLDayListViewController *)controller;
+-(void)userDidBeginInteractingWithDayListViewController:(TLEventViewController *)controller;
+-(void)userDidEndInteractingWithDayListViewController:(TLEventViewController *)controller;
 
--(void)userDidInteractWithDayListView:(TLDayListViewController *)controller updatingTimeRatio:(CGFloat)timeRatio;
+-(void)userDidInteractWithDayListView:(TLEventViewController *)controller updatingTimeRatio:(CGFloat)timeRatio;
 
 @end
 

@@ -75,6 +75,7 @@ static NSString *kFutureCellIdentifier = @"FutureCell";
 
 - (void)touchDownHandler:(TLTouchDownGestureRecognizer *)recognizer {
     if (recognizer.state == UIGestureRecognizerStateBegan) {
+        [self.delegate userDidBeginInteractingWithDayListViewController:self];
         self.currentView.hidden = NO;
         self.pastViewController.expanded = YES;
         self.futureViewController.expanded = YES;
@@ -95,6 +96,8 @@ static NSString *kFutureCellIdentifier = @"FutureCell";
     }
     
     if (recognizer.state == UIGestureRecognizerStateEnded) {
+        [self.delegate userDidEndInteractingWithDayListViewController:self];
+        
         CGRect pastRect = self.pastView.frame;
         pastRect.origin.y = HEADER_HEIGHT;
         pastRect.size.height = self.view.frame.size.height - HEADER_HEIGHT;
@@ -106,6 +109,7 @@ static NSString *kFutureCellIdentifier = @"FutureCell";
         self.futureView.frame = futureRect;
     } else {
         CGPoint location = [recognizer locationInView:self.view];
+        [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:(location.y / CGRectGetHeight(self.view.bounds))];
         
         CGFloat offset = location.y - (CURRENT_VIEW_HEIGHT / 2);
         if (offset < HEADER_HEIGHT) offset = HEADER_HEIGHT;
