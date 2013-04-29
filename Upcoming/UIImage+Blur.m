@@ -19,12 +19,12 @@
     
     //First, create some darkness
     CIFilter* blackGenerator = [CIFilter filterWithName:@"CIConstantColorGenerator"];
-    CIColor* black = [CIColor colorWithString:@"0.0 0.0 0.0 0.8"];
+    CIColor* black = [CIColor colorWithString:@"0.0 0.0 0.0 0.75"];
     [blackGenerator setValue:black forKey:@"inputColor"];
     CIImage* blackImage = [blackGenerator valueForKey:@"outputImage"];
     
     //Second, apply that black
-    CIFilter *compositeFilter = [CIFilter filterWithName:@"CIMultiplyBlendMode"];
+    CIFilter *compositeFilter = [CIFilter filterWithName:@"CISourceOverCompositing"];
     [compositeFilter setValue:blackImage forKey:@"inputImage"];
     [compositeFilter setValue:inputImage forKey:@"inputBackgroundImage"];
     CIImage *darkenedImage = [compositeFilter outputImage];

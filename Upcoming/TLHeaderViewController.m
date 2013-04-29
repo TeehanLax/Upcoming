@@ -121,7 +121,7 @@ const CGFloat kHeaderHeight = 72.0f;
     const CGFloat leftMargin = 10.0f;
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectInset(header.bounds, leftMargin, 0)];
     [label setText:[self tableView:tableView titleForHeaderInSection:section]];
-    label.font = [UIFont tl_appFont];
+    label.font = [[UIFont tl_mediumAppFont] fontWithSize:32];
     label.backgroundColor = [UIColor clearColor];
     label.textColor = [UIColor whiteColor];
     
@@ -160,11 +160,11 @@ const CGFloat kHeaderHeight = 72.0f;
     cell.textLabel.text = calendar.title;
     if ([eventManager.selectedCalendars containsObject:calendar.calendarIdentifier])
     {
-        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+        cell.accessoryView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"checkmark"]];
     }
     else
     {
-        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.accessoryView = nil;
     }
 
     return cell;

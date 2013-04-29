@@ -14,6 +14,7 @@
 {
     if (!(self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]))  return nil;
     
+    self.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"settings-panel"]];
     [self setupCustomColors];
     
     return self;
@@ -30,11 +31,11 @@
 {
     self.backgroundColor = [UIColor darkGrayColor];
     self.textLabel.textColor = [UIColor whiteColor];
-    self.textLabel.font = [UIFont tl_appFont];
+    self.textLabel.backgroundColor = [UIColor clearColor];
+    self.textLabel.font = [[UIFont tl_appFont] fontWithSize:14];
     self.contentView.backgroundColor = [UIColor clearColor];
     
-    UIView *selectedBackgroundView = [[UIView alloc] initWithFrame:self.bounds];
-    selectedBackgroundView.backgroundColor = [UIColor blueColor];
+    UIImageView *selectedBackgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"settings-panel-active"]];
     self.selectedBackgroundView = selectedBackgroundView;
 }
 

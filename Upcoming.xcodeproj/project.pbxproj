@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		58CAD422C26D45918EB422B5 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DF8D172A92B477D8A55BFE7 /* libPods.a */; };
 		5E18D2AC172AF5A50010F8FF /* UIFont+AppFonts.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E18D2AB172AF5A50010F8FF /* UIFont+AppFonts.m */; };
+		5E18D2B4172B03F60010F8FF /* checkmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2B0172B03F60010F8FF /* checkmark@2x.png */; };
+		5E18D2B6172B03F60010F8FF /* inner-shadow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2B2172B03F60010F8FF /* inner-shadow@2x.png */; };
+		5E18D2B7172B03F60010F8FF /* settings-panel@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2B3172B03F60010F8FF /* settings-panel@2x.png */; };
+		5E18D2B9172B085B0010F8FF /* settings-panel-active@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2B8172B085B0010F8FF /* settings-panel-active@2x.png */; };
 		5E21DEDB171F19C000231263 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DED9171F19C000231263 /* EventKit.framework */; };
 		5E21DEDC171F19C000231263 /* EventKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DEDA171F19C000231263 /* EventKitUI.framework */; };
 		5E2EF7B5172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7B4172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m */; };
@@ -43,6 +47,10 @@
 		0DF8D172A92B477D8A55BFE7 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		5E18D2AA172AF5A50010F8FF /* UIFont+AppFonts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIFont+AppFonts.h"; sourceTree = "<group>"; };
 		5E18D2AB172AF5A50010F8FF /* UIFont+AppFonts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIFont+AppFonts.m"; sourceTree = "<group>"; };
+		5E18D2B0172B03F60010F8FF /* checkmark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "checkmark@2x.png"; path = "Images/checkmark@2x.png"; sourceTree = "<group>"; };
+		5E18D2B2172B03F60010F8FF /* inner-shadow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "inner-shadow@2x.png"; path = "Images/inner-shadow@2x.png"; sourceTree = "<group>"; };
+		5E18D2B3172B03F60010F8FF /* settings-panel@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "settings-panel@2x.png"; path = "Images/settings-panel@2x.png"; sourceTree = "<group>"; };
+		5E18D2B8172B085B0010F8FF /* settings-panel-active@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "settings-panel-active@2x.png"; path = "Images/settings-panel-active@2x.png"; sourceTree = "<group>"; };
 		5E21DED9171F19C000231263 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 		5E21DEDA171F19C000231263 /* EventKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKitUI.framework; path = System/Library/Frameworks/EventKitUI.framework; sourceTree = SDKROOT; };
 		5E2EF7B3172AC4FF00737A75 /* TLTouchDownGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLTouchDownGestureRecognizer.h; sourceTree = "<group>"; };
@@ -110,6 +118,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5E18D2AD172AFA540010F8FF /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				5E18D2B0172B03F60010F8FF /* checkmark@2x.png */,
+				5E18D2B2172B03F60010F8FF /* inner-shadow@2x.png */,
+				5E18D2B3172B03F60010F8FF /* settings-panel@2x.png */,
+				5E18D2B8172B085B0010F8FF /* settings-panel-active@2x.png */,
+			);
+			name = Images;
+			sourceTree = "<group>";
+		};
 		5E21DED8171EFCED00231263 /* EventManager */ = {
 			isa = PBXGroup;
 			children = (
@@ -168,6 +187,7 @@
 		5EB4E5571717374E00EC8E1C /* Upcoming */ = {
 			isa = PBXGroup;
 			children = (
+				5E18D2AD172AFA540010F8FF /* Images */,
 				5EB951AE17203DD700A5089B /* Views */,
 				5EB4E5601717374E00EC8E1C /* TLAppDelegate.h */,
 				5EB4E5611717374E00EC8E1C /* TLAppDelegate.m */,
@@ -288,6 +308,10 @@
 				5EB4E5681717374E00EC8E1C /* Default-568h@2x.png in Resources */,
 				5EB4E58517187E1500EC8E1C /* TLHeaderViewController.xib in Resources */,
 				5E2EF7BD172AC51700737A75 /* TLEventViewController.xib in Resources */,
+				5E18D2B4172B03F60010F8FF /* checkmark@2x.png in Resources */,
+				5E18D2B6172B03F60010F8FF /* inner-shadow@2x.png in Resources */,
+				5E18D2B7172B03F60010F8FF /* settings-panel@2x.png in Resources */,
+				5E18D2B9172B085B0010F8FF /* settings-panel-active@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

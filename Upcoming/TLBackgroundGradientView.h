@@ -10,6 +10,9 @@
 
 @interface TLBackgroundGradientView : UIView
 
-@property (nonatomic, assign) BOOL drawInnserShadow;
+/*
+ Change the ratio between normal colours and alerted colours.
+ */
+-(void)setAlertRatio:(CGFloat)ratio animated:(BOOL)animated;
 
 @end

@@ -8,6 +8,7 @@
 
 #import "TLEventViewController.h"
 #import "TLTouchDownGestureRecognizer.h"
+#import "TLBackgroundGradientView.h"
 #import <QuartzCore/QuartzCore.h>
 
 #define HEADER_HEIGHT 72.f
@@ -19,7 +20,7 @@ static NSString *kFutureCellIdentifier = @"FutureCell";
 
 @interface TLEventViewController ()
 
-//- (NSInteger)currentHour;
+@property (nonatomic, strong) TLBackgroundGradientView *backgroundGradientView;
 
 @end
 
@@ -42,6 +43,9 @@ static NSString *kFutureCellIdentifier = @"FutureCell";
     
     TLTouchDownGestureRecognizer *touchDown = [[TLTouchDownGestureRecognizer alloc] initWithTarget:self action:@selector(touchDownHandler:)];
     [self.view addGestureRecognizer:touchDown];
+    
+    self.backgroundGradientView = [[TLBackgroundGradientView alloc] initWithFrame:self.view.bounds];
+    [self.view insertSubview:self.backgroundGradientView atIndex:0];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
