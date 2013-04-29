@@ -52,6 +52,8 @@
 @property (nonatomic, strong) RACSubject *downwardFooterPanSubject;
 @property (nonatomic, strong) RACSubject *footerMovementSubject;
 @property (nonatomic, strong) RACSubject *footerFinishedTransitionSubject;
+// Used to receive ratios of translation for changing the alpha of the overlay view which covers the day list view
+@property (nonatomic, strong) RACSubject *dayListAndHeaderOverlaySubject;
 
 @end
 
@@ -138,6 +140,15 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         // This is the ratio of the movement. 0 is full sized and 1 is fully shrunk.
         CGFloat ratio = [x floatValue];
         
+        if (ratio > 1.0f)
+        {
+            ratio = 1.0f;
+        }
+        else if (ratio < 0.0f)
+        {
+            ratio = 0.0f;
+        }
+        
         self.dayListOverlayView.alpha = ratio;
     }];
     
@@ -218,6 +229,46 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     
     // Footer gesture recognizer subjects
     
+    // This subject is responsible for adding/removing the overlay view to our hierarchy
+    self.dayListAndHeaderOverlaySubject = [RACSubject subject];
+    [self.dayListAndHeaderOverlaySubject subscribeNext:^(id x) {
+        @strongify(self);
+        if ([x boolValue])
+        {
+            // Using 1.0 scale here because after blurring, we won't need the extra (Retina) pixels.
+            
+            // First grab the image of the day list view
+            UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 1.0);
+            [self.dayListViewController.view.layer renderInContext:UIGraphicsGetCurrentContext()];
+            UIImage *dayListImage = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            
+            // The grab the image of the header view
+            UIGraphicsBeginImageContextWithOptions(self.headerViewController.view.bounds.size, NO, 1.0);
+            [self.headerViewController.view.layer renderInContext:UIGraphicsGetCurrentContext()];
+            UIImage *headerImage = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            
+            // Finally, composite the two images together. 
+            UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 1.0);
+            [dayListImage drawInRect:self.view.bounds];
+            [headerImage drawInRect:CGRectOffset(self.headerViewController.view.bounds, 0, -CGRectGetHeight(self.headerViewController.view.bounds) + kHeaderHeight)];
+            UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+            
+            UIGraphicsEndImageContext();
+            
+            self.dayListOverlayView.image = [UIImage darkenedAndBlurredImageForImage:image];
+            
+            [self.view insertSubview:self.dayListOverlayView aboveSubview:self.headerViewController.view];
+        }
+        else
+        {
+            self.dayListOverlayView.image = nil;
+            [self.dayListOverlayView removeFromSuperview];
+            [self.headerViewController scrollTableViewToTop];
+        }
+    }];
+    
     self.footerMovementSubject = [RACSubject subject];
     [self.footerMovementSubject subscribeNext:^(id x) {
         
@@ -257,6 +308,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
             effectiveRatio = 1.0f + (y / fabsf(targetTranslation));
         }
         
+        [self.dayListBlurSubject sendNext:@(effectiveRatio)];
         [self.footerMovementSubject sendNext:@(effectiveRatio)];
     }];
     
@@ -281,6 +333,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
             effectiveRatio = verticalTranslation / targetTranslation;
         }
         
+        [self.dayListBlurSubject sendNext:@(effectiveRatio)];
         [self.footerMovementSubject sendNext:@(effectiveRatio)];
     }];
     
@@ -288,6 +341,11 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     [self.footerFinishedTransitionSubject subscribeNext:^(NSNumber *menuIsOpenNumber) {
         
         BOOL menuIsOpen = menuIsOpenNumber.boolValue;
+        
+        if (!menuIsOpen)
+        {
+            [self.dayListAndHeaderOverlaySubject sendNext:menuIsOpenNumber];
+        }
                 
         self.panFooterUpGestureRecognizer.enabled = !menuIsOpen;
         self.panFooterDownGestureRecognizer.enabled = menuIsOpen;
@@ -314,6 +372,11 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     
     self.footerViewController.view.frame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);
     [self.view addSubview:self.footerViewController.view];
+    
+    self.dayListOverlayView = [[UIImageView alloc] init];
+    self.dayListOverlayView.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.4f];
+    self.dayListOverlayView.frame = self.view.frame;
+    self.dayListOverlayView.alpha = 0.0f;
 }
 
 -(void)viewDidLoad
@@ -410,7 +473,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         
         if (state == UIGestureRecognizerStateBegan)
         {
-            [self.dayListOverlaySubject sendNext:@(YES)];
+            [self.dayListAndHeaderOverlaySubject sendNext:@(YES)];
         }
         else if (state == UIGestureRecognizerStateChanged)
         {
