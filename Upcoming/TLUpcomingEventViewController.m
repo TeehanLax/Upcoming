@@ -9,7 +9,7 @@
 #import "TLUpcomingEventViewController.h"
 
 const CGFloat TLUpcomingEventViewControllerHiddenHeight = 5.0f;
-const CGFloat TLUpcomingEventViewControllerTotalHeight = 59.0f;
+const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
 
 @interface TLUpcomingEventViewController ()
 
@@ -22,10 +22,6 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 59.0f;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    self.view.backgroundColor = [UIColor clearColor];
-    self.backgroundImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"upcomingEventBackground"]];
-    [self.view addSubview:self.backgroundImageView];
 }
 
 - (void)didReceiveMemoryWarning

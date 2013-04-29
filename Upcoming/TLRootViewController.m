@@ -76,7 +76,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     self.headerViewController = [[TLHeaderViewController alloc] initWithNibName:@"TLHeaderViewController" bundle:nil];
     [self addChildViewController:self.headerViewController];
     
-    self.footerViewController = [[TLUpcomingEventViewController alloc] init];
+    self.footerViewController = [[TLUpcomingEventViewController alloc] initWithNibName:@"TLUpcomingEventViewController" bundle:nil];
     [self addChildViewController:self.footerViewController];
     
     
@@ -249,7 +249,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
             UIImage *headerImage = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();
             
-            // Finally, composite the two images together. 
+            // Finally, composite the two images together.  
             UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 1.0);
             [dayListImage drawInRect:self.view.bounds];
             [headerImage drawInRect:CGRectOffset(self.headerViewController.view.bounds, 0, -CGRectGetHeight(self.headerViewController.view.bounds) + kHeaderHeight)];
