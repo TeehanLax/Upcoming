@@ -50,7 +50,7 @@
     self.gradientLayer.colors = colorsArray;
     self.gradientLayer.locations = locationsArray;
     
-    [self.layer addSublayer:self.gradientLayer];
+    [self.layer insertSublayer:self.gradientLayer atIndex:0];
         
     return self;
 }
