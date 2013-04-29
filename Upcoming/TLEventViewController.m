@@ -42,12 +42,7 @@ static NSString *kFutureCellIdentifier = @"FutureCell";
     
     self.touchDown = [[TLTouchDownGestureRecognizer alloc] initWithTarget:self action:@selector(touchDownHandler:)];
     [self.view addGestureRecognizer:self.touchDown];
-    
-    // TODO: Remove the following three lines.
-    self.pastView.alpha = 0.0f;
-    self.currentView.alpha = 0.0f;
-    self.futureView.alpha = 0.0f;
-    
+        
     self.backgroundGradientView = [[TLBackgroundGradientView alloc] initWithFrame:self.view.bounds];
     [self.view insertSubview:self.backgroundGradientView atIndex:0];
 }
