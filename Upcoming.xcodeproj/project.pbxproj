@@ -13,6 +13,9 @@
 		5E18D2B6172B03F60010F8FF /* inner-shadow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2B2172B03F60010F8FF /* inner-shadow@2x.png */; };
 		5E18D2B7172B03F60010F8FF /* settings-panel@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2B3172B03F60010F8FF /* settings-panel@2x.png */; };
 		5E18D2B9172B085B0010F8FF /* settings-panel-active@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2B8172B085B0010F8FF /* settings-panel-active@2x.png */; };
+		5E18D2F9172EE7890010F8FF /* TLUpcomingEventViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E18D2F8172EE7880010F8FF /* TLUpcomingEventViewController.m */; };
+		5E18D2FB172EEA6B0010F8FF /* upcomingEventBackground@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2FA172EEA6B0010F8FF /* upcomingEventBackground@2x.png */; };
+		5E18D2FD172F028F0010F8FF /* TLUpcomingEventViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2FC172F028F0010F8FF /* TLUpcomingEventViewController.xib */; };
 		5E21DEDB171F19C000231263 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DED9171F19C000231263 /* EventKit.framework */; };
 		5E21DEDC171F19C000231263 /* EventKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DEDA171F19C000231263 /* EventKitUI.framework */; };
 		5E2EF7B5172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7B4172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m */; };
@@ -51,6 +54,10 @@
 		5E18D2B2172B03F60010F8FF /* inner-shadow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "inner-shadow@2x.png"; path = "Images/inner-shadow@2x.png"; sourceTree = "<group>"; };
 		5E18D2B3172B03F60010F8FF /* settings-panel@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "settings-panel@2x.png"; path = "Images/settings-panel@2x.png"; sourceTree = "<group>"; };
 		5E18D2B8172B085B0010F8FF /* settings-panel-active@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "settings-panel-active@2x.png"; path = "Images/settings-panel-active@2x.png"; sourceTree = "<group>"; };
+		5E18D2F7172EE7880010F8FF /* TLUpcomingEventViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLUpcomingEventViewController.h; sourceTree = "<group>"; };
+		5E18D2F8172EE7880010F8FF /* TLUpcomingEventViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLUpcomingEventViewController.m; sourceTree = "<group>"; };
+		5E18D2FA172EEA6B0010F8FF /* upcomingEventBackground@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "upcomingEventBackground@2x.png"; path = "Images/upcomingEventBackground@2x.png"; sourceTree = "<group>"; };
+		5E18D2FC172F028F0010F8FF /* TLUpcomingEventViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLUpcomingEventViewController.xib; sourceTree = "<group>"; };
 		5E21DED9171F19C000231263 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 		5E21DEDA171F19C000231263 /* EventKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKitUI.framework; path = System/Library/Frameworks/EventKitUI.framework; sourceTree = SDKROOT; };
 		5E2EF7B3172AC4FF00737A75 /* TLTouchDownGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLTouchDownGestureRecognizer.h; sourceTree = "<group>"; };
@@ -121,6 +128,7 @@
 		5E18D2AD172AFA540010F8FF /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				5E18D2FA172EEA6B0010F8FF /* upcomingEventBackground@2x.png */,
 				5E18D2B0172B03F60010F8FF /* checkmark@2x.png */,
 				5E18D2B2172B03F60010F8FF /* inner-shadow@2x.png */,
 				5E18D2B3172B03F60010F8FF /* settings-panel@2x.png */,
@@ -227,6 +235,9 @@
 				5EB4E58317187E1500EC8E1C /* TLHeaderViewController.xib */,
 				5E2EF7BE172AC53500737A75 /* TLEventViewController.h */,
 				5E2EF7BF172AC53500737A75 /* TLEventViewController.m */,
+				5E18D2F7172EE7880010F8FF /* TLUpcomingEventViewController.h */,
+				5E18D2F8172EE7880010F8FF /* TLUpcomingEventViewController.m */,
+				5E18D2FC172F028F0010F8FF /* TLUpcomingEventViewController.xib */,
 				5E2EF7BC172AC51700737A75 /* TLEventViewController.xib */,
 				5E2EF7B6172AC51100737A75 /* TLPastViewController.h */,
 				5E2EF7B7172AC51100737A75 /* TLPastViewController.m */,
@@ -312,6 +323,8 @@
 				5E18D2B6172B03F60010F8FF /* inner-shadow@2x.png in Resources */,
 				5E18D2B7172B03F60010F8FF /* settings-panel@2x.png in Resources */,
 				5E18D2B9172B085B0010F8FF /* settings-panel-active@2x.png in Resources */,
+				5E18D2FB172EEA6B0010F8FF /* upcomingEventBackground@2x.png in Resources */,
+				5E18D2FD172F028F0010F8FF /* TLUpcomingEventViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -355,6 +368,7 @@
 				5E2EF7BB172AC51100737A75 /* TLFutureViewController.m in Sources */,
 				5E2EF7C0172AC53500737A75 /* TLEventViewController.m in Sources */,
 				5E18D2AC172AF5A50010F8FF /* UIFont+AppFonts.m in Sources */,
+				5E18D2F9172EE7890010F8FF /* TLUpcomingEventViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
