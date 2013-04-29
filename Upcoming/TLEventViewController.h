@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "TLTouchDownGestureRecognizer.h"
 #import "TLPastViewController.h"
 #import "TLFutureViewController.h"
 
@@ -31,5 +32,7 @@
 
 @property (nonatomic, strong) TLPastViewController *pastViewController;
 @property (nonatomic, strong) TLFutureViewController *futureViewController;
+
+@property (nonatomic, strong) TLTouchDownGestureRecognizer *touchDown;
 
 @end

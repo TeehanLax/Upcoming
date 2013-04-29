@@ -7,7 +7,6 @@
 //
 
 #import "TLEventViewController.h"
-#import "TLTouchDownGestureRecognizer.h"
 #import "TLBackgroundGradientView.h"
 #import <QuartzCore/QuartzCore.h>
 
@@ -41,8 +40,8 @@ static NSString *kFutureCellIdentifier = @"FutureCell";
     [self.currentView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:kCurrentCellIdentifier];
     [self.futureView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:kFutureCellIdentifier];
     
-    TLTouchDownGestureRecognizer *touchDown = [[TLTouchDownGestureRecognizer alloc] initWithTarget:self action:@selector(touchDownHandler:)];
-    [self.view addGestureRecognizer:touchDown];
+    self.touchDown = [[TLTouchDownGestureRecognizer alloc] initWithTarget:self action:@selector(touchDownHandler:)];
+    [self.view addGestureRecognizer:self.touchDown];
     
     // TODO: Remove the following three lines.
     self.pastView.alpha = 0.0f;

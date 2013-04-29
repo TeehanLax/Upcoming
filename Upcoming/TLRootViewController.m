@@ -400,10 +400,9 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
             }];
         }
     }];
-    
     self.panHeaderUpGestureRecognizer.delegate = self;
     [self.headerViewController.view addGestureRecognizer:self.panHeaderUpGestureRecognizer];
-    
+        
     self.panFooterUpGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
         UIPanGestureRecognizer *recognizer = (UIPanGestureRecognizer *)sender;
         
@@ -438,7 +437,8 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         }
     }];
     self.panFooterUpGestureRecognizer.delegate = self;
-    [self.footerViewController.view addGestureRecognizer:self.panFooterUpGestureRecognizer];
+    [self.view addGestureRecognizer:self.panFooterUpGestureRecognizer];
+    [self.dayListViewController.touchDown requireGestureRecognizerToFail:self.panFooterUpGestureRecognizer];
     
     self.panFooterDownGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
         UIPanGestureRecognizer *recognizer = (UIPanGestureRecognizer *)sender;
@@ -469,7 +469,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         }
     }];
     self.panFooterDownGestureRecognizer.delegate = self;
-    [self.footerViewController.view addGestureRecognizer:self.panFooterDownGestureRecognizer];
+    [self.view addGestureRecognizer:self.panFooterDownGestureRecognizer];
     
     [self.menuFinishedTransitionSubject sendNext:@(NO)];
     [self.footerFinishedTransitionSubject sendNext:@(NO)];
@@ -487,6 +487,11 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         // Only allow the tap to take place in the area beneath the header menu.
         CGFloat menuHeight = kHeaderHeight + kMaximumHeaderTranslationThreshold;
         return CGRectContainsPoint(CGRectMake(0, menuHeight, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - menuHeight), [touch locationInView:self.view]);
+    }
+    else if (gestureRecognizer == self.panFooterUpGestureRecognizer)
+    {
+        CGFloat headerTapHeight = 44.0f;
+        return CGRectContainsPoint(CGRectMake(0, CGRectGetHeight(self.view.bounds) - headerTapHeight, CGRectGetWidth(self.view.bounds), headerTapHeight), [touch locationInView:self.view]);
     }
     else
     {
