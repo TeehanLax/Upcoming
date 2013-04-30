@@ -366,7 +366,7 @@ static CGFloat interAnimationDelay = 0.05f;
 
 -(void)showHeaderView
 {
-    [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
+    //[[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     [UIView animateWithDuration:pullDownAnimationDuration animations:^{
         self.headerClockView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
     } completion:^(BOOL finished) {
@@ -380,7 +380,7 @@ static CGFloat interAnimationDelay = 0.05f;
                 [UIView animateWithDuration:pullDownAnimationDuration animations:^{
                     self.headerDetailView.transform = CGAffineTransformIdentity;
                 } completion:^(BOOL finished) {
-                    [[UIApplication sharedApplication] endIgnoringInteractionEvents];
+                    //[[UIApplication sharedApplication] endIgnoringInteractionEvents];
                 }];
             }];
         }];

@@ -12,12 +12,12 @@
 
 +(UIFont *)tl_appFont
 {
-    return [UIFont fontWithName:@"Avenir Next" size:[UIFont systemFontSize]];
+    return [UIFont fontWithName:@"AvenirNext" size:[UIFont systemFontSize]];
 }
 
 +(UIFont *)tl_mediumAppFont
 {
-    return [UIFont fontWithName:@"Avenir Next-Medium" size:[UIFont systemFontSize]];
+    return [UIFont fontWithName:@"AvenirNext-Medium" size:[UIFont systemFontSize]];
 }
 
 @end
