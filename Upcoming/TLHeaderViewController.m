@@ -23,9 +23,9 @@ const CGFloat kHeaderHeight = 72.0f;
 @property (nonatomic, weak) IBOutlet UIView *headerDetailView;
 @property (nonatomic, weak) IBOutlet TLClockHeaderView *headerClockView;
 
-@property (nonatomic, weak) IBOutlet UILabel *meetingNameLabel;
-@property (nonatomic, weak) IBOutlet UILabel *meetingLocationLabel;
-@property (nonatomic, weak) IBOutlet UILabel *meetingTimeLabel;
+@property (nonatomic, weak) IBOutlet UILabel *eventTitleLabel;
+@property (nonatomic, weak) IBOutlet UILabel *eventLocationLabel;
+@property (nonatomic, weak) IBOutlet UILabel *eventTimeLabel;
 @property (nonatomic, weak) IBOutlet UILabel *eventRelativeTimeLabel;
 @property (nonatomic, weak) IBOutlet UILabel *eventRelativeTimeUnitLabel;
 @property (nonatomic, weak) IBOutlet UIImageView *eventLocationImageView;
@@ -58,36 +58,38 @@ const CGFloat kHeaderHeight = 72.0f;
     self.view.backgroundColor = [UIColor clearColor];
     
     // Update our header labels with the next event whenever it changes. 
-//    @weakify(self);
-    [[RACAbleWithStart([EKEventManager sharedInstance], events)
-     deliverOn:[RACScheduler mainThreadScheduler]]
-     subscribeNext:^(NSArray *eventArray) {
-         
-         NSArray *filteredArray = [[[eventArray.rac_sequence filter:^BOOL(EKEvent *event) {
-             return [event.startDate compare:[NSDate date]] == NSOrderedDescending;
-         }] array] sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-             return [[obj1 startDate] compare:[obj2 startDate]];
-         }];
-         
-         EKEvent *event;
-         
-         if (filteredArray.count == 0)
-         {
-             event = [[EKEventManager sharedInstance] nextEvent];
-         }
-         else
-         {
-             event = filteredArray[0];
-         }
+    //    @weakify(self);
+    [[[RACSignal combineLatest:@[RACAbleWithStart([EKEventManager sharedInstance], events), RACAbleWithStart([EKEventManager sharedInstance], nextEvent)]
+                        reduce:^id(NSArray *eventArray, EKEvent *event)
+       {
+           
+           NSArray *filteredArray = [[[eventArray.rac_sequence filter:^BOOL(EKEvent *event) {
+               return [event.startDate compare:[NSDate date]] == NSOrderedDescending;
+           }] array] sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+               return [[obj1 startDate] compare:[obj2 startDate]];
+           }];
+           
+           if (filteredArray.count == 0)
+           {
+               return event;
+           }
+           else
+           {
+               return filteredArray[0];
+           }           
+       }] deliverOn:[RACScheduler mainThreadScheduler]]
+     subscribeNext:^(EKEvent *event) {
          
          if (event == nil)
          {
              
-             self.meetingNameLabel.text = NSLocalizedString(@"No Upcoming Event", @"No upcoming event header text");
-             self.meetingLocationLabel.text = @"";
-             self.meetingTimeLabel.text = @"";
+             self.eventTitleLabel.text = NSLocalizedString(@"No Upcoming Event", @"No upcoming event header text");
+             self.eventLocationLabel.text = @"";
+             self.eventTimeLabel.text = @"";
              self.eventRelativeTimeLabel.text = @"";
              self.eventRelativeTimeUnitLabel.text = @"";
+             self.eventLocationImageView.alpha = 0.0f;
+             self.calendarView.alpha = 0.0f;
              
              return;
          }
@@ -165,13 +167,13 @@ const CGFloat kHeaderHeight = 72.0f;
              }
          }
          
-         self.meetingNameLabel.text = event.title;
-         self.meetingLocationLabel.text = event.location;
-         self.meetingTimeLabel.text = [NSString stringWithFormat:@"%@ – %@",
+         self.eventTitleLabel.text = event.title;
+         self.eventLocationLabel.text = event.location;
+         self.eventTimeLabel.text = [NSString stringWithFormat:@"%@ – %@",
                                        [NSDateFormatter localizedStringFromDate:event.startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle],
                                        [NSDateFormatter localizedStringFromDate:event.endDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle]];
          
-         if ([self.meetingLocationLabel.text length] > 0)
+         if ([self.eventLocationLabel.text length] > 0)
          {
              self.eventLocationImageView.alpha = 1.0f;
          }
@@ -180,6 +182,7 @@ const CGFloat kHeaderHeight = 72.0f;
              self.eventLocationImageView.alpha = 0.0f;
          }
          
+         self.calendarView.alpha = 1.0f;
          self.calendarView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
      }];
     
@@ -187,9 +190,9 @@ const CGFloat kHeaderHeight = 72.0f;
     [self setupTableViewMask];
     
     // Set our custom colours
-    self.meetingNameLabel.textColor = [UIColor headerTextColor];
-    self.meetingLocationLabel.textColor = [UIColor headerTextColor];
-    self.meetingTimeLabel.textColor = [UIColor headerTextColor];
+    self.eventTitleLabel.textColor = [UIColor headerTextColor];
+    self.eventLocationLabel.textColor = [UIColor headerTextColor];
+    self.eventTimeLabel.textColor = [UIColor headerTextColor];
     
     // Remove the default table view background
     UIView *backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
@@ -271,7 +274,7 @@ const CGFloat kHeaderHeight = 72.0f;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"Cell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    TLCalendarSelectCell *cell = (TLCalendarSelectCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
     if (!cell)
     {
@@ -292,6 +295,8 @@ const CGFloat kHeaderHeight = 72.0f;
     {
         cell.accessoryView = nil;
     }
+    
+    cell.dotColor = [UIColor colorWithCGColor:calendar.CGColor];
 
     return cell;
 }

@@ -69,6 +69,8 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
             self.eventTimeLabel.text = @"";
             self.eventRelativeTimeLabel.text = @"";
             self.eventRelativeTimeUnitLabel.text = @"";
+            self.eventLocationImageView.alpha = 0.0f;
+            self.calendarView.alpha = 0.0f;
         }
         else
         {
@@ -214,6 +216,7 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
         self.eventLocationImageView.alpha = 0.0f;
     }
     
+    self.calendarView.alpha = 1.0f;
     self.calendarView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
 }
 

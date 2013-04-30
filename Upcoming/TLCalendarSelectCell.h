@@ -10,4 +10,6 @@
 
 @interface TLCalendarSelectCell : UITableViewCell
 
+@property (nonatomic, strong) UIColor *dotColor;
+
 @end
