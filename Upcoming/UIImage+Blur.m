@@ -13,7 +13,18 @@
 
 + (UIImage *)darkenedAndBlurredImageForImage:(UIImage *)image
 {
-    CIImage *inputImage = [[[CIImage alloc] initWithImage:image] imageByApplyingTransform:CGAffineTransformMakeScale(0.25f, 0.25f)];
+    CGFloat scaleFactor = 1.0f;
+    
+    if (AppDelegate.device == TLAppDelegateDeviceIPhone3GS || AppDelegate.device == TLAppDelegateDeviceIPhone4)
+    {
+        scaleFactor = 0.25f;
+    }
+    else if (AppDelegate.device == TLAppDelegateDeviceIPhone4S)
+    {
+        scaleFactor = 0.5f;
+    }
+    
+    CIImage *inputImage = [[[CIImage alloc] initWithImage:image] imageByApplyingTransform:CGAffineTransformMakeScale(scaleFactor, 0.25f)];
     
     CIContext *context = [CIContext contextWithOptions:nil];
     
@@ -32,7 +43,7 @@
     //Third, blur the image
     CIFilter *blurFilter = [CIFilter filterWithName:@"CIGaussianBlur"];
     [blurFilter setDefaults];
-    [blurFilter setValue:@(0.5f) forKey:@"inputRadius"];
+    [blurFilter setValue:@(2 * scaleFactor) forKey:@"inputRadius"];
     [blurFilter setValue:darkenedImage forKey:kCIInputImageKey];
     CIImage *blurredImage = [blurFilter outputImage];
     
