@@ -8,8 +8,6 @@
 
 #import <UIKit/UIKit.h>
 #import "TLTouchDownGestureRecognizer.h"
-#import "TLPastViewController.h"
-#import "TLFutureViewController.h"
 
 @class TLEventViewController;
 
@@ -26,12 +24,7 @@
 
 @property (nonatomic, weak) id<TLEventViewControllerDelegate> delegate;
 
-@property (nonatomic, strong) IBOutlet UICollectionView *pastView;
-@property (nonatomic, strong) IBOutlet UICollectionView *currentView;
-@property (nonatomic, strong) IBOutlet UICollectionView *futureView;
-
-@property (nonatomic, strong) TLPastViewController *pastViewController;
-@property (nonatomic, strong) TLFutureViewController *futureViewController;
+@property (nonatomic, strong) IBOutlet UICollectionView *collectionView;
 
 @property (nonatomic, strong) TLTouchDownGestureRecognizer *touchDown;
 
