@@ -176,14 +176,14 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
             // This event spans multiple days.
             
             timeString = [NSString stringWithFormat:@"%@ – %@",
-                          [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterMediumStyle],
-                          [NSDateFormatter localizedStringFromDate:endDate dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterNoStyle]];
+                          [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle],
+                          [NSDateFormatter localizedStringFromDate:endDate dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterNoStyle]];
         }
         else
         {
             timeString = [NSString stringWithFormat:@"%@ – %@",
-                          [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterMediumStyle],
-                          [NSDateFormatter localizedStringFromDate:endDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterMediumStyle]];
+                          [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle],
+                          [NSDateFormatter localizedStringFromDate:endDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle]];
         }
     }
     
@@ -198,7 +198,7 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     }
     else
     {
-        dateString = [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterNoStyle];
+        dateString = [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterNoStyle];
     }
     
     self.eventTimeLabel.text = [NSString stringWithFormat:@"%@, %@", dateString, timeString];
