@@ -351,6 +351,8 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         self.panFooterUpGestureRecognizer.enabled = !menuIsOpen;
         self.panFooterDownGestureRecognizer.enabled = menuIsOpen;
         
+        self.panHeaderDownGestureRecognizer.enabled = !menuIsOpen;
+        
         self.dayListViewController.view.userInteractionEnabled = !menuIsOpen;
     }];
     
