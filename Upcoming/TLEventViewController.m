@@ -8,171 +8,125 @@
 
 #import "TLEventViewController.h"
 #import "TLBackgroundGradientView.h"
+#import "TLCollectionViewLayout.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define HEADER_HEIGHT 72.f
-#define CURRENT_VIEW_HEIGHT 240.f
+#define NUMBER_OF_ROWS 24
+#define EXPANDED_ROWS 4
+#define MAX_ROW_HEIGHT 60.f
 
-static NSString *kPastCellIdentifier = @"PastCell";
-static NSString *kCurrentCellIdentifier = @"CurrentCell";
-static NSString *kFutureCellIdentifier = @"FutureCell";
+static NSString *kCellIdentifier = @"Cell";
 
 @interface TLEventViewController ()
 
+@property (nonatomic, assign) CGPoint location;
+@property (nonatomic, assign) BOOL touch;
 @property (nonatomic, strong) TLBackgroundGradientView *backgroundGradientView;
 
 @end
 
-@implementation TLEventViewController {
-    NSInteger currentHour;
-    NSInteger lastHour;
-    BOOL isPanning;
-}
+@implementation TLEventViewController
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
-    currentHour = 0;
-    isPanning = NO;
+    self.touch = NO;
     
-    [self.pastView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:kPastCellIdentifier];
-    [self.currentView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:kCurrentCellIdentifier];
-    [self.futureView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:kFutureCellIdentifier];
+    [self.collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:kCellIdentifier];
     
     self.touchDown = [[TLTouchDownGestureRecognizer alloc] initWithTarget:self action:@selector(touchDownHandler:)];
-    [self.view addGestureRecognizer:self.touchDown];
-        
+    [self.collectionView addGestureRecognizer:self.touchDown];
+    
     self.backgroundGradientView = [[TLBackgroundGradientView alloc] initWithFrame:self.view.bounds];
     [self.view insertSubview:self.backgroundGradientView atIndex:0];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    self.pastViewController = [[TLPastViewController alloc] init];
-    self.pastViewController.expanded = NO;
-    self.pastViewController.parentHeight = self.view.bounds.size.height - HEADER_HEIGHT;
-    NSLog(@"PARENT HEIGHT: %f", self.pastViewController.parentHeight);
-    self.pastView.delegate = self.pastViewController;
-    self.pastView.dataSource = self.pastViewController;
-    [self.pastView reloadData];
+    TLCollectionViewLayout *layout = [[TLCollectionViewLayout alloc] init];
     
-    self.futureViewController = [[TLFutureViewController alloc] init];
-    self.futureViewController.expanded = NO;
-    self.futureViewController.parentHeight = self.view.frame.size.height - HEADER_HEIGHT;
-    self.futureView.delegate = self.futureViewController;
-    self.futureView.dataSource = self.futureViewController;
-    [self.futureView reloadData];
-    
-    self.currentView.hidden = YES;
-    
-    CGRect pastRect = self.pastView.frame;
-    pastRect.origin.y = HEADER_HEIGHT;
-    pastRect.size.height = self.view.frame.size.height - HEADER_HEIGHT;
-    self.pastView.frame = pastRect;
-    
-    CGRect futureRect = self.futureView.frame;
-    futureRect.origin.y = HEADER_HEIGHT;
-    futureRect.size.height = self.view.frame.size.height - HEADER_HEIGHT;
-    self.futureView.frame = futureRect;
+    [self.collectionView setCollectionViewLayout:layout animated:animated];
 }
 
 - (void)touchDownHandler:(TLTouchDownGestureRecognizer *)recognizer {
+    self.location = [recognizer locationInView:recognizer.view];
+    
     if (recognizer.state == UIGestureRecognizerStateBegan) {
+        self.touch = YES;
         [self.delegate userDidBeginInteractingWithDayListViewController:self];
-        self.currentView.hidden = NO;
-        self.pastViewController.expanded = YES;
-        self.futureViewController.expanded = YES;
-        isPanning = YES;
-        [_pastView reloadData];
-        [_futureView reloadData];
-//        [_pastView performBatchUpdates:nil completion:nil];
-//        [_futureView performBatchUpdates:nil completion:nil];
+        if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
+            [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:(self.location.y / CGRectGetHeight(recognizer.view.bounds))];
+        }
+    } else if (recognizer.state == UIGestureRecognizerStateChanged) {
+        if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
+            [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:(self.location.y / CGRectGetHeight(recognizer.view.bounds))];
+        }
     } else if (recognizer.state == UIGestureRecognizerStateEnded) {
-        self.currentView.hidden = YES;
-        self.pastViewController.expanded = NO;
-        self.futureViewController.expanded = NO;
-        isPanning = NO;
-        [_pastView reloadData];
-        [_futureView reloadData];
-//        [_pastView performBatchUpdates:nil completion:nil];
-//        [_futureView performBatchUpdates:nil completion:nil];
+        self.touch = NO;
+        [self.delegate userDidEndInteractingWithDayListViewController:self];
+    }
+    [self.collectionView performBatchUpdates:nil completion:nil];
+}
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    if (!self.touch) {
+        // default size
+        return CGSizeMake(320, collectionView.frame.size.height / NUMBER_OF_ROWS);
     }
     
-    if (recognizer.state == UIGestureRecognizerStateEnded) {
-        [self.delegate userDidEndInteractingWithDayListViewController:self];
-        
-        CGRect pastRect = self.pastView.frame;
-        pastRect.origin.y = HEADER_HEIGHT;
-        pastRect.size.height = self.view.frame.size.height - HEADER_HEIGHT;
-        self.pastView.frame = pastRect;
-
-        CGRect futureRect = self.futureView.frame;
-        futureRect.origin.y = HEADER_HEIGHT;
-        futureRect.size.height = self.view.frame.size.height - HEADER_HEIGHT;
-        self.futureView.frame = futureRect;
-    } else {
-        CGPoint location = [recognizer locationInView:self.view];
-        
-        if (CGRectContainsPoint(CGRectOffset(self.view.bounds, 0, HEADER_HEIGHT), location))
-        {
-            [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:((location.y - HEADER_HEIGHT) / (CGRectGetHeight(self.view.bounds) - HEADER_HEIGHT))];
-        }
-        
-        CGFloat offset = location.y - (CURRENT_VIEW_HEIGHT / 2);
-        if (offset < HEADER_HEIGHT) offset = HEADER_HEIGHT;
-        if (offset > self.view.frame.size.height - CURRENT_VIEW_HEIGHT) offset = self.view.frame.size.height - CURRENT_VIEW_HEIGHT;
-        
-        CGRect currentRect = self.currentView.frame;
-        currentRect.origin.y = offset;
-        
-        self.currentView.frame = currentRect;
-        
-        CGRect pastRect = self.pastView.frame;
-        pastRect.size.height = offset - HEADER_HEIGHT;
-        self.pastView.frame = pastRect;
-        
-        CGRect futureRect = self.futureView.frame;
-        futureRect.size.height = ((self.view.frame.size.height - HEADER_HEIGHT - CURRENT_VIEW_HEIGHT) / 20) * 24;
-        futureRect.origin.y = self.view.frame.size.height - futureRect.size.height;
-        self.futureView.frame = futureRect;
-        
-        CGFloat position = (offset - HEADER_HEIGHT) / (self.view.frame.size.height - HEADER_HEIGHT - CURRENT_VIEW_HEIGHT);
-        if (position < 0) position = 0;
-        
-        self.currentView.contentOffset = CGPointMake(0, (self.currentView.contentSize.height - CURRENT_VIEW_HEIGHT) * position);
+    CGFloat minSize = (collectionView.frame.size.height - (MAX_ROW_HEIGHT * EXPANDED_ROWS)) / 20;
+    
+    CGFloat dayLocation = (self.location.y / self.collectionView.frame.size.height) * 24;
+    
+    CGFloat diff = dayLocation - (float)indexPath.row;
+    
+    // prevent reducing size of min / max rows
+    if (indexPath.row < EXPANDED_ROWS) {
+        if (diff < 0) diff = 0;
+    } else if (indexPath.row > NUMBER_OF_ROWS - EXPANDED_ROWS - 1) {
+        if (diff > 0) diff = 0;
     }
+    
+    CGFloat size = (minSize + MAX_ROW_HEIGHT) * ((EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS);
+    
+    if (size > MAX_ROW_HEIGHT) size = MAX_ROW_HEIGHT;
+    if (size < minSize) size = minSize;
+    
+    return CGSizeMake(320, size);
 }
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return 24;
+    return NUMBER_OF_ROWS;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    UICollectionViewCell *cell = nil;
-    if (collectionView == _pastView) {
-        cell = [collectionView dequeueReusableCellWithReuseIdentifier:kPastCellIdentifier forIndexPath:indexPath];
-    } else if (collectionView == _currentView) {
-        cell = [collectionView dequeueReusableCellWithReuseIdentifier:kCurrentCellIdentifier forIndexPath:indexPath];
-    } else if (collectionView == _futureView) {
-        cell = [collectionView dequeueReusableCellWithReuseIdentifier:kFutureCellIdentifier forIndexPath:indexPath];
-    }
+    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:kCellIdentifier forIndexPath:indexPath];
+    
+    cell.backgroundColor = [UIColor clearColor];
     
     if (indexPath.row % 2 == 0) {
-        cell.backgroundColor = [UIColor lightGrayColor];
+        cell.contentView.backgroundColor = [UIColor lightGrayColor];
+        cell.contentView.alpha = 0.5;
     } else {
-        cell.backgroundColor = [UIColor whiteColor];
+        cell.contentView.backgroundColor = [UIColor whiteColor];
+        cell.contentView.alpha = 0.5;
     }
     
     if (indexPath.row == 6) {
-        cell.backgroundColor = [UIColor blueColor];
+        cell.contentView.backgroundColor = [UIColor blueColor];
+        cell.contentView.alpha = 0.7;
     } else if (indexPath.row == 11) {
-        cell.backgroundColor = [UIColor redColor];
+        cell.contentView.backgroundColor = [UIColor redColor];
+        cell.contentView.alpha = 0.7;
     } else if (indexPath.row == 14) {
-        cell.backgroundColor = [UIColor greenColor];
+        cell.contentView.backgroundColor = [UIColor greenColor];
+        cell.contentView.alpha = 0.7;
     } else if (indexPath.row == 17) {
-        cell.backgroundColor = [UIColor magentaColor];
+        cell.contentView.backgroundColor = [UIColor magentaColor];
+        cell.contentView.alpha = 0.7;
     } else if (indexPath.row == 21) {
-        cell.backgroundColor = [UIColor cyanColor];
+        cell.contentView.backgroundColor = [UIColor cyanColor];
+        cell.contentView.alpha = 0.7;
     }
     
     return cell;
