@@ -8,6 +8,7 @@
 
 #import "TLUpcomingEventViewController.h"
 #import "EKEventManager.h"
+#import "TLCalendarDotView.h"
 
 #import <ReactiveCocoa.h>
 #import <EXTScope.h>
@@ -18,9 +19,11 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
 
 @interface TLUpcomingEventViewController ()
 
+@property (nonatomic, weak) IBOutlet UIImageView *backgroundImageView;
 @property (nonatomic, weak) IBOutlet UILabel *eventNameLabel;
 @property (nonatomic, weak) IBOutlet UILabel *eventLocationLabel;
 @property (nonatomic, weak) IBOutlet UIImageView *eventLocationImageView;
+@property (nonatomic, weak) IBOutlet TLCalendarDotView *calendarView;
 @property (nonatomic, weak) IBOutlet UILabel *eventTimeLabel;
 @property (nonatomic, weak) IBOutlet UILabel *eventRelativeTimeLabel;
 @property (nonatomic, weak) IBOutlet UILabel *eventRelativeTimeUnitLabel;
@@ -34,6 +37,12 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    self.backgroundImageView.layer.shadowColor = [[UIColor colorWithWhite:0.0f alpha:1.0f] CGColor];
+    self.backgroundImageView.layer.shadowOffset = CGSizeMake(0, 0);
+    self.backgroundImageView.layer.shadowOpacity = 0.4f;
+    self.backgroundImageView.layer.shadowPath = [[UIBezierPath bezierPathWithRect:self.backgroundImageView.bounds] CGPath];
+    self.backgroundImageView.layer.shadowRadius = 22.0f;
         
     // Reload our table view whenever the sources change on the event manager
     @weakify(self);
@@ -204,6 +213,8 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     {
         self.eventLocationImageView.alpha = 0.0f;
     }
+    
+    self.calendarView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
 }
 
 @end
