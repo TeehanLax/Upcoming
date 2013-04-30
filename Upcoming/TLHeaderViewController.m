@@ -59,8 +59,8 @@ const CGFloat kHeaderHeight = 72.0f;
     
     // Update our header labels with the next event whenever it changes. 
     //    @weakify(self);
-    [[[RACSignal combineLatest:@[RACAbleWithStart([EKEventManager sharedInstance], events), RACAbleWithStart([EKEventManager sharedInstance], nextEvent)]
-                        reduce:^id(NSArray *eventArray, EKEvent *event)
+    [[[[[RACSignal combineLatest:@[RACAbleWithStart([EKEventManager sharedInstance], events), RACAbleWithStart([EKEventManager sharedInstance], nextEvent)]
+                        reduce:^id(NSArray *eventArray, EKEvent *nextEvent)
        {
            
            NSArray *filteredArray = [[[eventArray.rac_sequence filter:^BOOL(EKEvent *event) {
@@ -71,13 +71,14 @@ const CGFloat kHeaderHeight = 72.0f;
            
            if (filteredArray.count == 0)
            {
-               return event;
+               return nextEvent;
            }
            else
            {
                return filteredArray[0];
-           }           
-       }] deliverOn:[RACScheduler mainThreadScheduler]]
+           }
+           
+       }] deliverOn:[RACScheduler mainThreadScheduler]] distinctUntilChanged] throttle:0.25f]
      subscribeNext:^(EKEvent *event) {
          
          if (event == nil)
