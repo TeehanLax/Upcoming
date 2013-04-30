@@ -21,8 +21,6 @@
 		5E21DEDB171F19C000231263 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DED9171F19C000231263 /* EventKit.framework */; };
 		5E21DEDC171F19C000231263 /* EventKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DEDA171F19C000231263 /* EventKitUI.framework */; };
 		5E2EF7B5172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7B4172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m */; };
-		5E2EF7BA172AC51100737A75 /* TLPastViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7B7172AC51100737A75 /* TLPastViewController.m */; };
-		5E2EF7BB172AC51100737A75 /* TLFutureViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7B9172AC51100737A75 /* TLFutureViewController.m */; };
 		5E2EF7BD172AC51700737A75 /* TLEventViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E2EF7BC172AC51700737A75 /* TLEventViewController.xib */; };
 		5E2EF7C0172AC53500737A75 /* TLEventViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7BF172AC53500737A75 /* TLEventViewController.m */; };
 		5E7207DF172AC3560067B19E /* EKEventManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E7207DE172AC3560067B19E /* EKEventManager.m */; };
@@ -46,6 +44,7 @@
 		5EB951B117203DE600A5089B /* TLCalendarSelectCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EB951B017203DE600A5089B /* TLCalendarSelectCell.m */; };
 		5ECEA3EB1720809C00DD6626 /* TLClockHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ECEA3EA1720809C00DD6626 /* TLClockHeaderView.m */; };
 		5ED60CCB171C57E000F55891 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ED60CCA171C57E000F55891 /* QuartzCore.framework */; };
+		A85CD65D1730058B00B9BBC9 /* TLCollectionViewLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = A85CD65C1730058B00B9BBC9 /* TLCollectionViewLayout.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -67,10 +66,6 @@
 		5E21DEDA171F19C000231263 /* EventKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKitUI.framework; path = System/Library/Frameworks/EventKitUI.framework; sourceTree = SDKROOT; };
 		5E2EF7B3172AC4FF00737A75 /* TLTouchDownGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLTouchDownGestureRecognizer.h; sourceTree = "<group>"; };
 		5E2EF7B4172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLTouchDownGestureRecognizer.m; sourceTree = "<group>"; };
-		5E2EF7B6172AC51100737A75 /* TLPastViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLPastViewController.h; sourceTree = "<group>"; };
-		5E2EF7B7172AC51100737A75 /* TLPastViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLPastViewController.m; sourceTree = "<group>"; };
-		5E2EF7B8172AC51100737A75 /* TLFutureViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLFutureViewController.h; sourceTree = "<group>"; };
-		5E2EF7B9172AC51100737A75 /* TLFutureViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLFutureViewController.m; sourceTree = "<group>"; };
 		5E2EF7BC172AC51700737A75 /* TLEventViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLEventViewController.xib; sourceTree = "<group>"; };
 		5E2EF7BE172AC53500737A75 /* TLEventViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLEventViewController.h; sourceTree = "<group>"; };
 		5E2EF7BF172AC53500737A75 /* TLEventViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLEventViewController.m; sourceTree = "<group>"; };
@@ -108,6 +103,8 @@
 		5ECEA3E91720809C00DD6626 /* TLClockHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLClockHeaderView.h; sourceTree = "<group>"; };
 		5ECEA3EA1720809C00DD6626 /* TLClockHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLClockHeaderView.m; sourceTree = "<group>"; };
 		5ED60CCA171C57E000F55891 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		A85CD65B1730058B00B9BBC9 /* TLCollectionViewLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLCollectionViewLayout.h; sourceTree = "<group>"; };
+		A85CD65C1730058B00B9BBC9 /* TLCollectionViewLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLCollectionViewLayout.m; sourceTree = "<group>"; };
 		CB35EE43CD0E4DBFBCC0B9D3 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -210,6 +207,8 @@
 				5EA3D48D1726DD5200D9764F /* Categories */,
 				5E2EF7B3172AC4FF00737A75 /* TLTouchDownGestureRecognizer.h */,
 				5E2EF7B4172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m */,
+				A85CD65B1730058B00B9BBC9 /* TLCollectionViewLayout.h */,
+				A85CD65C1730058B00B9BBC9 /* TLCollectionViewLayout.m */,
 				5EB4E5581717374E00EC8E1C /* Supporting Files */,
 			);
 			path = Upcoming;
@@ -245,10 +244,6 @@
 				5E18D2F7172EE7880010F8FF /* TLUpcomingEventViewController.h */,
 				5E18D2F8172EE7880010F8FF /* TLUpcomingEventViewController.m */,
 				5E18D2FC172F028F0010F8FF /* TLUpcomingEventViewController.xib */,
-				5E2EF7B6172AC51100737A75 /* TLPastViewController.h */,
-				5E2EF7B7172AC51100737A75 /* TLPastViewController.m */,
-				5E2EF7B8172AC51100737A75 /* TLFutureViewController.h */,
-				5E2EF7B9172AC51100737A75 /* TLFutureViewController.m */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -373,12 +368,11 @@
 				5EA3D49A17296E7900D9764F /* TLBackgroundGradientView.m in Sources */,
 				5E7207DF172AC3560067B19E /* EKEventManager.m in Sources */,
 				5E2EF7B5172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m in Sources */,
-				5E2EF7BA172AC51100737A75 /* TLPastViewController.m in Sources */,
-				5E2EF7BB172AC51100737A75 /* TLFutureViewController.m in Sources */,
 				5E2EF7C0172AC53500737A75 /* TLEventViewController.m in Sources */,
 				5E18D2AC172AF5A50010F8FF /* UIFont+AppFonts.m in Sources */,
 				5E18D2F9172EE7890010F8FF /* TLUpcomingEventViewController.m in Sources */,
 				5E18D302173019860010F8FF /* TLCalendarDotView.m in Sources */,
+				A85CD65D1730058B00B9BBC9 /* TLCollectionViewLayout.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -459,6 +453,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Upcoming/Upcoming-Prefix.pch";
 				INFOPLIST_FILE = "Upcoming/Upcoming-Info.plist";
+				LIBRARY_SEARCH_PATHS = "$(SYMROOT)/../Pods/build/Debug$(EFFECTIVE_PLATFORM_NAME)";
 				PRODUCT_NAME = Upcoming;
 				WRAPPER_EXTENSION = app;
 			};
@@ -471,6 +466,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Upcoming/Upcoming-Prefix.pch";
 				INFOPLIST_FILE = "Upcoming/Upcoming-Info.plist";
+				LIBRARY_SEARCH_PATHS = "$(SYMROOT)/../Pods/build/Debug$(EFFECTIVE_PLATFORM_NAME)";
 				PRODUCT_NAME = Upcoming;
 				WRAPPER_EXTENSION = app;
 			};
