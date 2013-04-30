@@ -69,6 +69,8 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
             self.eventTimeLabel.text = @"";
             self.eventRelativeTimeLabel.text = @"";
             self.eventRelativeTimeUnitLabel.text = @"";
+            self.eventLocationImageView.alpha = 0.0f;
+            self.calendarView.alpha = 0.0f;
         }
         else
         {
@@ -176,14 +178,14 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
             // This event spans multiple days.
             
             timeString = [NSString stringWithFormat:@"%@ – %@",
-                          [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterMediumStyle],
-                          [NSDateFormatter localizedStringFromDate:endDate dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterNoStyle]];
+                          [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle],
+                          [NSDateFormatter localizedStringFromDate:endDate dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterNoStyle]];
         }
         else
         {
             timeString = [NSString stringWithFormat:@"%@ – %@",
-                          [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterMediumStyle],
-                          [NSDateFormatter localizedStringFromDate:endDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterMediumStyle]];
+                          [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle],
+                          [NSDateFormatter localizedStringFromDate:endDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle]];
         }
     }
     
@@ -198,7 +200,7 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     }
     else
     {
-        dateString = [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterMediumStyle timeStyle:NSDateFormatterNoStyle];
+        dateString = [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterNoStyle];
     }
     
     self.eventTimeLabel.text = [NSString stringWithFormat:@"%@, %@", dateString, timeString];
@@ -214,6 +216,7 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
         self.eventLocationImageView.alpha = 0.0f;
     }
     
+    self.calendarView.alpha = 1.0f;
     self.calendarView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
 }
 

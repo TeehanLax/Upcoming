@@ -9,6 +9,7 @@
 #import "TLHeaderViewController.h"
 #import "EKEventManager.h"
 #import "TLClockHeaderView.h"
+#import "TLCalendarDotView.h"
 #import "TLCalendarSelectCell.h"
 
 #import <EXTScope.h>
@@ -22,9 +23,13 @@ const CGFloat kHeaderHeight = 72.0f;
 @property (nonatomic, weak) IBOutlet UIView *headerDetailView;
 @property (nonatomic, weak) IBOutlet TLClockHeaderView *headerClockView;
 
-@property (nonatomic, weak) IBOutlet UILabel *meetingNameLabel;
-@property (nonatomic, weak) IBOutlet UILabel *meetingLocationLabel;
-@property (nonatomic, weak) IBOutlet UILabel *meetingTimeLabel;
+@property (nonatomic, weak) IBOutlet UILabel *eventTitleLabel;
+@property (nonatomic, weak) IBOutlet UILabel *eventLocationLabel;
+@property (nonatomic, weak) IBOutlet UILabel *eventTimeLabel;
+@property (nonatomic, weak) IBOutlet UILabel *eventRelativeTimeLabel;
+@property (nonatomic, weak) IBOutlet UILabel *eventRelativeTimeUnitLabel;
+@property (nonatomic, weak) IBOutlet UIImageView *eventLocationImageView;
+@property (nonatomic, weak) IBOutlet TLCalendarDotView *calendarView;
 
 @property (nonatomic, weak) IBOutlet UIView *tableMaskingView;
 
@@ -50,20 +55,145 @@ const CGFloat kHeaderHeight = 72.0f;
 {
     [super viewDidLoad];
     
+    self.view.backgroundColor = [UIColor clearColor];
+    
     // Update our header labels with the next event whenever it changes. 
-//    @weakify(self);
-    [[RACAbleWithStart([EKEventManager sharedInstance], nextEvent) deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(EKEvent *event) {
-//        @strongify(self);
-        NSLog(@"New Event: %@", event);
-    }];
+    //    @weakify(self);
+    [[[[[RACSignal combineLatest:@[RACAbleWithStart([EKEventManager sharedInstance], events), RACAbleWithStart([EKEventManager sharedInstance], nextEvent)]
+                        reduce:^id(NSArray *eventArray, EKEvent *nextEvent)
+       {
+           
+           NSArray *filteredArray = [[[eventArray.rac_sequence filter:^BOOL(EKEvent *event) {
+               return [event.startDate compare:[NSDate date]] == NSOrderedDescending;
+           }] array] sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+               return [[obj1 startDate] compare:[obj2 startDate]];
+           }];
+           
+           if (filteredArray.count == 0)
+           {
+               return nextEvent;
+           }
+           else
+           {
+               return filteredArray[0];
+           }
+           
+       }] deliverOn:[RACScheduler mainThreadScheduler]] distinctUntilChanged] throttle:0.25f]
+     subscribeNext:^(EKEvent *event) {
+         
+         if (event == nil)
+         {
+             
+             self.eventTitleLabel.text = NSLocalizedString(@"No Upcoming Event", @"No upcoming event header text");
+             self.eventLocationLabel.text = @"";
+             self.eventTimeLabel.text = @"";
+             self.eventRelativeTimeLabel.text = @"";
+             self.eventRelativeTimeUnitLabel.text = @"";
+             self.eventLocationImageView.alpha = 0.0f;
+             self.calendarView.alpha = 0.0f;
+             
+             return;
+         }
+         
+         NSCalendar *calendar = [NSCalendar currentCalendar];
+         
+         unsigned int unitFlags = NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit;
+         NSDateComponents *startTimeComponents = [calendar components:unitFlags fromDate:[NSDate date] toDate:event.startDate options:0];
+         
+         // Check for descending unit lengths being greater than zero for the largest, non-zero component.
+         if (startTimeComponents.month > 0)
+         {
+             NSInteger numberOfMonths = startTimeComponents.month;
+             
+             if (startTimeComponents.day > 15)
+             {
+                 numberOfMonths++;
+             }
+             
+             self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", numberOfMonths];
+             
+             if (numberOfMonths == 1)
+             {
+                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Month", @"Month unit singular");
+             }
+             else
+             {
+                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Months", @"Month unit plural");
+             }
+         }
+         else if (startTimeComponents.day > 0)
+         {
+             self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", startTimeComponents.day];
+             
+             if (startTimeComponents.day == 1)
+             {
+                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Day", @"Day unit singular");
+             }
+             else
+             {
+                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Days", @"Day unit plural");
+             }
+         }
+         else if (startTimeComponents.hour > 0)
+         {
+             NSInteger numberOfHours = startTimeComponents.hour;
+             
+             if (startTimeComponents.minute > 30)
+             {
+                 numberOfHours++;
+             }
+             
+             self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", numberOfHours];
+             
+             if (numberOfHours == 1)
+             {
+                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Hour", @"Hour unit singular");
+             }
+             else
+             {
+                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Hours", @"Hour unit plural");
+             }
+         }
+         else if (startTimeComponents.minute > 0)
+         {
+             self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", startTimeComponents.minute];
+             
+             if (startTimeComponents.minute == 1)
+             {
+                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Minute", @"Minute unit singular");
+             }
+             else
+             {
+                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Minutes", @"Minute unit plural");
+             }
+         }
+         
+         self.eventTitleLabel.text = event.title;
+         self.eventLocationLabel.text = event.location;
+         self.eventTimeLabel.text = [NSString stringWithFormat:@"%@ – %@",
+                                       [NSDateFormatter localizedStringFromDate:event.startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle],
+                                       [NSDateFormatter localizedStringFromDate:event.endDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle]];
+         
+         if ([self.eventLocationLabel.text length] > 0)
+         {
+             self.eventLocationImageView.alpha = 1.0f;
+         }
+         else
+         {
+             self.eventLocationImageView.alpha = 0.0f;
+         }
+         
+         self.calendarView.alpha = 1.0f;
+         self.calendarView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
+     }];
     
     // Set up the table view mask
     [self setupTableViewMask];
     
     // Set our custom colours
-    self.meetingNameLabel.textColor = [UIColor headerTextColor];
-    self.meetingLocationLabel.textColor = [UIColor headerTextColor];
-    self.meetingTimeLabel.textColor = [UIColor headerTextColor];
+    self.eventTitleLabel.textColor = [UIColor headerTextColor];
+    self.eventLocationLabel.textColor = [UIColor headerTextColor];
+    self.eventTimeLabel.textColor = [UIColor headerTextColor];
     
     // Remove the default table view background
     UIView *backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
@@ -145,7 +275,7 @@ const CGFloat kHeaderHeight = 72.0f;
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"Cell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    TLCalendarSelectCell *cell = (TLCalendarSelectCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
     if (!cell)
     {
@@ -166,6 +296,8 @@ const CGFloat kHeaderHeight = 72.0f;
     {
         cell.accessoryView = nil;
     }
+    
+    cell.dotColor = [UIColor colorWithCGColor:calendar.CGColor];
 
     return cell;
 }

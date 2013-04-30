@@ -20,7 +20,7 @@
 {
     CGContextRef ctx = UIGraphicsGetCurrentContext();
     CGContextAddEllipseInRect(ctx, self.bounds);
-    CGContextSetFillColor(ctx, CGColorGetComponents([self.dotColor CGColor]));
+    CGContextSetFillColor(ctx, CGColorGetComponents([self.dotColor CGColor] ?: [[UIColor clearColor] CGColor]));
     CGContextFillPath(ctx);
 }
 
