@@ -110,7 +110,7 @@
 								<int key="IBUIContentMode">7</int>
 								<bool key="IBUIUserInteractionEnabled">NO</bool>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-								<string key="IBUIText">5</string>
+								<string key="IBUIText">45</string>
 								<object class="NSColor" key="IBUITextColor" id="406746317">
 									<int key="NSColorSpace">3</int>
 									<bytes key="NSWhite">MQA</bytes>
@@ -122,11 +122,11 @@
 									<string key="name">AvenirNext-Regular</string>
 									<string key="family">Avenir Next</string>
 									<int key="traits">0</int>
-									<double key="pointSize">27</double>
+									<double key="pointSize">45</double>
 								</object>
 								<object class="NSFont" key="IBUIFont">
 									<string key="NSName">AvenirNext-UltraLight</string>
-									<double key="NSSize">27</double>
+									<double key="NSSize">45</double>
 									<int key="NSfFlags">16</int>
 								</object>
 								<bool key="IBUIAdjustsFontSizeToFit">NO</bool>

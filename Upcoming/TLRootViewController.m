@@ -92,7 +92,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         {
             // Using 1.0 scale here because after blurring, we won't need the extra (Retina) pixels.
             
-            UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 1.0);
+            UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 0);
             [self.dayListViewController.view.layer renderInContext:UIGraphicsGetCurrentContext()];
             UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();
@@ -224,6 +224,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         self.panHeaderUpGestureRecognizer.enabled = menuIsOpen;
         self.tapGestureRecognizer.enabled = menuIsOpen;
         self.dayListViewController.view.userInteractionEnabled = !menuIsOpen;
+        self.panFooterUpGestureRecognizer.enabled = !menuIsOpen;
     }];
     
     
@@ -238,19 +239,19 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
             // Using 1.0 scale here because after blurring, we won't need the extra (Retina) pixels.
             
             // First grab the image of the day list view
-            UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 1.0);
+            UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 0);
             [self.dayListViewController.view.layer renderInContext:UIGraphicsGetCurrentContext()];
             UIImage *dayListImage = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();
             
             // The grab the image of the header view
-            UIGraphicsBeginImageContextWithOptions(self.headerViewController.view.bounds.size, NO, 1.0);
+            UIGraphicsBeginImageContextWithOptions(self.headerViewController.view.bounds.size, NO, 0);
             [self.headerViewController.view.layer renderInContext:UIGraphicsGetCurrentContext()];
             UIImage *headerImage = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();
             
             // Finally, composite the two images together.  
-            UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 1.0);
+            UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 0);
             [dayListImage drawInRect:self.view.bounds];
             [headerImage drawInRect:CGRectOffset(self.headerViewController.view.bounds, 0, -CGRectGetHeight(self.headerViewController.view.bounds) + kHeaderHeight)];
             UIImage *image = UIGraphicsGetImageFromCurrentImageContext();

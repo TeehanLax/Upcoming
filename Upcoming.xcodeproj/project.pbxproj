@@ -16,6 +16,8 @@
 		5E18D2F9172EE7890010F8FF /* TLUpcomingEventViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E18D2F8172EE7880010F8FF /* TLUpcomingEventViewController.m */; };
 		5E18D2FB172EEA6B0010F8FF /* upcomingEventBackground@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2FA172EEA6B0010F8FF /* upcomingEventBackground@2x.png */; };
 		5E18D2FD172F028F0010F8FF /* TLUpcomingEventViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2FC172F028F0010F8FF /* TLUpcomingEventViewController.xib */; };
+		5E18D2FF172FFF560010F8FF /* location@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2FE172FFF560010F8FF /* location@2x.png */; };
+		5E18D302173019860010F8FF /* TLCalendarDotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E18D301173019860010F8FF /* TLCalendarDotView.m */; };
 		5E21DEDB171F19C000231263 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DED9171F19C000231263 /* EventKit.framework */; };
 		5E21DEDC171F19C000231263 /* EventKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DEDA171F19C000231263 /* EventKitUI.framework */; };
 		5E2EF7B5172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7B4172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m */; };
@@ -57,6 +59,9 @@
 		5E18D2F8172EE7880010F8FF /* TLUpcomingEventViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLUpcomingEventViewController.m; sourceTree = "<group>"; };
 		5E18D2FA172EEA6B0010F8FF /* upcomingEventBackground@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "upcomingEventBackground@2x.png"; path = "Images/upcomingEventBackground@2x.png"; sourceTree = "<group>"; };
 		5E18D2FC172F028F0010F8FF /* TLUpcomingEventViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLUpcomingEventViewController.xib; sourceTree = "<group>"; };
+		5E18D2FE172FFF560010F8FF /* location@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "location@2x.png"; path = "Images/location@2x.png"; sourceTree = "<group>"; };
+		5E18D300173019860010F8FF /* TLCalendarDotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLCalendarDotView.h; sourceTree = "<group>"; };
+		5E18D301173019860010F8FF /* TLCalendarDotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLCalendarDotView.m; sourceTree = "<group>"; };
 		5E21DED9171F19C000231263 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 		5E21DEDA171F19C000231263 /* EventKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKitUI.framework; path = System/Library/Frameworks/EventKitUI.framework; sourceTree = SDKROOT; };
 		5E2EF7B3172AC4FF00737A75 /* TLTouchDownGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLTouchDownGestureRecognizer.h; sourceTree = "<group>"; };
@@ -125,6 +130,7 @@
 		5E18D2AD172AFA540010F8FF /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				5E18D2FE172FFF560010F8FF /* location@2x.png */,
 				5E18D2FA172EEA6B0010F8FF /* upcomingEventBackground@2x.png */,
 				5E18D2B0172B03F60010F8FF /* checkmark@2x.png */,
 				5E18D2B2172B03F60010F8FF /* inner-shadow@2x.png */,
@@ -251,6 +257,8 @@
 				5EB951B017203DE600A5089B /* TLCalendarSelectCell.m */,
 				5ECEA3E91720809C00DD6626 /* TLClockHeaderView.h */,
 				5ECEA3EA1720809C00DD6626 /* TLClockHeaderView.m */,
+				5E18D300173019860010F8FF /* TLCalendarDotView.h */,
+				5E18D301173019860010F8FF /* TLCalendarDotView.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -320,6 +328,7 @@
 				5E18D2B9172B085B0010F8FF /* settings-panel-active@2x.png in Resources */,
 				5E18D2FB172EEA6B0010F8FF /* upcomingEventBackground@2x.png in Resources */,
 				5E18D2FD172F028F0010F8FF /* TLUpcomingEventViewController.xib in Resources */,
+				5E18D2FF172FFF560010F8FF /* location@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,6 +371,7 @@
 				5E2EF7C0172AC53500737A75 /* TLEventViewController.m in Sources */,
 				5E18D2AC172AF5A50010F8FF /* UIFont+AppFonts.m in Sources */,
 				5E18D2F9172EE7890010F8FF /* TLUpcomingEventViewController.m in Sources */,
+				5E18D302173019860010F8FF /* TLCalendarDotView.m in Sources */,
 				A85CD65D1730058B00B9BBC9 /* TLCollectionViewLayout.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
