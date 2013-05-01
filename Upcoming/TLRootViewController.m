@@ -586,9 +586,9 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     [self.headerViewController showHeaderView];
 }
 
--(void)userDidInteractWithDayListView:(TLEventViewController *)controller updatingTimeRatio:(CGFloat)timeRatio
+-(void)userDidInteractWithDayListView:(TLEventViewController *)controller updatingTimeRatio:(CGFloat)timeRatio event:(EKEvent *)event
 {
-    [self.headerViewController updateTimeRatio:timeRatio];
+    [self.headerViewController updateTimeRatio:timeRatio event:event];
 }
 
 @end

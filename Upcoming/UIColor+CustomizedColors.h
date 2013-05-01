@@ -10,8 +10,6 @@
 
 @interface UIColor (CustomizedColors)
 
-+(UIColor *)headerTextColor;
-
 +(UIColor *)interpolatedColorWithRatio:(CGFloat)ratio color:(UIColor *)color color:(UIColor *)otherColor;
 
 @end

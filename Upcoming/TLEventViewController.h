@@ -10,13 +10,14 @@
 #import "TLTouchDownGestureRecognizer.h"
 
 @class TLEventViewController;
+@class EKEvent;
 
 @protocol TLEventViewControllerDelegate <NSObject>
 
 -(void)userDidBeginInteractingWithDayListViewController:(TLEventViewController *)controller;
 -(void)userDidEndInteractingWithDayListViewController:(TLEventViewController *)controller;
 
--(void)userDidInteractWithDayListView:(TLEventViewController *)controller updatingTimeRatio:(CGFloat)timeRatio;
+-(void)userDidInteractWithDayListView:(TLEventViewController *)controller updatingTimeRatio:(CGFloat)timeRatio event:(EKEvent *)event;
 
 @end
 

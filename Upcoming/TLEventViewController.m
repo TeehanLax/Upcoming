@@ -55,11 +55,11 @@ static NSString *kCellIdentifier = @"Cell";
         self.touch = YES;
         [self.delegate userDidBeginInteractingWithDayListViewController:self];
         if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
-            [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:(self.location.y / CGRectGetHeight(recognizer.view.bounds))];
+            [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:(self.location.y / CGRectGetHeight(recognizer.view.bounds)) event:nil]; //TODO: Should not be nil
         }
     } else if (recognizer.state == UIGestureRecognizerStateChanged) {
         if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
-            [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:(self.location.y / CGRectGetHeight(recognizer.view.bounds))];
+            [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:(self.location.y / CGRectGetHeight(recognizer.view.bounds)) event:nil]; //TODO: Should not be nil
         }
     } else if (recognizer.state == UIGestureRecognizerStateEnded) {
         self.touch = NO;

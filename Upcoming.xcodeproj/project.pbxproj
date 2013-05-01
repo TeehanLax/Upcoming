@@ -42,7 +42,6 @@
 		5EB4E58417187E1500EC8E1C /* TLHeaderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EB4E58217187E1500EC8E1C /* TLHeaderViewController.m */; };
 		5EB4E58517187E1500EC8E1C /* TLHeaderViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5EB4E58317187E1500EC8E1C /* TLHeaderViewController.xib */; };
 		5EB951B117203DE600A5089B /* TLCalendarSelectCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EB951B017203DE600A5089B /* TLCalendarSelectCell.m */; };
-		5ECEA3EB1720809C00DD6626 /* TLClockHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ECEA3EA1720809C00DD6626 /* TLClockHeaderView.m */; };
 		5ED60CCB171C57E000F55891 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ED60CCA171C57E000F55891 /* QuartzCore.framework */; };
 		A85CD65D1730058B00B9BBC9 /* TLCollectionViewLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = A85CD65C1730058B00B9BBC9 /* TLCollectionViewLayout.m */; };
 /* End PBXBuildFile section */
@@ -100,8 +99,6 @@
 		5EB4E58317187E1500EC8E1C /* TLHeaderViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLHeaderViewController.xib; sourceTree = "<group>"; };
 		5EB951AF17203DE600A5089B /* TLCalendarSelectCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLCalendarSelectCell.h; sourceTree = "<group>"; };
 		5EB951B017203DE600A5089B /* TLCalendarSelectCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLCalendarSelectCell.m; sourceTree = "<group>"; };
-		5ECEA3E91720809C00DD6626 /* TLClockHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLClockHeaderView.h; sourceTree = "<group>"; };
-		5ECEA3EA1720809C00DD6626 /* TLClockHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLClockHeaderView.m; sourceTree = "<group>"; };
 		5ED60CCA171C57E000F55891 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		A85CD65B1730058B00B9BBC9 /* TLCollectionViewLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLCollectionViewLayout.h; sourceTree = "<group>"; };
 		A85CD65C1730058B00B9BBC9 /* TLCollectionViewLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLCollectionViewLayout.m; sourceTree = "<group>"; };
@@ -255,8 +252,6 @@
 				5EA3D49917296E7900D9764F /* TLBackgroundGradientView.m */,
 				5EB951AF17203DE600A5089B /* TLCalendarSelectCell.h */,
 				5EB951B017203DE600A5089B /* TLCalendarSelectCell.m */,
-				5ECEA3E91720809C00DD6626 /* TLClockHeaderView.h */,
-				5ECEA3EA1720809C00DD6626 /* TLClockHeaderView.m */,
 				5E18D300173019860010F8FF /* TLCalendarDotView.h */,
 				5E18D301173019860010F8FF /* TLCalendarDotView.m */,
 			);
@@ -361,7 +356,6 @@
 				5EB4E57C17187CF700EC8E1C /* TLRootViewController.m in Sources */,
 				5EB4E58417187E1500EC8E1C /* TLHeaderViewController.m in Sources */,
 				5EB951B117203DE600A5089B /* TLCalendarSelectCell.m in Sources */,
-				5ECEA3EB1720809C00DD6626 /* TLClockHeaderView.m in Sources */,
 				5EA3D48C1726DD4D00D9764F /* UIColor+CustomizedColors.m in Sources */,
 				5EA3D4941726FCC500D9764F /* UIImage+Blur.m in Sources */,
 				5EA3D4971726FD9E00D9764F /* TLProfiling.m in Sources */,
