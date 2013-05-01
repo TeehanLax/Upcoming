@@ -225,6 +225,11 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         self.tapGestureRecognizer.enabled = menuIsOpen;
         self.dayListViewController.view.userInteractionEnabled = !menuIsOpen;
         self.panFooterUpGestureRecognizer.enabled = !menuIsOpen;
+        
+        if (menuIsOpen)
+        {
+            [self.headerViewController flashScrollBars];
+        }
     }];
     
     

@@ -237,6 +237,11 @@ const CGFloat kHeaderHeight = 72.0f;
     return source.title;
 }
 
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 46;
+}
+
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
     return 37;
@@ -313,6 +318,11 @@ const CGFloat kHeaderHeight = 72.0f;
 }
 
 #pragma mark - Public Methods
+
+-(void)flashScrollBars
+{
+    [self.calendarTableView flashScrollIndicators];
+}
 
 -(void)scrollTableViewToTop
 {
