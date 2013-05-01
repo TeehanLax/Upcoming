@@ -12,9 +12,9 @@
 @implementation TLEventViewCell
 
 - (void)awakeFromNib {
-    self.title.clipsToBounds = NO;
-    self.title.font = [[UIFont tl_mediumAppFont] fontWithSize:14];
-    self.title.textColor = [UIColor colorFromRGB:0x444444];
+    self.titleLabel.clipsToBounds = NO;
+    self.titleLabel.font = [[UIFont tl_mediumAppFont] fontWithSize:14];
+    self.titleLabel.textColor = [UIColor colorFromRGB:0x444444];
 }
 
 @end

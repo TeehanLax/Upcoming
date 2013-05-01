@@ -98,7 +98,7 @@ static NSString *kCellIdentifier = @"Cell";
             if (![self.activeCells containsObject:[NSNumber numberWithInt:indexPath.row]]) {
                 cell.contentView.alpha = 0;
             }
-            cell.title.alpha = 0;
+            cell.titleLabel.alpha = 0;
         } completion:nil];
         return CGSizeMake(320, collectionView.frame.size.height / NUMBER_OF_ROWS);
     }
@@ -121,7 +121,7 @@ static NSString *kCellIdentifier = @"Cell";
     if (![self.activeCells containsObject:[NSNumber numberWithInt:indexPath.row]]) {
         cell.contentView.alpha = (EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS;
     }
-    cell.title.alpha = (EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS;
+    cell.titleLabel.alpha = (EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS;
     
     if (size > MAX_ROW_HEIGHT) size = MAX_ROW_HEIGHT;
     if (size < minSize) size = minSize;
@@ -147,7 +147,7 @@ static NSString *kCellIdentifier = @"Cell";
         if (hour == indexPath.row) {
             [self.activeCells addObject:[NSNumber numberWithInt:indexPath.row]];
             cell.contentView.alpha = 1;
-            cell.title.text = event.title;
+            cell.titleLabel.text = event.title;
             
         }
     }
