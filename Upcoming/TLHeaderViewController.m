@@ -12,6 +12,7 @@
 #import "TLCalendarSelectCell.h"
 
 #import <EXTScope.h>
+#import <ViewUtils.h>
 
 const CGFloat kHeaderHeight = 72.0f;
 
@@ -37,6 +38,7 @@ const CGFloat kHeaderHeight = 72.0f;
 @property (nonatomic, weak) IBOutlet UILabel *alternateAbsoluteTimeLabel;
 @property (nonatomic, weak) IBOutlet UIImageView *alternateEventLocationImageView;
 @property (nonatomic, weak) IBOutlet TLCalendarDotView *alternateCalendarView;
+@property (nonatomic, strong) RACSubject *alternateEventSubject;
 
 
 @property (nonatomic, weak) IBOutlet UIView *tableMaskingView;
@@ -194,6 +196,41 @@ const CGFloat kHeaderHeight = 72.0f;
          self.calendarView.alpha = 1.0f;
          self.calendarView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
      }];
+    
+    self.alternateEventSubject = [RACSubject subject];
+    [[self.alternateEventSubject distinctUntilChanged] subscribeNext:^(EKEvent *event) {
+        
+        if (event == nil)
+        {
+            self.alternateEventTitleLabel.text = @"";
+            self.alternateEventLocationLabel.text = @"";
+            self.alternateEventTimeLabel.text = @"";
+            self.alternateCalendarView.alpha = 0.0f;
+            self.alternateEventLocationImageView.alpha = 0.0f;
+        }
+        else
+        {
+            self.alternateEventTitleLabel.text = event.title;
+            self.alternateEventLocationLabel.text = event.location;
+            self.alternateEventTimeLabel.text = [NSString stringWithFormat:@"%@ – %@",
+                                                 [NSDateFormatter localizedStringFromDate:event.startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle],
+                                                 [NSDateFormatter localizedStringFromDate:event.endDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle]];
+            
+            if ([self.alternateEventLocationLabel.text length] > 0)
+            {
+                self.alternateEventLocationImageView.alpha = 1.0f;
+            }
+            else
+            {
+                self.alternateEventLocationImageView.alpha = 0.0f;
+            }
+            
+            self.alternateCalendarView.alpha = 1.0f;
+            self.alternateCalendarView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
+        }
+        
+        [self.headerAlernateDetailView crossfadeWithDuration:0.1f];
+    }];
     
     // Set up the table view mask
     [self setupTableViewMask];
@@ -400,24 +437,7 @@ static CGFloat interAnimationDelay = 0.05f;
     
     self.alternateAbsoluteTimeLabel.text = [NSString stringWithFormat:@"%d:%02d", hours, minutes];
     
-    
-    self.alternateEventTitleLabel.text = event.title;
-    self.alternateEventLocationLabel.text = event.location;
-    self.alternateEventTimeLabel.text = [NSString stringWithFormat:@"%@ – %@",
-                                         [NSDateFormatter localizedStringFromDate:event.startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle],
-                                         [NSDateFormatter localizedStringFromDate:event.endDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle]];
-    
-    if ([self.alternateEventLocationLabel.text length] > 0)
-    {
-        self.alternateEventLocationImageView.alpha = 1.0f;
-    }
-    else
-    {
-        self.alternateEventLocationImageView.alpha = 0.0f;
-    }
-    
-    self.alternateCalendarView.alpha = 1.0f;
-    self.alternateCalendarView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
+    [self.alternateEventSubject sendNext:event];
 }
 
 @end
