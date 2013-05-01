@@ -319,6 +319,11 @@ const CGFloat kHeaderHeight = 72.0f;
 
 #pragma mark - Public Methods
 
+-(void)flashScrollBars
+{
+    [self.calendarTableView flashScrollIndicators];
+}
+
 -(void)scrollTableViewToTop
 {
     [self.calendarTableView scrollRectToVisible:CGRectMake(1, 1, 1, 1) animated:NO];
