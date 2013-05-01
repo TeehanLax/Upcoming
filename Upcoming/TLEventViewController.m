@@ -62,15 +62,17 @@ static NSString *kCellIdentifier = @"Cell";
 - (void)touchDownHandler:(TLTouchDownGestureRecognizer *)recognizer {
     self.location = [recognizer locationInView:recognizer.view];
     
+    EKEvent *event = [self eventUnderPoint:self.location];
+        
     if (recognizer.state == UIGestureRecognizerStateBegan) {
         self.touch = YES;
         [self.delegate userDidBeginInteractingWithDayListViewController:self];
         if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
-            [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:(self.location.y / CGRectGetHeight(recognizer.view.bounds))];
+            [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:(self.location.y / CGRectGetHeight(recognizer.view.bounds)) event:event];
         }
     } else if (recognizer.state == UIGestureRecognizerStateChanged) {
         if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
-            [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:(self.location.y / CGRectGetHeight(recognizer.view.bounds))];
+            [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:(self.location.y / CGRectGetHeight(recognizer.view.bounds)) event:event];
         }
     } else if (recognizer.state == UIGestureRecognizerStateEnded) {
         self.touch = NO;
@@ -153,6 +155,26 @@ static NSString *kCellIdentifier = @"Cell";
     }
     
     return cell;
+}
+
+#pragma mark - Private Methods
+-(EKEvent *)eventUnderPoint:(CGPoint)point
+{
+    EKEvent *eventUnderTouch;
+    NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:point];
+    if ([self.activeCells containsObject:@(indexPath.row)])
+    {
+        for (EKEvent *event in [EKEventManager sharedInstance].events) {
+            NSCalendar *calendar = [NSCalendar currentCalendar];
+            NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:event.startDate];
+            NSInteger hour = [components hour];
+            if (hour == indexPath.row) {
+                eventUnderTouch = event;
+            }
+        }
+    }
+    
+    return eventUnderTouch;
 }
 
 @end
