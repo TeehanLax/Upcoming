@@ -378,9 +378,9 @@ const CGFloat kHeaderHeight = 72.0f;
 
 static CGFloat pullDownDistance = 7.0f;
 
-static CGFloat pullDownAnimationDuration = 0.075f;
-static CGFloat pullUpAnimationDuration = 0.15f;
-static CGFloat fallDownAnimationDuration = 0.15f;
+static CGFloat pullDownAnimationDuration = 0.05f;
+static CGFloat pullUpAnimationDuration = 0.1f;
+static CGFloat fallDownAnimationDuration = 0.1f;
 static CGFloat interAnimationDelay = 0.05f;
 
 -(void)hideHeaderView
@@ -432,8 +432,10 @@ static CGFloat interAnimationDelay = 0.05f;
     NSInteger hours = floorf(timeRatio * 24);
     NSInteger minutes = (int)(floorf(timeRatio * 3600)) % 60;
     
+    // Convert from 24-hour format
     if (hours > 12) hours -= 12;
     if (hours == 0) hours += 12;
+    
     
     self.alternateAbsoluteTimeLabel.text = [NSString stringWithFormat:@"%d:%02d", hours, minutes];
     
