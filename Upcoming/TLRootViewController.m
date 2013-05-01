@@ -212,6 +212,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     // This subject is responsible for mapping this value to other signals and state (ugh). 
     self.menuFinishedTransitionSubject = [RACReplaySubject subject];
     [self.menuFinishedTransitionSubject subscribeNext:^(NSNumber *menuIsOpenNumber) {
+        @strongify(self);
         
         BOOL menuIsOpen = menuIsOpenNumber.boolValue;
         
@@ -277,6 +278,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     
     self.footerMovementSubject = [RACSubject subject];
     [self.footerMovementSubject subscribeNext:^(id x) {
+        @strongify(self);
         
         // This is the ratio of the movement. 0 is closed and 1 is open.
         // Values less than zero are treated as zero.
@@ -345,6 +347,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     
     self.footerFinishedTransitionSubject = [RACReplaySubject subject];
     [self.footerFinishedTransitionSubject subscribeNext:^(NSNumber *menuIsOpenNumber) {
+        @strongify(self);
         
         BOOL menuIsOpen = menuIsOpenNumber.boolValue;
         
