@@ -56,6 +56,7 @@ static NSString *kCellIdentifier = @"Cell";
         [self.delegate userDidBeginInteractingWithDayListViewController:self];
         if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
             [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:(self.location.y / CGRectGetHeight(recognizer.view.bounds))];
+            [AppDelegate playTouchDownSound];
         }
     } else if (recognizer.state == UIGestureRecognizerStateChanged) {
         if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
@@ -64,6 +65,7 @@ static NSString *kCellIdentifier = @"Cell";
     } else if (recognizer.state == UIGestureRecognizerStateEnded) {
         self.touch = NO;
         [self.delegate userDidEndInteractingWithDayListViewController:self];
+        [AppDelegate playTouchUpSound];
     }
     [self.collectionView performBatchUpdates:nil completion:nil];
 }

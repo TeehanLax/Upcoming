@@ -100,12 +100,14 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
             self.dayListOverlayView.image = [UIImage darkenedAndBlurredImageForImage:image];
             
             [self.view insertSubview:self.dayListOverlayView aboveSubview:self.dayListViewController.view];
+            [AppDelegate playPullMenuOutSound];
         }
-        else
+        else if (self.dayListOverlayView.superview)
         {
             self.dayListOverlayView.image = nil;
             [self.dayListOverlayView removeFromSuperview];
             [self.headerViewController scrollTableViewToTop];
+            [AppDelegate playPushMenuInSound];
         }
     }];
     
@@ -267,12 +269,15 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
             self.dayListOverlayView.image = [UIImage darkenedAndBlurredImageForImage:image];
             
             [self.view insertSubview:self.dayListOverlayView aboveSubview:self.headerViewController.view];
+            
+            [AppDelegate playPullMenuOutSound];
         }
-        else
+        else if (self.dayListOverlayView.superview)
         {
             self.dayListOverlayView.image = nil;
             [self.dayListOverlayView removeFromSuperview];
             [self.headerViewController scrollTableViewToTop];
+            [AppDelegate playPushMenuInSound];
         }
     }];
     
@@ -584,6 +589,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
 -(void)userDidEndInteractingWithDayListViewController:(TLEventViewController *)controller
 {
     [self.headerViewController showHeaderView];
+    [AppDelegate playTouchUpSound];
 }
 
 -(void)userDidInteractWithDayListView:(TLEventViewController *)controller updatingTimeRatio:(CGFloat)timeRatio
