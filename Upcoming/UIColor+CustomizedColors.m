@@ -27,4 +27,9 @@ static CGFloat lerp (CGFloat amount, CGFloat a, CGFloat b)
     return [UIColor colorWithRed:lerp(ratio, red1, red2) green:lerp(ratio, green1, green2) blue:lerp(ratio, blue1, blue2) alpha:lerp(ratio, alpha1, alpha2)];
 }
 
++(UIColor *)colorFromRGB:(int)rgbValue
+{
+    return [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0];
+}
+
 @end

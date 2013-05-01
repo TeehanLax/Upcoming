@@ -12,4 +12,6 @@
 
 +(UIColor *)interpolatedColorWithRatio:(CGFloat)ratio color:(UIColor *)color color:(UIColor *)otherColor;
 
++(UIColor *)colorFromRGB:(int)rgbValue;
+
 @end
