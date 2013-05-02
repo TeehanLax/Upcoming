@@ -15,4 +15,6 @@
  */
 -(void)setAlertRatio:(CGFloat)ratio animated:(BOOL)animated;
 
+-(void)setDarkened:(BOOL)darkened;
+
 @end

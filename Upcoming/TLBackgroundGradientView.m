@@ -11,6 +11,7 @@
 @interface TLBackgroundGradientView ()
 
 @property (nonatomic, strong) CAGradientLayer *gradientLayer;
+@property (nonatomic, strong) CALayer *darkenLayer;
 
 @property (nonatomic, strong) UIImageView *innerShadowView;
 
@@ -49,8 +50,13 @@
     self.gradientLayer.backgroundColor = [[UIColor clearColor] CGColor];
     self.gradientLayer.colors = colorsArray;
     self.gradientLayer.locations = locationsArray;
-    
     [self.layer insertSublayer:self.gradientLayer atIndex:0];
+    
+    self.darkenLayer = [CALayer layer];
+    self.darkenLayer.opacity = 0.0f;
+    self.darkenLayer.frame = self.bounds;
+    self.darkenLayer.backgroundColor = [[UIColor colorWithWhite:0.0f alpha:0.5f] CGColor];
+    [self.layer insertSublayer:self.darkenLayer above:self.gradientLayer];
         
     return self;
 }
@@ -87,6 +93,24 @@
     {
         self.gradientLayer.colors = toColors;
     }
+}
+
+-(void)setDarkened:(BOOL)darkened
+{    
+    if (darkened)
+    {
+        self.darkenLayer.opacity = 1.0f;
+    }
+    else
+    {
+        self.darkenLayer.opacity = 0.0f;
+    }
+    
+    CATransition *transition = [CATransition animation];
+    transition.duration = 0.2f;
+    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    transition.type = kCATransitionFade;
+    [self.darkenLayer addAnimation:transition forKey:nil];
 }
 
 @end

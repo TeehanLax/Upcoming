@@ -83,43 +83,46 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     if (hour == 0) hour += 12;
     
     
-    if (recognizer.state == UIGestureRecognizerStateBegan) {
-        self.eventUnderFinger = nil;
-        self.indexPathUnderFinger = indexPath;
-        self.touch = YES;
-        [self.delegate userDidBeginInteractingWithDayListViewController:self];
-        if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
-            [AppDelegate playTouchDownSound];
-            [self.delegate userDidInteractWithDayListView:self updateTimeHour:hour minute:minute event:event];
-        }
-    } else if (recognizer.state == UIGestureRecognizerStateChanged) {
-        if ([self.eventUnderFinger compareStartDateWithEvent:event] != NSOrderedSame ||
-            (self.eventUnderFinger == nil && event != nil) ||
-            (self.eventUnderFinger != nil && event == nil))
-        {
-            [AppDelegate playTouchNewEventSound];
-            self.eventUnderFinger = event;
-        }
-        else
-        {
-            if ([indexPath compare:self.indexPathUnderFinger] != NSOrderedSame)
-            {
-                [AppDelegate playTouchNewHourSound];
-                self.indexPathUnderFinger = indexPath;
+    [self.collectionView performBatchUpdates:^{
+        if (recognizer.state == UIGestureRecognizerStateBegan) {
+            [self.backgroundGradientView setDarkened:YES];
+            self.eventUnderFinger = nil;
+            self.indexPathUnderFinger = indexPath;
+            self.touch = YES;
+            [self.delegate userDidBeginInteractingWithDayListViewController:self];
+            if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
+                [AppDelegate playTouchDownSound];
+                [self.delegate userDidInteractWithDayListView:self updateTimeHour:hour minute:minute event:event];
             }
+        } else if (recognizer.state == UIGestureRecognizerStateChanged) {
+            if ([self.eventUnderFinger compareStartDateWithEvent:event] != NSOrderedSame ||
+                (self.eventUnderFinger == nil && event != nil) ||
+                (self.eventUnderFinger != nil && event == nil))
+            {
+                [AppDelegate playTouchNewEventSound];
+                self.eventUnderFinger = event;
+            }
+            else
+            {
+                if ([indexPath compare:self.indexPathUnderFinger] != NSOrderedSame)
+                {
+                    [AppDelegate playTouchNewHourSound];
+                    self.indexPathUnderFinger = indexPath;
+                }
+            }
+            
+            if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
+                [self.delegate userDidInteractWithDayListView:self updateTimeHour:hour minute:minute event:event];
+            }
+        } else if (recognizer.state == UIGestureRecognizerStateEnded) {
+            [self.backgroundGradientView setDarkened:NO];
+            self.eventUnderFinger = nil;
+            self.indexPathUnderFinger = nil;
+            self.touch = NO;
+            [self.delegate userDidEndInteractingWithDayListViewController:self];
+            [AppDelegate playTouchUpSound];
         }
-        
-        if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
-            [self.delegate userDidInteractWithDayListView:self updateTimeHour:hour minute:minute event:event];
-        }
-    } else if (recognizer.state == UIGestureRecognizerStateEnded) {
-        self.eventUnderFinger = nil;
-        self.indexPathUnderFinger = nil;
-        self.touch = NO;
-        [self.delegate userDidEndInteractingWithDayListViewController:self];
-        [AppDelegate playTouchUpSound];
-    }
-    [self.collectionView performBatchUpdates:nil completion:nil];
+    } completion:nil];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
