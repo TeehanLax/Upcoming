@@ -296,7 +296,7 @@ const CGFloat kHeaderHeight = 72.0f;
     const CGFloat leftMargin = 10.0f;
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectInset(header.bounds, leftMargin, 0)];
     [label setText:[self tableView:tableView titleForHeaderInSection:section]];
-    label.font = [[UIFont tl_mediumAppFont] fontWithSize:32];
+    label.font = [[UIFont tl_mediumAppFont] fontWithSize:16];
     label.backgroundColor = [UIColor clearColor];
     label.textColor = [UIColor whiteColor];
     
