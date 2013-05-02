@@ -7,11 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "TLImageView.h"
 
 @interface TLEventViewCell : UICollectionViewCell
 
 @property (nonatomic, strong) IBOutlet UILabel *titleLabel;
-@property (nonatomic, strong) IBOutlet TLImageView *backgroundImage;
+@property (nonatomic, strong) IBOutlet UIImageView *backgroundImage;
 
 @end

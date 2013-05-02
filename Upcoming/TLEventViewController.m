@@ -12,6 +12,8 @@
 #import <QuartzCore/QuartzCore.h>
 #import "EKEventManager.h"
 #import "TLEventViewCell.h"
+#import "TLAppDelegate.h"
+#import "TLRootViewController.h"
 
 #define NUMBER_OF_ROWS 24
 #define EXPANDED_ROWS 4
@@ -51,6 +53,14 @@ static NSString *kCellIdentifier = @"Cell";
     
     self.backgroundGradientView = [[TLBackgroundGradientView alloc] initWithFrame:self.view.bounds];
     [self.view insertSubview:self.backgroundGradientView atIndex:0];
+    
+    // save copy of gradient as image
+    TLAppDelegate *appDelegate = (TLAppDelegate *)[UIApplication sharedApplication].delegate;
+    TLRootViewController *rootViewController = appDelegate.viewController;
+    UIGraphicsBeginImageContext(self.backgroundGradientView.bounds.size);
+    [self.backgroundGradientView.layer renderInContext:UIGraphicsGetCurrentContext()];
+    rootViewController.gradientImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -151,6 +161,7 @@ static NSString *kCellIdentifier = @"Cell";
             
         }
     }
+    [cell setNeedsDisplay];
     
     return cell;
 }
