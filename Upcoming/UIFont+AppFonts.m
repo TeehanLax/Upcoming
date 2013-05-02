@@ -12,7 +12,7 @@
 
 +(UIFont *)tl_appFont
 {
-    return [UIFont fontWithName:@"AvenirNext" size:[UIFont systemFontSize]];
+    return [UIFont fontWithName:@"AvenirNext-Regular" size:[UIFont systemFontSize]];
 }
 
 +(UIFont *)tl_mediumAppFont

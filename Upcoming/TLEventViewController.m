@@ -8,18 +8,18 @@
 
 #import "TLEventViewController.h"
 #import "TLBackgroundGradientView.h"
-#import "TLCollectionViewLayout.h"
-#import <QuartzCore/QuartzCore.h>
 #import "EKEventManager.h"
 #import "TLEventViewCell.h"
 #import "TLAppDelegate.h"
 #import "TLRootViewController.h"
+#import "TLHourSupplementaryView.h"
 
 #define NUMBER_OF_ROWS 24
 #define EXPANDED_ROWS 4
 #define MAX_ROW_HEIGHT 38.f
 
 static NSString *kCellIdentifier = @"Cell";
+static NSString *kSupplementaryViewIdentifier = @"HourView";
 
 @interface TLEventViewController ()
 
@@ -27,6 +27,9 @@ static NSString *kCellIdentifier = @"Cell";
 @property (nonatomic, assign) BOOL touch;
 @property (nonatomic, strong) TLBackgroundGradientView *backgroundGradientView;
 @property (nonatomic, strong) NSMutableSet *activeCells;
+
+@property (nonatomic, strong) NSIndexPath *indexPathUnderFinger;
+@property (nonatomic, strong) EKEvent *eventUnderFinger;
 
 @end
 
@@ -44,6 +47,7 @@ static NSString *kCellIdentifier = @"Cell";
     self.activeCells = [[NSMutableSet alloc] initWithCapacity:0];
     
     [self.collectionView registerNib:[UINib nibWithNibName:@"TLEventViewCell" bundle:nil] forCellWithReuseIdentifier:kCellIdentifier];
+    [self.collectionView registerClass:[TLHourSupplementaryView class] forSupplementaryViewOfKind:[TLHourSupplementaryView kind] withReuseIdentifier:kSupplementaryViewIdentifier];
     
     self.touchDown = [[TLTouchDownGestureRecognizer alloc] initWithTarget:self action:@selector(touchDownHandler:)];
     self.touchDown.cancelsTouchesInView = NO;
@@ -63,6 +67,11 @@ static NSString *kCellIdentifier = @"Cell";
     UIGraphicsEndImageContext();
 }
 
+-(void)viewDidAppear:(BOOL)animated
+{
+    [self.collectionView reloadData];
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     TLCollectionViewLayout *layout = [[TLCollectionViewLayout alloc] init];
     
@@ -72,21 +81,58 @@ static NSString *kCellIdentifier = @"Cell";
 - (void)touchDownHandler:(TLTouchDownGestureRecognizer *)recognizer {
     self.location = [recognizer locationInView:recognizer.view];
     
-    if (recognizer.state == UIGestureRecognizerStateBegan) {
-        self.touch = YES;
-        [self.delegate userDidBeginInteractingWithDayListViewController:self];
-        if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
-            [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:(self.location.y / CGRectGetHeight(recognizer.view.bounds))];
+    EKEvent *event = [self eventUnderPoint:self.location];
+    
+    NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:self.location];    
+    UICollectionViewLayoutAttributes *attributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:indexPath];
+    NSInteger hour = indexPath.row;
+    NSInteger minute = ((self.location.y - attributes.frame.origin.y) / attributes.size.height) * 60;
+    
+    // Convert from 24-hour format
+    if (hour > 12) hour -= 12;
+    if (hour == 0) hour += 12;
+    
+    
+    [self.collectionView performBatchUpdates:^{
+        if (recognizer.state == UIGestureRecognizerStateBegan) {
+            [self.backgroundGradientView setDarkened:YES];
+            self.eventUnderFinger = nil;
+            self.indexPathUnderFinger = indexPath;
+            self.touch = YES;
+            [self.delegate userDidBeginInteractingWithDayListViewController:self];
+            if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
+                [AppDelegate playTouchDownSound];
+                [self.delegate userDidInteractWithDayListView:self updateTimeHour:hour minute:minute event:event];
+            }
+        } else if (recognizer.state == UIGestureRecognizerStateChanged) {
+            if ([self.eventUnderFinger compareStartDateWithEvent:event] != NSOrderedSame ||
+                (self.eventUnderFinger == nil && event != nil) ||
+                (self.eventUnderFinger != nil && event == nil))
+            {
+                [AppDelegate playTouchNewEventSound];
+                self.eventUnderFinger = event;
+            }
+            else
+            {
+                if ([indexPath compare:self.indexPathUnderFinger] != NSOrderedSame)
+                {
+                    [AppDelegate playTouchNewHourSound];
+                    self.indexPathUnderFinger = indexPath;
+                }
+            }
+            
+            if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
+                [self.delegate userDidInteractWithDayListView:self updateTimeHour:hour minute:minute event:event];
+            }
+        } else if (recognizer.state == UIGestureRecognizerStateEnded) {
+            [self.backgroundGradientView setDarkened:NO];
+            self.eventUnderFinger = nil;
+            self.indexPathUnderFinger = nil;
+            self.touch = NO;
+            [self.delegate userDidEndInteractingWithDayListViewController:self];
+            [AppDelegate playTouchUpSound];
         }
-    } else if (recognizer.state == UIGestureRecognizerStateChanged) {
-        if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
-            [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:(self.location.y / CGRectGetHeight(recognizer.view.bounds))];
-        }
-    } else if (recognizer.state == UIGestureRecognizerStateEnded) {
-        self.touch = NO;
-        [self.delegate userDidEndInteractingWithDayListViewController:self];
-    }
-    [self.collectionView performBatchUpdates:nil completion:nil];
+    } completion:nil];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
@@ -139,6 +185,30 @@ static NSString *kCellIdentifier = @"Cell";
     return CGSizeMake(320, size);
 }
 
+-(CGRect)collectionView:(UICollectionView *)collectionView frameForHourViewInLayout:(TLCollectionViewLayout *)layout {
+    
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
+    
+    NSInteger currentHour = components.hour;
+    NSInteger currentMinute = components.minute;
+    
+    UICollectionViewLayoutAttributes *attributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:currentHour inSection:0]];
+    
+    CGFloat viewHeight = attributes.size.height;
+    CGFloat minuteAdjustment = attributes.size.height * (CGFloat)(currentMinute / 60);
+    
+    return CGRectMake(0, attributes.frame.origin.y + minuteAdjustment, CGRectGetWidth(self.view.bounds), viewHeight);
+}
+
+-(CGFloat)collectionView:(UICollectionView *)collectionView alphaForHourViewInLayout:(TLCollectionViewLayout *)layout
+{
+    if (self.touch)
+        return 0.0f;
+    else
+        return 1.0f;
+}
+
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     return NUMBER_OF_ROWS;
 }
@@ -158,12 +228,41 @@ static NSString *kCellIdentifier = @"Cell";
             [self.activeCells addObject:[NSNumber numberWithInt:indexPath.row]];
             cell.contentView.alpha = 1;
             cell.titleLabel.text = event.title;
-            
         }
     }
     [cell setNeedsDisplay];
     
     return cell;
+}
+
+-(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {    
+    TLHourSupplementaryView *supplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kSupplementaryViewIdentifier forIndexPath:indexPath];
+    
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
+    supplementaryView.timeString = [NSString stringWithFormat:@"%d:%02d", components.hour % 12, components.minute];
+        
+    return supplementaryView;
+}
+
+#pragma mark - Private Methods
+-(EKEvent *)eventUnderPoint:(CGPoint)point
+{
+    EKEvent *eventUnderTouch;
+    NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:point];
+    if ([self.activeCells containsObject:@(indexPath.row)])
+    {
+        for (EKEvent *event in [EKEventManager sharedInstance].events) {
+            NSCalendar *calendar = [NSCalendar currentCalendar];
+            NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:event.startDate];
+            NSInteger hour = [components hour];
+            if (hour == indexPath.row) {
+                eventUnderTouch = event;
+            }
+        }
+    }
+    
+    return eventUnderTouch;
 }
 
 @end
