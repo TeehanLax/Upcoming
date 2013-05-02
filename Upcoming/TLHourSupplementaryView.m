@@ -49,20 +49,36 @@
         CGContextAddPath(context, path);
         CGContextEOClip(context);
         
-        CGContextSetLineWidth(context, 1);
-        CGContextSetRGBStrokeColor(context, 1.0f, 1.0f, 1.0f, 0.7f);
-        CGContextBeginPath(context);
-        CGContextMoveToPoint(context, 0, (int)CGRectGetMidY(self.bounds));
-        CGContextAddLineToPoint(context, CGRectGetWidth(self.bounds), (int)CGRectGetMidY(self.bounds));
+        CGContextSaveGState(context);
+        {
+            CGContextSetLineWidth(context, 1);
+            CGContextSetRGBStrokeColor(context, 0.0f, 0.0f, 0.0f, 0.2f);
+            CGContextBeginPath(context);
+            CGContextMoveToPoint(context, 0, (int)CGRectGetMidY(self.bounds) + 1);
+            CGContextAddLineToPoint(context, CGRectGetWidth(self.bounds), (int)CGRectGetMidY(self.bounds) + 1);
+            
+            CGContextStrokePath(context);
+        }
+        CGContextRestoreGState(context);
         
-        CGContextStrokePath(context);
+        CGContextSaveGState(context);
+        {
+            CGContextSetLineWidth(context, 1);
+            CGContextSetRGBStrokeColor(context, 1.0f, 1.0f, 1.0f, 1.0f);
+            CGContextBeginPath(context);
+            CGContextMoveToPoint(context, 0, (int)CGRectGetMidY(self.bounds));
+            CGContextAddLineToPoint(context, CGRectGetWidth(self.bounds), (int)CGRectGetMidY(self.bounds));
+            
+            CGContextStrokePath(context);
+        }
+        CGContextRestoreGState(context);
     }
     CGContextRestoreGState(context);
     
     
-    [[UIColor colorWithWhite:0.0f alpha:0.7f] set];
+    [[UIColor colorWithWhite:0.0f alpha:0.2f] set];
     [self.timeString drawInRect:CGRectOffset(textRect, 0, 1) withFont:font lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentCenter];
-    [[UIColor colorWithWhite:1.0f alpha:0.7f] set];
+    [[UIColor colorWithWhite:1.0f alpha:1.0f] set];
     [self.timeString drawInRect:textRect withFont:font lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentCenter];
 }
 

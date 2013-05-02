@@ -67,14 +67,6 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     
     self.backgroundGradientView = [[TLBackgroundGradientView alloc] initWithFrame:self.view.bounds];
     [self.view insertSubview:self.backgroundGradientView atIndex:0];
-    
-    // save copy of gradient as image
-    TLAppDelegate *appDelegate = (TLAppDelegate *)[UIApplication sharedApplication].delegate;
-    TLRootViewController *rootViewController = appDelegate.viewController;
-    UIGraphicsBeginImageContext(self.backgroundGradientView.bounds.size);
-    [self.backgroundGradientView.layer renderInContext:UIGraphicsGetCurrentContext()];
-    rootViewController.gradientImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
 }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -294,6 +286,14 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
         
         [self.backgroundGradientView setAlertRatio:ratio animated:YES];
     }
+    
+    // save copy of gradient as image
+    TLAppDelegate *appDelegate = (TLAppDelegate *)[UIApplication sharedApplication].delegate;
+    TLRootViewController *rootViewController = appDelegate.viewController;
+    UIGraphicsBeginImageContext(self.backgroundGradientView.bounds.size);
+    [self.backgroundGradientView.layer renderInContext:UIGraphicsGetCurrentContext()];
+    rootViewController.gradientImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
 }
 
 -(EKEvent *)eventUnderPoint:(CGPoint)point
