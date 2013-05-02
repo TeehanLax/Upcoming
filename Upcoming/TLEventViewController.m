@@ -10,6 +10,8 @@
 #import "TLBackgroundGradientView.h"
 #import "EKEventManager.h"
 #import "TLEventViewCell.h"
+#import "TLAppDelegate.h"
+#import "TLRootViewController.h"
 #import "TLHourSupplementaryView.h"
 
 #define NUMBER_OF_ROWS 24
@@ -55,6 +57,14 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     
     self.backgroundGradientView = [[TLBackgroundGradientView alloc] initWithFrame:self.view.bounds];
     [self.view insertSubview:self.backgroundGradientView atIndex:0];
+    
+    // save copy of gradient as image
+    TLAppDelegate *appDelegate = (TLAppDelegate *)[UIApplication sharedApplication].delegate;
+    TLRootViewController *rootViewController = appDelegate.viewController;
+    UIGraphicsBeginImageContext(self.backgroundGradientView.bounds.size);
+    [self.backgroundGradientView.layer renderInContext:UIGraphicsGetCurrentContext()];
+    rootViewController.gradientImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
 }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -144,7 +154,7 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
             if (![self.activeCells containsObject:[NSNumber numberWithInt:indexPath.row]]) {
                 cell.contentView.alpha = 0;
             }
-            cell.title.alpha = 0;
+            cell.titleLabel.alpha = 0;
         } completion:nil];
         return CGSizeMake(320, collectionView.frame.size.height / NUMBER_OF_ROWS);
     }
@@ -167,7 +177,7 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     if (![self.activeCells containsObject:[NSNumber numberWithInt:indexPath.row]]) {
         cell.contentView.alpha = (EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS;
     }
-    cell.title.alpha = (EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS;
+    cell.titleLabel.alpha = (EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS;
     
     if (size > MAX_ROW_HEIGHT) size = MAX_ROW_HEIGHT;
     if (size < minSize) size = minSize;
@@ -217,9 +227,10 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
         if (hour == indexPath.row) {
             [self.activeCells addObject:[NSNumber numberWithInt:indexPath.row]];
             cell.contentView.alpha = 1;
-            cell.title.text = event.title;
+            cell.titleLabel.text = event.title;
         }
     }
+    [cell setNeedsDisplay];
     
     return cell;
 }

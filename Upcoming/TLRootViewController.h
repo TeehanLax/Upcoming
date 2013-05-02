@@ -7,9 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-
 #import "TLEventViewController.h"
 
 @interface TLRootViewController : UIViewController <UIGestureRecognizerDelegate, TLEventViewControllerDelegate>
+
+@property (nonatomic, strong) UIImage *gradientImage;
 
 @end
