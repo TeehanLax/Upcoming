@@ -75,10 +75,8 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     
     
     @weakify(self);
-    
-    // Set up our RAC subjects for passing messages.
-    
-    // This subject is responsible for adding/removing the overlay view to our hierarchy.
+        
+    // These subjects are responsible for adding/removing the overlay view to our hierarchy.
     // We're using an explicit subject here because it maintains state (whether or not the overlay view is in the hierarchy).
     self.dayListOverlaySubject = [RACSubject subject];
     [self.dayListOverlaySubject subscribeNext:^(id x) {
@@ -103,132 +101,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
             [self.headerViewController scrollTableViewToTop];
         }
     }];
-        
-    // This subject is responsible for receiving translations from a gesture recognizers and turning
-    // thos values into ratios. These ratios are fead into other signals.
-    self.headerPanSubject = [RACSubject subject];
     
-    RACSignal *headerOpenRatioSubject = [self.headerPanSubject
-                                         map:^id(NSNumber *translation) {
-                                             
-                                             CGFloat verticalTranslation = [translation floatValue];
-                                             
-                                             CGFloat effectiveRatio = 0.0f;
-                                             
-                                             if (verticalTranslation <= 0)
-                                             {
-                                                 effectiveRatio = 0.0f;
-                                             }
-                                             else if (verticalTranslation <= kMaximumHeaderTranslationThreshold)
-                                             {
-                                                 effectiveRatio = fabsf(verticalTranslation / kMaximumHeaderTranslationThreshold);
-                                             }
-                                             else
-                                             {
-                                                 CGFloat overshoot = verticalTranslation - kMaximumHeaderTranslationThreshold;
-                                                 CGFloat y = 2 * sqrtf(overshoot + 1) - 2;
-                                                 effectiveRatio = 1.0f + (y / kMaximumHeaderTranslationThreshold);
-                                             }
-                                             
-                                             return @(effectiveRatio);
-                                         }];
-    
-    RACSignal *dayListBlurSubject = [headerOpenRatioSubject map:^id(id value) {
-        // This is the ratio of the movement. 0 is full sized and 1 is fully shrunk.
-        CGFloat ratio = [value floatValue];
-        
-        if (ratio > 1.0f)
-        {
-            ratio = 1.0f;
-        }
-        else if (ratio < 0.0f)
-        {
-            ratio = 0.0f;
-        }
-        
-        return @(ratio);
-    }];
-    
-    RAC(self.dayListOverlayView.alpha) = dayListBlurSubject;
-    
-    RACSignal *headerFrameSignal = [headerOpenRatioSubject map:^id(id value) {
-        
-        // This is the ratio of the movement. 0 is closed and 1 is open.
-        // Values less than zero are treated as zero.
-        // Values greater than one are valid and will be extrapolated beyond the fully open menu.
-        CGFloat ratio = [value floatValue];
-        
-        CGRect headerFrame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight + ratio * kMaximumHeaderTranslationThreshold);
-        CGRect footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight + ratio * kMaximumHeaderTranslationThreshold, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);
-        
-        if (ratio < 0)
-        {
-            headerFrame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight);
-            footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);;
-        }
-        
-        return [NSValue valueWithCGRect:headerFrame];
-    }];
-    
-    RACSignal *footerFrameSignal = [headerOpenRatioSubject map:^id(id value) {
-        CGFloat ratio = [value floatValue];
-        
-        CGRect footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight + ratio * kMaximumHeaderTranslationThreshold, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);
-        
-        if (ratio < 0)
-        {
-            footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);;
-        }
-        
-        return [NSValue valueWithCGRect:footerFrame];
-    }];
-    
-    RAC(self.headerViewController.view.frame) = headerFrameSignal;
-    RAC(self.footerViewController.view.frame) = footerFrameSignal;
-
-    // This subject is responsible for mapping this value to other signals and state (ugh). 
-    self.headerFinishedTransitionSubject = [RACReplaySubject subject];
-    [self.headerFinishedTransitionSubject subscribeNext:^(NSNumber *menuIsOpenNumber) {
-        @strongify(self);
-        
-        BOOL menuIsOpen = menuIsOpenNumber.boolValue;
-        
-        if (menuIsOpen)
-        {
-            [self.headerViewController flashScrollBars];
-        }
-        
-        if (!menuIsOpen)
-        {
-            [self.dayListOverlaySubject sendNext:menuIsOpenNumber];
-        }
-    }];
-    
-    self.footerFinishedTransitionSubject = [RACReplaySubject subject];
-    [self.footerFinishedTransitionSubject subscribeNext:^(NSNumber *menuIsOpenNumber) {
-        @strongify(self);
-        
-        BOOL menuIsOpen = menuIsOpenNumber.boolValue;
-        
-        if (!menuIsOpen)
-        {
-            [self.dayListAndHeaderOverlaySubject sendNext:menuIsOpenNumber];
-        }
-    }];
-    
-    RACSignal *canOpenMenuSignal = [RACSignal combineLatest:@[self.headerFinishedTransitionSubject, self.footerFinishedTransitionSubject]
-                                                     reduce:^(NSNumber *headerIsOpen, NSNumber *footerIsOpen) {
-                                                         return @(!headerIsOpen.boolValue && !footerIsOpen.boolValue);
-                                                     }];
-    RAC(self.panHeaderDownGestureRecognizer.enabled) = canOpenMenuSignal;
-    RAC(self.panFooterUpGestureRecognizer.enabled) = canOpenMenuSignal;
-    RAC(self.dayListViewController.view.userInteractionEnabled) = [canOpenMenuSignal not];
-    
-    RAC(self.panFooterDownGestureRecognizer.enabled) = self.footerFinishedTransitionSubject;
-    RAC(self.panHeaderUpGestureRecognizer.enabled) = self.headerFinishedTransitionSubject;
-    RAC(self.tapGestureRecognizer.enabled) = self.headerFinishedTransitionSubject;
-    
-    // This subject is responsible for adding/removing the overlay view to our hierarchy
     self.dayListAndHeaderOverlaySubject = [RACSubject subject];
     [self.dayListAndHeaderOverlaySubject subscribeNext:^(id x) {
         @strongify(self);
@@ -269,80 +142,172 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     }];
     
     
-    /*
-    // Footer gesture recognizer subjects
+    //These subjects are responsible for calculating the frame of the header and footer
+    self.headerPanSubject = [RACSubject subject];
     
-    self.footerMovementSubject = [RACSubject subject];
-    [self.footerMovementSubject subscribeNext:^(id x) {
-        @strongify(self);
+    RACSignal *headerOpenRatioSubject = [self.headerPanSubject
+                                         map:^id(NSNumber *translation) {
+                                             
+                                             CGFloat verticalTranslation = [translation floatValue];
+                                             
+                                             CGFloat effectiveRatio = 0.0f;
+                                             
+                                             if (verticalTranslation <= 0)
+                                             {
+                                                 effectiveRatio = 0.0f;
+                                             }
+                                             else if (verticalTranslation <= kMaximumHeaderTranslationThreshold)
+                                             {
+                                                 effectiveRatio = fabsf(verticalTranslation / kMaximumHeaderTranslationThreshold);
+                                             }
+                                             else
+                                             {
+                                                 CGFloat overshoot = verticalTranslation - kMaximumHeaderTranslationThreshold;
+                                                 CGFloat y = 2 * sqrtf(overshoot + 1) - 2;
+                                                 effectiveRatio = 1.0f + (y / kMaximumHeaderTranslationThreshold);
+                                             }
+                                             
+                                             return @(effectiveRatio);
+                                         }];
+        
+    RACSignal *headerFrameSignal = [headerOpenRatioSubject map:^id(id value) {
         
         // This is the ratio of the movement. 0 is closed and 1 is open.
         // Values less than zero are treated as zero.
         // Values greater than one are valid and will be extrapolated beyond the fully open menu.
-        CGFloat ratio = [x floatValue];
+        CGFloat ratio = [value floatValue];
         
-        CGFloat targetTranslation = kMaximumFooterTranslationThreshold;
-        CGRect footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight + ratio * targetTranslation, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);
+        CGRect headerFrame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight + ratio * kMaximumHeaderTranslationThreshold);
+        CGRect footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight + ratio * kMaximumHeaderTranslationThreshold, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);
         
         if (ratio < 0)
         {
+            headerFrame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight);
             footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);;
         }
         
-        self.footerViewController.view.frame = footerFrame;
+        return [NSValue valueWithCGRect:headerFrame];
     }];
     
-    self.downwardFooterPanSubject = [RACSubject subject];
-    [self.downwardFooterPanSubject subscribeNext:^(NSNumber *translation) {
+    RAC(self.headerViewController.view.frame) = headerFrameSignal;
+    
+    self.footerPanSubject = [RACSubject subject];
+    
+    RACSignal *footerOpenRatioSubject = [self.footerPanSubject
+                                         map:^id(id translation) {
+                                             
+                                             @strongify(self);
+                                             
+                                             CGFloat verticalTranslation = [translation floatValue];
+                                             
+                                             CGFloat targetTranslation = kMaximumFooterTranslationThreshold;
+                                             CGFloat effectiveRatio = 0.0f;
+                                             
+                                             if (verticalTranslation < targetTranslation)
+                                             {
+                                                 
+                                                 CGFloat overshoot = fabsf(verticalTranslation) - fabsf(targetTranslation);
+                                                 CGFloat y = 2 * sqrtf(overshoot + 1) - 2;
+                                                 effectiveRatio = 1.0f + (y / fabsf(targetTranslation));
+                                             }
+                                             else
+                                             {
+                                                 effectiveRatio = verticalTranslation / targetTranslation;
+                                             }
+                                             
+                                             return @(effectiveRatio);
+                                         }];
+    
+    // Need to combine latest on the two signals since the footer moves with both
+    RACSignal *footerFrameSignal = [[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)]]
+                                                      reduce:^id(NSNumber *headerRatio, NSNumber *footerRatio){
+                                                          if (headerRatio.floatValue > 0) return @(-headerRatio.floatValue);
+                                                          if (footerRatio.floatValue > 0) return footerRatio;
+                                                          return @(0);
+                                                      }]
+                                    map:^id(id value) {
+                                        @strongify(self);
+                                        
+                                        // This is the ratio of the movement. 0 is closed and 1 is open.
+                                        // Values less than zero are treated as zero.
+                                        // Values greater than one are valid and will be extrapolated beyond the fully open menu.
+                                        CGFloat ratio = [value floatValue];
+                                        
+                                        CGFloat targetTranslation = kMaximumFooterTranslationThreshold;
+                                        CGRect footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight + ratio * targetTranslation, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);
+                                        
+                                        return [NSValue valueWithCGRect:footerFrame];
+                                    }];
+    
+    RAC(self.footerViewController.view.frame) = footerFrameSignal;
+    
+    
+    // This subject is responsible for calculating the alpha value of the overlay view
+    RACSignal *dayListBlurSubject = [[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)]]
+                                                       reduce:^id(NSNumber *headerRatio, NSNumber *footerRatio){
+                                                           return @(MAX(headerRatio.floatValue, footerRatio.floatValue));
+                                                       }]
+                                     map:^id(id value) {
+                                         // This is the ratio of the movement. 0 is full sized and 1 is fully shrunk.
+                                         CGFloat ratio = [value floatValue];
+                                         
+                                         if (ratio > 1.0f)
+                                         {
+                                             ratio = 1.0f;
+                                         }
+                                         else if (ratio < 0.0f)
+                                         {
+                                             ratio = 0.0f;
+                                         }
+                                         
+                                         return @(ratio);
+                                     }];
+    
+    RAC(self.dayListOverlayView.alpha) = dayListBlurSubject;
+
+    
+    // These subjects are responsible for mapping this value to other signals and state (ugh).
+    self.headerFinishedTransitionSubject = [RACReplaySubject subject];
+    [self.headerFinishedTransitionSubject subscribeNext:^(NSNumber *menuIsOpenNumber) {
         @strongify(self);
         
-        CGFloat verticalTranslation = [translation floatValue];
+        BOOL menuIsOpen = menuIsOpenNumber.boolValue;
         
-        CGFloat targetTranslation = kMaximumFooterTranslationThreshold;
-        CGFloat effectiveRatio = 1.0f;
-        
-        if (verticalTranslation > 0)
+        if (menuIsOpen)
         {
-            effectiveRatio = ((targetTranslation + verticalTranslation) / targetTranslation);
-        }
-        else
-        {
-            CGFloat overshoot = fabsf(verticalTranslation);
-            CGFloat y = 2 * sqrtf(overshoot + 1) - 2;
-            effectiveRatio = 1.0f + (y / fabsf(targetTranslation));
+            [self.headerViewController flashScrollBars];
         }
         
-        [self.dayListBlurSubject sendNext:@(effectiveRatio)];
-        [self.footerMovementSubject sendNext:@(effectiveRatio)];
+        if (!menuIsOpen)
+        {
+            [self.dayListOverlaySubject sendNext:menuIsOpenNumber];
+        }
     }];
     
-    self.upwardFooterPanSubject = [RACSubject subject];
-    [self.upwardFooterPanSubject subscribeNext:^(NSNumber *translation) {
+    self.footerFinishedTransitionSubject = [RACReplaySubject subject];
+    [self.footerFinishedTransitionSubject subscribeNext:^(NSNumber *menuIsOpenNumber) {
         @strongify(self);
         
-        CGFloat verticalTranslation = [translation floatValue];
+        BOOL menuIsOpen = menuIsOpenNumber.boolValue;
         
-        CGFloat targetTranslation = kMaximumFooterTranslationThreshold;
-        CGFloat effectiveRatio = 0.0f;
-        
-        if (verticalTranslation < targetTranslation)
+        if (!menuIsOpen)
         {
-            
-            CGFloat overshoot = fabsf(verticalTranslation) - fabsf(targetTranslation);
-            CGFloat y = 2 * sqrtf(overshoot + 1) - 2;
-            effectiveRatio = 1.0f + (y / fabsf(targetTranslation));
+            [self.dayListAndHeaderOverlaySubject sendNext:menuIsOpenNumber];
         }
-        else
-        {
-            effectiveRatio = verticalTranslation / targetTranslation;
-        }
-        
-        [self.dayListBlurSubject sendNext:@(effectiveRatio)];
-        [self.footerMovementSubject sendNext:@(effectiveRatio)];
     }];
     
-    */
+    RACSignal *canOpenMenuSignal = [RACSignal combineLatest:@[self.headerFinishedTransitionSubject, self.footerFinishedTransitionSubject]
+                                                     reduce:^(NSNumber *headerIsOpen, NSNumber *footerIsOpen) {
+                                                         return @(!headerIsOpen.boolValue && !footerIsOpen.boolValue);
+                                                     }];
+    RAC(self.panHeaderDownGestureRecognizer.enabled) = canOpenMenuSignal;
+    RAC(self.panFooterUpGestureRecognizer.enabled) = canOpenMenuSignal;
+    RAC(self.dayListViewController.view.userInteractionEnabled) = canOpenMenuSignal;
+    RAC(self.panFooterDownGestureRecognizer.enabled) = self.footerFinishedTransitionSubject;
+    RAC(self.panHeaderUpGestureRecognizer.enabled) = self.headerFinishedTransitionSubject;
+    RAC(self.tapGestureRecognizer.enabled) = self.headerFinishedTransitionSubject;
     
+        
     return self;
 }
 
