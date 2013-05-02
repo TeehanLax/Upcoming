@@ -31,18 +31,10 @@
 @property (nonatomic, strong) UIPanGestureRecognizer *panHeaderDownGestureRecognizer;
 @property (nonatomic, strong) UIPanGestureRecognizer *panHeaderUpGestureRecognizer;
 @property (nonatomic, strong) UITapGestureRecognizer *tapGestureRecognizer;
-
 @property (nonatomic, strong) UIPanGestureRecognizer *panFooterUpGestureRecognizer;
 @property (nonatomic, strong) UIPanGestureRecognizer *panFooterDownGestureRecognizer;
 
-// Used to receive translations from the downward pan gesture recognizer on the header.
-@property (nonatomic, strong) RACSubject *downwardHeaderPanSubject;
-// Used to receive translations from the upward pan gesture recognizer on the header.
-@property (nonatomic, strong) RACSubject *upwardHeaderPanSubject;
-// Used to receive ratios of translation for shrinking the day list view controller's view.
-@property (nonatomic, strong) RACSubject *dayListBlurSubject;
-// Used to receive ratios of translation for moving the header view controller's view.
-@property (nonatomic, strong) RACSubject *headerMovementSubject;
+@property (nonatomic, strong) RACSubject *headerPanSubject;
 // Used to receive ratios of translation for changing the alpha of the overlay view which covers the day list view
 @property (nonatomic, strong) RACSubject *dayListOverlaySubject;
 // Used to enable/disable gesture recognizers
@@ -84,7 +76,8 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     
     // Set up our RAC subjects for passing messages.
     
-    // This subject is responsible for adding/removing the overlay view to our hierarchy
+    // This subject is responsible for adding/removing the overlay view to our hierarchy.
+    // We're using an explicit subject here because it maintains state (whether or not the overlay view is in the hierarchy).
     self.dayListOverlaySubject = [RACSubject subject];
     [self.dayListOverlaySubject subscribeNext:^(id x) {
         @strongify(self);
@@ -108,37 +101,40 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
             [self.headerViewController scrollTableViewToTop];
         }
     }];
+        
+    // This subject is responsible for receiving translations from a gesture recognizers and turning
+    // thos values into ratios. These ratios are fead into other signals.
+    self.headerPanSubject = [RACSubject subject];
     
-    // This subject is responsible for moving the actual header up and down
-    self.headerMovementSubject = [RACSubject subject];
-    [self.headerMovementSubject subscribeNext:^(id x) {
-        @strongify(self);
-        
-        // This is the ratio of the movement. 0 is closed and 1 is open.
-        // Values less than zero are treated as zero.
-        // Values greater than one are valid and will be extrapolated beyond the fully open menu.
-        CGFloat ratio = [x floatValue];
-        
-        CGRect headerFrame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight + ratio * kMaximumHeaderTranslationThreshold);
-        CGRect footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight + ratio * kMaximumHeaderTranslationThreshold, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);
-        
-        if (ratio < 0)
-        {            
-            headerFrame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight);
-            footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);;
-        }
-        
-        self.headerViewController.view.frame = headerFrame;
-        self.footerViewController.view.frame = footerFrame;
-    }];
+    RACSignal *headerOpenRatioSubject = [self.headerPanSubject
+                                         map:^id(NSNumber *translation) {
+                                             
+                                             CGFloat verticalTranslation = [translation floatValue];
+                                             
+                                             CGFloat effectiveRatio = 0.0f;
+                                             
+                                             if (verticalTranslation <= 0)
+                                             {
+                                                 effectiveRatio = 0.0f;
+                                             }
+                                             else if (verticalTranslation <= kMaximumHeaderTranslationThreshold)
+                                             {
+                                                 effectiveRatio = fabsf(verticalTranslation / kMaximumHeaderTranslationThreshold);
+                                             }
+                                             else
+                                             {
+                                                 CGFloat overshoot = verticalTranslation - kMaximumHeaderTranslationThreshold;
+                                                 CGFloat y = 2 * sqrtf(overshoot + 1) - 2;
+                                                 effectiveRatio = 1.0f + (y / kMaximumHeaderTranslationThreshold);
+                                             }
+                                             
+                                             return @(effectiveRatio);
+                                         }];
     
-    // This subject is repsonisble for shrinking the day list view controller's view via a CAAffineTransform.
-    self.dayListBlurSubject = [RACSubject subject];
-    [self.dayListBlurSubject subscribeNext:^(id x) {
-        @strongify(self);
+    RACSignal *dayListBlurSubject = [headerOpenRatioSubject map:^id(id value) {
         
         // This is the ratio of the movement. 0 is full sized and 1 is fully shrunk.
-        CGFloat ratio = [x floatValue];
+        CGFloat ratio = [value floatValue];
         
         if (ratio > 1.0f)
         {
@@ -149,66 +145,46 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
             ratio = 0.0f;
         }
         
-        self.dayListOverlayView.alpha = ratio;
+        return @(ratio);
     }];
     
-    // This subject is responsible for receiving translations from a gesture recognizers and turning
-    // thos values into ratios. These ratios are fead into other signals.
-    self.downwardHeaderPanSubject = [RACSubject subject];
-    [self.downwardHeaderPanSubject subscribeNext:^(NSNumber *translation) {
-        @strongify(self);
-        CGFloat verticalTranslation = [translation floatValue];
+    RAC(self.dayListOverlayView.alpha) = dayListBlurSubject;
+    
+    RACSignal *headerFrameSignal = [headerOpenRatioSubject map:^id(id value) {
         
-        CGFloat effectiveRatio = 0.0f;
+        // This is the ratio of the movement. 0 is closed and 1 is open.
+        // Values less than zero are treated as zero.
+        // Values greater than one are valid and will be extrapolated beyond the fully open menu.
+        CGFloat ratio = [value floatValue];
         
-        if (verticalTranslation <= 0)
+        CGRect headerFrame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight + ratio * kMaximumHeaderTranslationThreshold);
+        CGRect footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight + ratio * kMaximumHeaderTranslationThreshold, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);
+        
+        if (ratio < 0)
         {
-            effectiveRatio = 0.0f;
-        }
-        else if (verticalTranslation <= kMaximumHeaderTranslationThreshold)
-        {
-            effectiveRatio = fabsf(verticalTranslation / kMaximumHeaderTranslationThreshold);
-        }
-        else
-        {
-            CGFloat overshoot = verticalTranslation - kMaximumHeaderTranslationThreshold;
-            CGFloat y = 2 * sqrtf(overshoot + 1) - 2;
-            effectiveRatio = 1.0f + (y / kMaximumHeaderTranslationThreshold);
+            headerFrame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight);
+            footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);;
         }
         
-        [self.dayListBlurSubject sendNext:@(effectiveRatio)];
-        [self.headerMovementSubject sendNext:@(effectiveRatio)];
+        return [NSValue valueWithCGRect:headerFrame];
     }];
     
-    // This subject is responsible for receiving translations from a gesture recognizers and turning
-    // thos values into ratios. These ratios are fead into other signals.
-    self.upwardHeaderPanSubject = [RACSubject subject];
-    [self.upwardHeaderPanSubject subscribeNext:^(NSNumber *translation) {
-        @strongify(self);
+    RACSignal *footerFrameSignal = [headerOpenRatioSubject map:^id(id value) {
+        CGFloat ratio = [value floatValue];
         
-        CGFloat verticalTranslation = [translation floatValue];
+        CGRect footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight + ratio * kMaximumHeaderTranslationThreshold, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);
+        
+        if (ratio < 0)
+        {
+            footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);;
+        }
+        
+        return [NSValue valueWithCGRect:footerFrame];
+    }];
+    
+    RAC(self.headerViewController.view.frame) = headerFrameSignal;
+    RAC(self.footerViewController.view.frame) = footerFrameSignal;
 
-        CGFloat effectiveRatio = 1.0f;
-        
-        if (verticalTranslation >= 0)
-        {
-            CGFloat overshoot = verticalTranslation;
-            CGFloat y = 2 * sqrtf(overshoot + 1) - 2;
-            effectiveRatio = 1.0f + (y / kMaximumHeaderTranslationThreshold);
-        }
-        else if (verticalTranslation > -kMaximumHeaderTranslationThreshold)
-        {
-            effectiveRatio = fabsf((verticalTranslation + kMaximumHeaderTranslationThreshold) / kMaximumHeaderTranslationThreshold);
-        }
-        else
-        {
-            effectiveRatio = 0.0f;
-        }
-
-        [self.dayListBlurSubject sendNext:@(effectiveRatio)];
-        [self.headerMovementSubject sendNext:@(effectiveRatio)];
-    }];
-    
     // This subject is responsible for mapping this value to other signals and state (ugh). 
     self.menuFinishedTransitionSubject = [RACReplaySubject subject];
     [self.menuFinishedTransitionSubject subscribeNext:^(NSNumber *menuIsOpenNumber) {
@@ -216,25 +192,26 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         
         BOOL menuIsOpen = menuIsOpenNumber.boolValue;
         
-        if (!menuIsOpen)
-        {
-            [self.dayListOverlaySubject sendNext:menuIsOpenNumber];
-        }
-        
-        self.panHeaderDownGestureRecognizer.enabled = !menuIsOpen;
-        self.panHeaderUpGestureRecognizer.enabled = menuIsOpen;
-        self.tapGestureRecognizer.enabled = menuIsOpen;
-        self.dayListViewController.view.userInteractionEnabled = !menuIsOpen;
-        self.panFooterUpGestureRecognizer.enabled = !menuIsOpen;
-        
         if (menuIsOpen)
         {
             [self.headerViewController flashScrollBars];
         }
+        
+        if (!menuIsOpen)
+        {
+            [self.dayListOverlaySubject sendNext:menuIsOpenNumber];
+        }
     }];
     
+    RAC(self.panHeaderDownGestureRecognizer.enabled) = [self.menuFinishedTransitionSubject not];
+    RAC(self.panHeaderUpGestureRecognizer.enabled) = self.menuFinishedTransitionSubject;
+    RAC(self.tapGestureRecognizer.enabled) = self.menuFinishedTransitionSubject;
+    RAC(self.dayListViewController.view.userInteractionEnabled) = [self.menuFinishedTransitionSubject not];
+    RAC(self.panFooterUpGestureRecognizer.enabled) = [self.menuFinishedTransitionSubject not];
     
+    /*
     // Footer gesture recognizer subjects
+    {
     
     // This subject is responsible for adding/removing the overlay view to our hierarchy
     self.dayListAndHeaderOverlaySubject = [RACSubject subject];
@@ -363,6 +340,8 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         
         self.dayListViewController.view.userInteractionEnabled = !menuIsOpen;
     }];
+    }
+    */
     
     return self;
 }
@@ -387,7 +366,6 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     self.dayListOverlayView = [[UIImageView alloc] init];
     self.dayListOverlayView.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.4f];
     self.dayListOverlayView.frame = self.view.frame;
-    self.dayListOverlayView.alpha = 0.0f;
 }
 
 -(void)viewDidLoad
@@ -399,7 +377,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     
     self.tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
         [UIView animateWithDuration:0.25f animations:^{
-            [self.downwardHeaderPanSubject sendNext:@(0)];
+            [self.headerPanSubject sendNext:@(0)];
         } completion:^(BOOL finished) {
             [self.menuFinishedTransitionSubject sendNext:@(NO)];
         }];
@@ -421,7 +399,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         }
         else if (state == UIGestureRecognizerStateChanged)
         {
-            [self.downwardHeaderPanSubject sendNext:@(translation.y)];
+            [self.headerPanSubject sendNext:@(translation.y)];
         }
         else if (state == UIGestureRecognizerStateEnded)
         {
@@ -432,11 +410,11 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
             [UIView animateWithDuration:0.25f animations:^{
                 if (movingDown)
                 {
-                    [self.downwardHeaderPanSubject sendNext:@(kMaximumHeaderTranslationThreshold)];
+                    [self.headerPanSubject sendNext:@(kMaximumHeaderTranslationThreshold)];
                 }
                 else
                 {
-                    [self.downwardHeaderPanSubject sendNext:@(0)];
+                    [self.headerPanSubject sendNext:@(0)];
                 }
             } completion:^(BOOL finished) {
                 [self.menuFinishedTransitionSubject sendNext:@(movingDown)];
@@ -452,7 +430,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         CGPoint translation = [recognizer translationInView:self.view];
         if (state == UIGestureRecognizerStateChanged)
         {
-            [self.upwardHeaderPanSubject sendNext:@(translation.y)];
+            [self.headerPanSubject sendNext:@(kMaximumHeaderTranslationThreshold + translation.y)];
         }
         else if (state == UIGestureRecognizerStateEnded)
         {
@@ -463,11 +441,11 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
             [UIView animateWithDuration:0.25f animations:^{
                 if (movingDown)
                 {
-                    [self.upwardHeaderPanSubject sendNext:@(0)];
+                    [self.headerPanSubject sendNext:@(kMaximumHeaderTranslationThreshold)];
                 }
                 else
                 {
-                    [self.upwardHeaderPanSubject sendNext:@(-kMaximumHeaderTranslationThreshold)];
+                    [self.headerPanSubject sendNext:@(0)];
                 }
             } completion:^(BOOL finished) {
                 [self.menuFinishedTransitionSubject sendNext:@(movingDown)];
