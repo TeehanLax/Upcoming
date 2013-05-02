@@ -12,6 +12,10 @@
 #import "TLEventViewCell.h"
 #import "TLHourSupplementaryView.h"
 
+#import <NSDate-Utilities.h>
+#import <EXTScope.h>
+#import <ReactiveCocoa.h>
+
 #define NUMBER_OF_ROWS 24
 #define EXPANDED_ROWS 4
 #define MAX_ROW_HEIGHT 38.f
@@ -53,6 +57,12 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     self.touchDown.delaysTouchesEnded = NO;
     [self.collectionView addGestureRecognizer:self.touchDown];
     
+    @weakify(self);
+    [[RACSignal interval:60.0f] subscribeNext:^(id x) {
+        @strongify(self);
+        [self updateBackgroundGradient];
+    }];
+    
     self.backgroundGradientView = [[TLBackgroundGradientView alloc] initWithFrame:self.view.bounds];
     [self.view insertSubview:self.backgroundGradientView atIndex:0];
 }
@@ -60,6 +70,7 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
 -(void)viewDidAppear:(BOOL)animated
 {
     [self.collectionView reloadData];
+    [self updateBackgroundGradient];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -235,6 +246,45 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
 }
 
 #pragma mark - Private Methods
+-(void)updateBackgroundGradient
+{
+    NSArray *events = [[EKEventManager sharedInstance] events];
+    
+    CGFloat soonestEvent = NSIntegerMax;
+    for (EKEvent *event in events)
+    {
+        if ([event.startDate isEarlierThanDate:[NSDate date]] && ![event.endDate isEarlierThanDate:[NSDate date]])
+        {
+            // There's an event going on NOW.
+            soonestEvent = 0;
+        }
+        else if (![event.startDate isEarlierThanDate:[NSDate date]])
+        {
+            NSTimeInterval interval = [event.startDate timeIntervalSinceNow];
+            NSInteger numberOfMinutes = interval / 60;
+            
+            soonestEvent = MIN(soonestEvent, numberOfMinutes);
+        }
+    }
+    
+    const CGFloat fadeTime = 30.0f;
+    
+    if (soonestEvent == 0)
+    {
+        [self.backgroundGradientView setAlertRatio:1.0f animated:YES];
+    }
+    else if (soonestEvent > fadeTime)
+    {
+        [self.backgroundGradientView setAlertRatio:0.0f animated:YES];
+    }
+    else
+    {
+        CGFloat ratio = soonestEvent / fadeTime;
+        
+        [self.backgroundGradientView setAlertRatio:ratio animated:YES];
+    }
+}
+
 -(EKEvent *)eventUnderPoint:(CGPoint)point
 {
     EKEvent *eventUnderTouch;
