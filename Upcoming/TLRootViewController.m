@@ -592,9 +592,9 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     [AppDelegate playTouchUpSound];
 }
 
--(void)userDidInteractWithDayListView:(TLEventViewController *)controller updatingTimeRatio:(CGFloat)timeRatio event:(EKEvent *)event
+-(void)userDidInteractWithDayListView:(TLEventViewController *)controller updateTimeHour:(NSInteger)hour minute:(NSInteger)minute event:(EKEvent *)event
 {
-    [self.headerViewController updateTimeRatio:timeRatio event:event];
+    [self.headerViewController updateHour:hour minute:minute event:event];
 }
 
 @end

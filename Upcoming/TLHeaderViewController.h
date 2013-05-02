@@ -18,6 +18,6 @@ extern const CGFloat kHeaderHeight;
 -(void)scrollTableViewToTop;
 -(void)hideHeaderView;
 -(void)showHeaderView;
--(void)updateTimeRatio:(CGFloat)timeRatio event:(EKEvent *)event;
+-(void)updateHour:(NSInteger)hours minute:(NSInteger)minutes event:(EKEvent *)event;
 
 @end

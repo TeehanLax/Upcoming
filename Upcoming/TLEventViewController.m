@@ -57,6 +57,11 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     [self.view insertSubview:self.backgroundGradientView atIndex:0];
 }
 
+-(void)viewDidAppear:(BOOL)animated
+{
+    [self.collectionView reloadData];
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     TLCollectionViewLayout *layout = [[TLCollectionViewLayout alloc] init];
     
@@ -68,7 +73,15 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     
     EKEvent *event = [self eventUnderPoint:self.location];
     
-    NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:self.location];
+    NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:self.location];    
+    UICollectionViewLayoutAttributes *attributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:indexPath];
+    NSInteger hour = indexPath.row;
+    NSInteger minute = ((self.location.y - attributes.frame.origin.y) / attributes.size.height) * 60;
+    
+    // Convert from 24-hour format
+    if (hour > 12) hour -= 12;
+    if (hour == 0) hour += 12;
+    
     
     if (recognizer.state == UIGestureRecognizerStateBegan) {
         self.eventUnderFinger = nil;
@@ -77,7 +90,7 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
         [self.delegate userDidBeginInteractingWithDayListViewController:self];
         if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
             [AppDelegate playTouchDownSound];
-            [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:(self.location.y / CGRectGetHeight(recognizer.view.bounds)) event:event];
+            [self.delegate userDidInteractWithDayListView:self updateTimeHour:hour minute:minute event:event];
         }
     } else if (recognizer.state == UIGestureRecognizerStateChanged) {
         if ([self.eventUnderFinger compareStartDateWithEvent:event] != NSOrderedSame ||
@@ -97,7 +110,7 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
         }
         
         if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
-            [self.delegate userDidInteractWithDayListView:self updatingTimeRatio:(self.location.y / CGRectGetHeight(recognizer.view.bounds)) event:event];
+            [self.delegate userDidInteractWithDayListView:self updateTimeHour:hour minute:minute event:event];
         }
     } else if (recognizer.state == UIGestureRecognizerStateEnded) {
         self.eventUnderFinger = nil;
@@ -164,14 +177,23 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     NSCalendar *calendar = [NSCalendar currentCalendar];
     NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
     
-    const CGFloat viewHeight = 44.0f;
     NSInteger currentHour = components.hour;
     NSInteger currentMinute = components.minute;
     
     UICollectionViewLayoutAttributes *attributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:currentHour inSection:0]];
+    
+    CGFloat viewHeight = attributes.size.height;
     CGFloat minuteAdjustment = attributes.size.height * (CGFloat)(currentMinute / 60);
     
-    return CGRectMake(0, attributes.frame.origin.y + minuteAdjustment - viewHeight, CGRectGetWidth(self.view.bounds), viewHeight);
+    return CGRectMake(0, attributes.frame.origin.y + minuteAdjustment, CGRectGetWidth(self.view.bounds), viewHeight);
+}
+
+-(CGFloat)collectionView:(UICollectionView *)collectionView alphaForHourViewInLayout:(TLCollectionViewLayout *)layout
+{
+    if (self.touch)
+        return 0.0f;
+    else
+        return 1.0f;
 }
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
@@ -202,11 +224,10 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
 -(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {    
     TLHourSupplementaryView *supplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kSupplementaryViewIdentifier forIndexPath:indexPath];
     
-    
     NSCalendar *calendar = [NSCalendar currentCalendar];
     NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
     supplementaryView.timeString = [NSString stringWithFormat:@"%d:%02d", components.hour % 12, components.minute];
-    
+        
     return supplementaryView;
 }
 

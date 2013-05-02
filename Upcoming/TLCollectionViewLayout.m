@@ -38,13 +38,16 @@
     UICollectionViewLayoutAttributes* attributes = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind withIndexPath:indexPath];
     
     CGRect frame = CGRectZero;
+    CGFloat alpha = 1.0f;
     
     if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)])
     {
         frame = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView frameForHourViewInLayout:self];
+        alpha = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView alphaForHourViewInLayout:self];
     }
     
     attributes.frame = frame;
+    attributes.alpha = alpha;
     attributes.zIndex = 1;
     
     return attributes;

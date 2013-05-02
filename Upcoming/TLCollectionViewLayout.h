@@ -13,6 +13,7 @@
 @protocol TLCollectionViewLayoutDelegate <UICollectionViewDelegateFlowLayout>
 
 -(CGRect)collectionView:(UICollectionView *)collectionView frameForHourViewInLayout:(TLCollectionViewLayout *)layout;
+-(CGFloat)collectionView:(UICollectionView *)collectionView alphaForHourViewInLayout:(TLCollectionViewLayout *)layout;
 
 @end
 

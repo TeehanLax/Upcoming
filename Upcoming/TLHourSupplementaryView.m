@@ -36,27 +36,31 @@
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
     
-    const CGFloat rightMargin = 7.0f;
-    UIFont *font = [[UIFont tl_appFont] fontWithSize:10];
-    CGFloat textWidth = [self.timeString sizeWithFont:font].width;
+    const CGFloat rightMargin = 12.0f;
+    UIFont *font = [[UIFont tl_appFont] fontWithSize:14];
+    CGSize textSize = [self.timeString sizeWithFont:font];
+    CGRect textRect = CGRectMake(CGRectGetWidth(self.bounds) - rightMargin - textSize.width, CGRectGetMidY(self.bounds) - textSize.height / 2, textSize.width, textSize.height);
     
     CGContextSaveGState(context);
     {
+        UIBezierPath *textRectPath = [UIBezierPath bezierPathWithRect:CGRectInset(textRect, -5, 0)];
+        [textRectPath appendPath:[UIBezierPath bezierPathWithRect:self.bounds]];
+        CGPathRef path = [textRectPath CGPath];
+        CGContextAddPath(context, path);
+        CGContextEOClip(context);
         
         CGContextSetLineWidth(context, 1);
-        CGContextSetRGBStrokeColor(context, 1.0f, 1.0f, 1.0f, 0.5f);
+        CGContextSetRGBStrokeColor(context, 1.0f, 1.0f, 1.0f, 0.7f);
         CGContextBeginPath(context);
         CGContextMoveToPoint(context, 0, (int)CGRectGetMidY(self.bounds));
         CGContextAddLineToPoint(context, CGRectGetWidth(self.bounds), (int)CGRectGetMidY(self.bounds));
         
-        
         CGContextStrokePath(context);
     }
+    CGContextRestoreGState(context);
     
     [[UIColor colorWithWhite:1.0f alpha:0.7f] set];
-    CGRect textRect = CGRectMake(CGRectGetWidth(self.bounds) - rightMargin - textWidth, 0, textWidth, CGRectGetHeight(self.bounds));
     [self.timeString drawInRect:textRect withFont:font lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentCenter];
-//    [self.timeString drawAtPoint:CGPointZero forWidth:200 withFont:[UIFont tl_appFont] fontSize:10 lineBreakMode:NSLineBreakByClipping baselineAdjustment:UIBaselineAdjustmentNone];
 }
 
 

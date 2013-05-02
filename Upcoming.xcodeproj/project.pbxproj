@@ -18,10 +18,10 @@
 		5E18D2FD172F028F0010F8FF /* TLUpcomingEventViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2FC172F028F0010F8FF /* TLUpcomingEventViewController.xib */; };
 		5E18D2FF172FFF560010F8FF /* location@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2FE172FFF560010F8FF /* location@2x.png */; };
 		5E18D302173019860010F8FF /* TLCalendarDotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E18D301173019860010F8FF /* TLCalendarDotView.m */; };
-		5E18D30C1732D7000010F8FF /* TLHourSupplementaryView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E18D30B1732D7000010F8FF /* TLHourSupplementaryView.m */; };
 		5E18D30517316AAB0010F8FF /* TLAppDelegate+Sounds.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E18D30417316AAB0010F8FF /* TLAppDelegate+Sounds.m */; };
 		5E18D30717316B830010F8FF /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E18D30617316B830010F8FF /* AudioToolbox.framework */; };
 		5E18D309173170970010F8FF /* soundeffect.wav in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D308173170970010F8FF /* soundeffect.wav */; };
+		5E18D30C1732D7000010F8FF /* TLHourSupplementaryView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E18D30B1732D7000010F8FF /* TLHourSupplementaryView.m */; };
 		5E21DEDB171F19C000231263 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DED9171F19C000231263 /* EventKit.framework */; };
 		5E21DEDC171F19C000231263 /* EventKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DEDA171F19C000231263 /* EventKitUI.framework */; };
 		5E2EF7B5172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7B4172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m */; };
@@ -68,12 +68,12 @@
 		5E18D2FE172FFF560010F8FF /* location@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "location@2x.png"; path = "Images/location@2x.png"; sourceTree = "<group>"; };
 		5E18D300173019860010F8FF /* TLCalendarDotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLCalendarDotView.h; sourceTree = "<group>"; };
 		5E18D301173019860010F8FF /* TLCalendarDotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLCalendarDotView.m; sourceTree = "<group>"; };
-		5E18D30A1732D7000010F8FF /* TLHourSupplementaryView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLHourSupplementaryView.h; sourceTree = "<group>"; };
-		5E18D30B1732D7000010F8FF /* TLHourSupplementaryView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLHourSupplementaryView.m; sourceTree = "<group>"; };
 		5E18D30317316AAB0010F8FF /* TLAppDelegate+Sounds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TLAppDelegate+Sounds.h"; sourceTree = "<group>"; };
 		5E18D30417316AAB0010F8FF /* TLAppDelegate+Sounds.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "TLAppDelegate+Sounds.m"; sourceTree = "<group>"; };
 		5E18D30617316B830010F8FF /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		5E18D308173170970010F8FF /* soundeffect.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = soundeffect.wav; sourceTree = "<group>"; };
+		5E18D30A1732D7000010F8FF /* TLHourSupplementaryView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLHourSupplementaryView.h; sourceTree = "<group>"; };
+		5E18D30B1732D7000010F8FF /* TLHourSupplementaryView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLHourSupplementaryView.m; sourceTree = "<group>"; };
 		5E21DED9171F19C000231263 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 		5E21DEDA171F19C000231263 /* EventKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKitUI.framework; path = System/Library/Frameworks/EventKitUI.framework; sourceTree = SDKROOT; };
 		5E2EF7B3172AC4FF00737A75 /* TLTouchDownGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLTouchDownGestureRecognizer.h; sourceTree = "<group>"; };
