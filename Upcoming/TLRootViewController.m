@@ -34,18 +34,18 @@
 @property (nonatomic, strong) UIPanGestureRecognizer *panFooterUpGestureRecognizer;
 @property (nonatomic, strong) UIPanGestureRecognizer *panFooterDownGestureRecognizer;
 
+// Two subjects used to receive translations from the gesture recognizers
 @property (nonatomic, strong) RACSubject *headerPanSubject;
-// Used to receive ratios of translation for changing the alpha of the overlay view which covers the day list view
-@property (nonatomic, strong) RACSubject *dayListOverlaySubject;
-// Used to enable/disable gesture recognizers
-@property (nonatomic, strong) RACSubject *menuFinishedTransitionSubject;
+@property (nonatomic, strong) RACSubject *footerPanSubject;
 
-@property (nonatomic, strong) RACSubject *upwardFooterPanSubject;
-@property (nonatomic, strong) RACSubject *downwardFooterPanSubject;
-@property (nonatomic, strong) RACSubject *footerMovementSubject;
-@property (nonatomic, strong) RACSubject *footerFinishedTransitionSubject;
 // Used to receive ratios of translation for changing the alpha of the overlay view which covers the day list view
 @property (nonatomic, strong) RACSubject *dayListAndHeaderOverlaySubject;
+@property (nonatomic, strong) RACSubject *dayListOverlaySubject;
+
+// Used to enable/disable gesture recognizers and view interactivity
+@property (nonatomic, strong) RACSubject *headerFinishedTransitionSubject;
+@property (nonatomic, strong) RACSubject *footerFinishedTransitionSubject;
+
 
 @end
 
@@ -55,6 +55,8 @@
 // The total height of the header is kHeaderHeight + kMaximumTranslationThreshold.
 static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
 
+// We have to use a #define here to get the compiler to expand this macro
+#define kMaximumFooterTranslationThreshold (-CGRectGetMidY(self.view.bounds) - CGRectGetHeight(self.footerViewController.view.bounds) / 2.0f)
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -132,7 +134,6 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
                                          }];
     
     RACSignal *dayListBlurSubject = [headerOpenRatioSubject map:^id(id value) {
-        
         // This is the ratio of the movement. 0 is full sized and 1 is fully shrunk.
         CGFloat ratio = [value floatValue];
         
@@ -186,8 +187,8 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     RAC(self.footerViewController.view.frame) = footerFrameSignal;
 
     // This subject is responsible for mapping this value to other signals and state (ugh). 
-    self.menuFinishedTransitionSubject = [RACReplaySubject subject];
-    [self.menuFinishedTransitionSubject subscribeNext:^(NSNumber *menuIsOpenNumber) {
+    self.headerFinishedTransitionSubject = [RACReplaySubject subject];
+    [self.headerFinishedTransitionSubject subscribeNext:^(NSNumber *menuIsOpenNumber) {
         @strongify(self);
         
         BOOL menuIsOpen = menuIsOpenNumber.boolValue;
@@ -203,15 +204,29 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         }
     }];
     
-    RAC(self.panHeaderDownGestureRecognizer.enabled) = [self.menuFinishedTransitionSubject not];
-    RAC(self.panHeaderUpGestureRecognizer.enabled) = self.menuFinishedTransitionSubject;
-    RAC(self.tapGestureRecognizer.enabled) = self.menuFinishedTransitionSubject;
-    RAC(self.dayListViewController.view.userInteractionEnabled) = [self.menuFinishedTransitionSubject not];
-    RAC(self.panFooterUpGestureRecognizer.enabled) = [self.menuFinishedTransitionSubject not];
+    self.footerFinishedTransitionSubject = [RACReplaySubject subject];
+    [self.footerFinishedTransitionSubject subscribeNext:^(NSNumber *menuIsOpenNumber) {
+        @strongify(self);
+        
+        BOOL menuIsOpen = menuIsOpenNumber.boolValue;
+        
+        if (!menuIsOpen)
+        {
+            [self.dayListAndHeaderOverlaySubject sendNext:menuIsOpenNumber];
+        }
+    }];
     
-    /*
-    // Footer gesture recognizer subjects
-    {
+    RACSignal *canOpenMenuSignal = [RACSignal combineLatest:@[self.headerFinishedTransitionSubject, self.footerFinishedTransitionSubject]
+                                                     reduce:^(NSNumber *headerIsOpen, NSNumber *footerIsOpen) {
+                                                         return @(!headerIsOpen.boolValue && !footerIsOpen.boolValue);
+                                                     }];
+    RAC(self.panHeaderDownGestureRecognizer.enabled) = canOpenMenuSignal;
+    RAC(self.panFooterUpGestureRecognizer.enabled) = canOpenMenuSignal;
+    RAC(self.dayListViewController.view.userInteractionEnabled) = [canOpenMenuSignal not];
+    
+    RAC(self.panFooterDownGestureRecognizer.enabled) = self.footerFinishedTransitionSubject;
+    RAC(self.panHeaderUpGestureRecognizer.enabled) = self.headerFinishedTransitionSubject;
+    RAC(self.tapGestureRecognizer.enabled) = self.headerFinishedTransitionSubject;
     
     // This subject is responsible for adding/removing the overlay view to our hierarchy
     self.dayListAndHeaderOverlaySubject = [RACSubject subject];
@@ -233,7 +248,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
             UIImage *headerImage = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();
             
-            // Finally, composite the two images together.  
+            // Finally, composite the two images together.
             UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 0);
             [dayListImage drawInRect:self.view.bounds];
             [headerImage drawInRect:CGRectOffset(self.headerViewController.view.bounds, 0, -CGRectGetHeight(self.headerViewController.view.bounds) + kHeaderHeight)];
@@ -253,6 +268,10 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         }
     }];
     
+    
+    /*
+    // Footer gesture recognizer subjects
+    
     self.footerMovementSubject = [RACSubject subject];
     [self.footerMovementSubject subscribeNext:^(id x) {
         @strongify(self);
@@ -262,7 +281,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         // Values greater than one are valid and will be extrapolated beyond the fully open menu.
         CGFloat ratio = [x floatValue];
         
-        CGFloat targetTranslation = -CGRectGetMidY(self.view.bounds) - CGRectGetHeight(self.footerViewController.view.bounds) / 2.0f;
+        CGFloat targetTranslation = kMaximumFooterTranslationThreshold;
         CGRect footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight + ratio * targetTranslation, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);
         
         if (ratio < 0)
@@ -279,7 +298,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         
         CGFloat verticalTranslation = [translation floatValue];
         
-        CGFloat targetTranslation = -CGRectGetMidY(self.view.bounds) - CGRectGetHeight(self.footerViewController.view.bounds) / 2.0f;
+        CGFloat targetTranslation = kMaximumFooterTranslationThreshold;
         CGFloat effectiveRatio = 1.0f;
         
         if (verticalTranslation > 0)
@@ -303,7 +322,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         
         CGFloat verticalTranslation = [translation floatValue];
         
-        CGFloat targetTranslation = -CGRectGetMidY(self.view.bounds) - CGRectGetHeight(self.footerViewController.view.bounds) / 2.0f;
+        CGFloat targetTranslation = kMaximumFooterTranslationThreshold;
         CGFloat effectiveRatio = 0.0f;
         
         if (verticalTranslation < targetTranslation)
@@ -322,25 +341,6 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         [self.footerMovementSubject sendNext:@(effectiveRatio)];
     }];
     
-    self.footerFinishedTransitionSubject = [RACReplaySubject subject];
-    [self.footerFinishedTransitionSubject subscribeNext:^(NSNumber *menuIsOpenNumber) {
-        @strongify(self);
-        
-        BOOL menuIsOpen = menuIsOpenNumber.boolValue;
-        
-        if (!menuIsOpen)
-        {
-            [self.dayListAndHeaderOverlaySubject sendNext:menuIsOpenNumber];
-        }
-                
-        self.panFooterUpGestureRecognizer.enabled = !menuIsOpen;
-        self.panFooterDownGestureRecognizer.enabled = menuIsOpen;
-        
-        self.panHeaderDownGestureRecognizer.enabled = !menuIsOpen;
-        
-        self.dayListViewController.view.userInteractionEnabled = !menuIsOpen;
-    }];
-    }
     */
     
     return self;
@@ -379,7 +379,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         [UIView animateWithDuration:0.25f animations:^{
             [self.headerPanSubject sendNext:@(0)];
         } completion:^(BOOL finished) {
-            [self.menuFinishedTransitionSubject sendNext:@(NO)];
+            [self.headerFinishedTransitionSubject sendNext:@(NO)];
         }];
     }];
     self.tapGestureRecognizer.delegate = self;
@@ -417,7 +417,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
                     [self.headerPanSubject sendNext:@(0)];
                 }
             } completion:^(BOOL finished) {
-                [self.menuFinishedTransitionSubject sendNext:@(movingDown)];
+                [self.headerFinishedTransitionSubject sendNext:@(movingDown)];
             }];
         }
     }];
@@ -448,7 +448,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
                     [self.headerPanSubject sendNext:@(0)];
                 }
             } completion:^(BOOL finished) {
-                [self.menuFinishedTransitionSubject sendNext:@(movingDown)];
+                [self.headerFinishedTransitionSubject sendNext:@(movingDown)];
             }];
         }
     }];
@@ -466,7 +466,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         }
         else if (state == UIGestureRecognizerStateChanged)
         {
-            [self.upwardFooterPanSubject sendNext:@(translation.y)];
+            [self.footerPanSubject sendNext:@(translation.y)];
         }
         else if (state == UIGestureRecognizerStateEnded)
         {
@@ -477,11 +477,11 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
             [UIView animateWithDuration:0.25f animations:^{
                 if (movingUp)
                 {
-                    [self.upwardFooterPanSubject sendNext:@(-CGRectGetMidY(self.view.bounds) - CGRectGetHeight(self.footerViewController.view.bounds) / 2.0f)];
+                    [self.footerPanSubject sendNext:@(kMaximumFooterTranslationThreshold)];
                 }
                 else
                 {
-                    [self.upwardFooterPanSubject sendNext:@(0)];
+                    [self.footerPanSubject sendNext:@(0)];
                 }
             } completion:^(BOOL finished) {
                 [self.footerFinishedTransitionSubject sendNext:@(movingUp)];
@@ -498,7 +498,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         CGPoint translation = [recognizer translationInView:self.view];
         if (state == UIGestureRecognizerStateChanged)
         {
-            [self.downwardFooterPanSubject sendNext:@(translation.y)];
+            [self.footerPanSubject sendNext:@(kMaximumFooterTranslationThreshold + translation.y)];
         }
         else if (state == UIGestureRecognizerStateEnded)
         {
@@ -509,11 +509,11 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
             [UIView animateWithDuration:0.25f animations:^{
                 if (movingDown)
                 {
-                    [self.downwardFooterPanSubject sendNext:@(CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight)];
+                    [self.footerPanSubject sendNext:@(CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight)];
                 }
                 else
                 {
-                    [self.downwardFooterPanSubject sendNext:@(0)];
+                    [self.footerPanSubject sendNext:@(0)];
                 }
             } completion:^(BOOL finished) {
                 [self.footerFinishedTransitionSubject sendNext:@(!movingDown)];
@@ -523,7 +523,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     self.panFooterDownGestureRecognizer.delegate = self;
     [self.view addGestureRecognizer:self.panFooterDownGestureRecognizer];
     
-    [self.menuFinishedTransitionSubject sendNext:@(NO)];
+    [self.headerFinishedTransitionSubject sendNext:@(NO)];
     [self.footerFinishedTransitionSubject sendNext:@(NO)];
 }
 
