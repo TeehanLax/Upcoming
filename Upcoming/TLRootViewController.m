@@ -178,12 +178,10 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         CGFloat ratio = [value floatValue];
         
         CGRect headerFrame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight + ratio * kMaximumHeaderTranslationThreshold);
-        CGRect footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight + ratio * kMaximumHeaderTranslationThreshold, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);
         
         if (ratio < 0)
         {
             headerFrame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight);
-            footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);;
         }
         
         return [NSValue valueWithCGRect:headerFrame];
@@ -296,10 +294,11 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         }
     }];
     
-    RACSignal *canOpenMenuSignal = [RACSignal combineLatest:@[self.headerFinishedTransitionSubject, self.footerFinishedTransitionSubject]
+    RACSignal *canOpenMenuSignal = [RACSignal combineLatest:@[[self.headerFinishedTransitionSubject startWith:@(NO)], [self.footerFinishedTransitionSubject startWith:@(NO)]]
                                                      reduce:^(NSNumber *headerIsOpen, NSNumber *footerIsOpen) {
                                                          return @(!headerIsOpen.boolValue && !footerIsOpen.boolValue);
                                                      }];
+    
     RAC(self.panHeaderDownGestureRecognizer.enabled) = canOpenMenuSignal;
     RAC(self.panFooterUpGestureRecognizer.enabled) = canOpenMenuSignal;
     RAC(self.dayListViewController.view.userInteractionEnabled) = canOpenMenuSignal;
@@ -331,6 +330,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     self.dayListOverlayView = [[UIImageView alloc] init];
     self.dayListOverlayView.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.4f];
     self.dayListOverlayView.frame = self.view.frame;
+    self.dayListOverlayView.userInteractionEnabled = YES; //this will absorb any interaction while in the view hierarchy
 }
 
 -(void)viewDidLoad
@@ -348,7 +348,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         }];
     }];
     self.tapGestureRecognizer.delegate = self;
-    [self.view addGestureRecognizer:self.tapGestureRecognizer];
+    [self.dayListOverlayView addGestureRecognizer:self.tapGestureRecognizer];
     
     // This is the number of points beyond which the user need to move their finger in order to trigger the menu moving down. 
     const CGFloat kMoveDownThreshold = 30.0f;
@@ -478,7 +478,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
                 }
                 else
                 {
-                    [self.footerPanSubject sendNext:@(0)];
+                    [self.footerPanSubject sendNext:@(kMaximumFooterTranslationThreshold)];
                 }
             } completion:^(BOOL finished) {
                 [self.footerFinishedTransitionSubject sendNext:@(!movingDown)];
@@ -487,9 +487,6 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     }];
     self.panFooterDownGestureRecognizer.delegate = self;
     [self.view addGestureRecognizer:self.panFooterDownGestureRecognizer];
-    
-    [self.headerFinishedTransitionSubject sendNext:@(NO)];
-    [self.footerFinishedTransitionSubject sendNext:@(NO)];
 }
 
 -(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
