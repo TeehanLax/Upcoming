@@ -8,16 +8,16 @@
 
 #import "TLEventViewController.h"
 #import "TLBackgroundGradientView.h"
-#import "TLCollectionViewLayout.h"
-#import <QuartzCore/QuartzCore.h>
 #import "EKEventManager.h"
 #import "TLEventViewCell.h"
+#import "TLHourSupplementaryView.h"
 
 #define NUMBER_OF_ROWS 24
 #define EXPANDED_ROWS 4
 #define MAX_ROW_HEIGHT 38.f
 
 static NSString *kCellIdentifier = @"Cell";
+static NSString *kSupplementaryViewIdentifier = @"HourView";
 
 @interface TLEventViewController ()
 
@@ -42,6 +42,7 @@ static NSString *kCellIdentifier = @"Cell";
     self.activeCells = [[NSMutableSet alloc] initWithCapacity:0];
     
     [self.collectionView registerNib:[UINib nibWithNibName:@"TLEventViewCell" bundle:nil] forCellWithReuseIdentifier:kCellIdentifier];
+    [self.collectionView registerClass:[TLHourSupplementaryView class] forSupplementaryViewOfKind:[TLHourSupplementaryView kind] withReuseIdentifier:kSupplementaryViewIdentifier];
     
     self.touchDown = [[TLTouchDownGestureRecognizer alloc] initWithTarget:self action:@selector(touchDownHandler:)];
     self.touchDown.cancelsTouchesInView = NO;
@@ -131,6 +132,21 @@ static NSString *kCellIdentifier = @"Cell";
     return CGSizeMake(320, size);
 }
 
+-(CGRect)collectionView:(UICollectionView *)collectionView frameForHourViewInLayout:(TLCollectionViewLayout *)layout {
+    
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
+    
+    const CGFloat viewHeight = 44.0f;
+    NSInteger currentHour = components.hour;
+    NSInteger currentMinute = components.minute;
+    
+    UICollectionViewLayoutAttributes *attributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:currentHour inSection:0]];
+    CGFloat minuteAdjustment = attributes.size.height * (CGFloat)(currentMinute / 60);
+    
+    return CGRectMake(0, attributes.frame.origin.y + minuteAdjustment - viewHeight, CGRectGetWidth(self.view.bounds), viewHeight);
+}
+
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     return NUMBER_OF_ROWS;
 }
@@ -150,11 +166,21 @@ static NSString *kCellIdentifier = @"Cell";
             [self.activeCells addObject:[NSNumber numberWithInt:indexPath.row]];
             cell.contentView.alpha = 1;
             cell.title.text = event.title;
-            
         }
     }
     
     return cell;
+}
+
+-(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {    
+    TLHourSupplementaryView *supplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kSupplementaryViewIdentifier forIndexPath:indexPath];
+    
+    
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
+    supplementaryView.timeString = [NSString stringWithFormat:@"%d:%02d", components.hour % 12, components.minute];
+    
+    return supplementaryView;
 }
 
 #pragma mark - Private Methods

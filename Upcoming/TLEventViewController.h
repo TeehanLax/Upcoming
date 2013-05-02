@@ -8,9 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import "TLTouchDownGestureRecognizer.h"
+#import "TLCollectionViewLayout.h"
 
 @class TLEventViewController;
 @class EKEvent;
+
 
 @protocol TLEventViewControllerDelegate <NSObject>
 
@@ -21,7 +23,7 @@
 
 @end
 
-@interface TLEventViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate>
+@interface TLEventViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate, TLCollectionViewLayoutDelegate>
 
 @property (nonatomic, weak) id<TLEventViewControllerDelegate> delegate;
 
