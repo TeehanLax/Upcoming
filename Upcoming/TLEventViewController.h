@@ -8,20 +8,22 @@
 
 #import <UIKit/UIKit.h>
 #import "TLTouchDownGestureRecognizer.h"
+#import "TLCollectionViewLayout.h"
 
 @class TLEventViewController;
 @class EKEvent;
+
 
 @protocol TLEventViewControllerDelegate <NSObject>
 
 -(void)userDidBeginInteractingWithDayListViewController:(TLEventViewController *)controller;
 -(void)userDidEndInteractingWithDayListViewController:(TLEventViewController *)controller;
 
--(void)userDidInteractWithDayListView:(TLEventViewController *)controller updatingTimeRatio:(CGFloat)timeRatio event:(EKEvent *)event;
+-(void)userDidInteractWithDayListView:(TLEventViewController *)controller updateTimeHour:(NSInteger)hour minute:(NSInteger)minute event:(EKEvent *)event;
 
 @end
 
-@interface TLEventViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate>
+@interface TLEventViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate, TLCollectionViewLayoutDelegate>
 
 @property (nonatomic, weak) id<TLEventViewControllerDelegate> delegate;
 

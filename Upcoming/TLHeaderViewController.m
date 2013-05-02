@@ -427,16 +427,8 @@ static CGFloat interAnimationDelay = 0.05f;
     }];
 }
 
--(void)updateTimeRatio:(CGFloat)timeRatio event:(EKEvent *)event
+-(void)updateHour:(NSInteger)hours minute:(NSInteger)minutes event:(EKEvent *)event
 {
-    NSInteger hours = floorf(timeRatio * 24);
-    NSInteger minutes = (int)(floorf(timeRatio * 3600)) % 60;
-    
-    // Convert from 24-hour format
-    if (hours > 12) hours -= 12;
-    if (hours == 0) hours += 12;
-    
-    
     self.alternateAbsoluteTimeLabel.text = [NSString stringWithFormat:@"%d:%02d", hours, minutes];
     
     [self.alternateEventSubject sendNext:event];

@@ -24,7 +24,7 @@
     [self.window makeKeyAndVisible];
     
     [self setupDevice];
-    
+        
     return YES;
 }
 

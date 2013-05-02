@@ -8,6 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
+@class TLCollectionViewLayout;
+
+@protocol TLCollectionViewLayoutDelegate <UICollectionViewDelegateFlowLayout>
+
+-(CGRect)collectionView:(UICollectionView *)collectionView frameForHourViewInLayout:(TLCollectionViewLayout *)layout;
+-(CGFloat)collectionView:(UICollectionView *)collectionView alphaForHourViewInLayout:(TLCollectionViewLayout *)layout;
+
+@end
+
 @interface TLCollectionViewLayout : UICollectionViewFlowLayout
 
 @end
