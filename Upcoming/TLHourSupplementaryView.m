@@ -59,6 +59,9 @@
     }
     CGContextRestoreGState(context);
     
+    
+    [[UIColor colorWithWhite:0.0f alpha:0.7f] set];
+    [self.timeString drawInRect:CGRectOffset(textRect, 0, 1) withFont:font lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentCenter];
     [[UIColor colorWithWhite:1.0f alpha:0.7f] set];
     [self.timeString drawInRect:textRect withFont:font lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentCenter];
 }
