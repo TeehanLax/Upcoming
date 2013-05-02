@@ -20,6 +20,7 @@
 #import "UIFont+AppFonts.h"
 
 #import "TLAppDelegate.h"
+#import "TLAppDelegate+Sounds.h"
 #define AppDelegate ((TLAppDelegate *)[[UIApplication sharedApplication] delegate])
 
 #endif
