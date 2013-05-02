@@ -16,10 +16,6 @@ static CGFloat lerp (CGFloat amount, CGFloat a, CGFloat b)
 
 @implementation UIColor (CustomizedColors)
 
-+(UIColor *)headerTextColor
-{
-    return [UIColor colorWithHue:0.0f saturation:0.0f brightness:1.0f alpha:1.0f];
-}
 
 +(UIColor *)interpolatedColorWithRatio:(CGFloat)ratio color:(UIColor *)color color:(UIColor *)otherColor
 {
@@ -29,6 +25,11 @@ static CGFloat lerp (CGFloat amount, CGFloat a, CGFloat b)
     [otherColor getRed:&red2 green:&green2 blue:&blue2 alpha:&alpha2];
     
     return [UIColor colorWithRed:lerp(ratio, red1, red2) green:lerp(ratio, green1, green2) blue:lerp(ratio, blue1, blue2) alpha:lerp(ratio, alpha1, alpha2)];
+}
+
++(UIColor *)colorFromRGB:(int)rgbValue
+{
+    return [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0];
 }
 
 @end

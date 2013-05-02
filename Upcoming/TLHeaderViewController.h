@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+@class EKEvent;
+
 extern const CGFloat kHeaderHeight;
 
 @interface TLHeaderViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
@@ -16,6 +18,6 @@ extern const CGFloat kHeaderHeight;
 -(void)scrollTableViewToTop;
 -(void)hideHeaderView;
 -(void)showHeaderView;
--(void)updateTimeRatio:(CGFloat)timeRatio;
+-(void)updateTimeRatio:(CGFloat)timeRatio event:(EKEvent *)event;
 
 @end

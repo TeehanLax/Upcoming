@@ -8,11 +8,11 @@
 
 #import "TLHeaderViewController.h"
 #import "EKEventManager.h"
-#import "TLClockHeaderView.h"
 #import "TLCalendarDotView.h"
 #import "TLCalendarSelectCell.h"
 
 #import <EXTScope.h>
+#import <ViewUtils.h>
 
 const CGFloat kHeaderHeight = 72.0f;
 
@@ -21,7 +21,7 @@ const CGFloat kHeaderHeight = 72.0f;
 @property (nonatomic, weak) IBOutlet UITableView *calendarTableView;
 
 @property (nonatomic, weak) IBOutlet UIView *headerDetailView;
-@property (nonatomic, weak) IBOutlet TLClockHeaderView *headerClockView;
+@property (nonatomic, weak) IBOutlet UIView *headerAlernateDetailView;
 
 @property (nonatomic, weak) IBOutlet UILabel *eventTitleLabel;
 @property (nonatomic, weak) IBOutlet UILabel *eventLocationLabel;
@@ -30,6 +30,16 @@ const CGFloat kHeaderHeight = 72.0f;
 @property (nonatomic, weak) IBOutlet UILabel *eventRelativeTimeUnitLabel;
 @property (nonatomic, weak) IBOutlet UIImageView *eventLocationImageView;
 @property (nonatomic, weak) IBOutlet TLCalendarDotView *calendarView;
+
+// Alternate event used while scrubbing over collection view
+@property (nonatomic, weak) IBOutlet UILabel *alternateEventTitleLabel;
+@property (nonatomic, weak) IBOutlet UILabel *alternateEventLocationLabel;
+@property (nonatomic, weak) IBOutlet UILabel *alternateEventTimeLabel;
+@property (nonatomic, weak) IBOutlet UILabel *alternateAbsoluteTimeLabel;
+@property (nonatomic, weak) IBOutlet UIImageView *alternateEventLocationImageView;
+@property (nonatomic, weak) IBOutlet TLCalendarDotView *alternateCalendarView;
+@property (nonatomic, strong) RACSubject *alternateEventSubject;
+
 
 @property (nonatomic, weak) IBOutlet UIView *tableMaskingView;
 
@@ -187,14 +197,44 @@ const CGFloat kHeaderHeight = 72.0f;
          self.calendarView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
      }];
     
+    self.alternateEventSubject = [RACSubject subject];
+    [[self.alternateEventSubject distinctUntilChanged] subscribeNext:^(EKEvent *event) {
+        
+        if (event == nil)
+        {
+            self.alternateEventTitleLabel.text = @"";
+            self.alternateEventLocationLabel.text = @"";
+            self.alternateEventTimeLabel.text = @"";
+            self.alternateCalendarView.alpha = 0.0f;
+            self.alternateEventLocationImageView.alpha = 0.0f;
+        }
+        else
+        {
+            self.alternateEventTitleLabel.text = event.title;
+            self.alternateEventLocationLabel.text = event.location;
+            self.alternateEventTimeLabel.text = [NSString stringWithFormat:@"%@ – %@",
+                                                 [NSDateFormatter localizedStringFromDate:event.startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle],
+                                                 [NSDateFormatter localizedStringFromDate:event.endDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle]];
+            
+            if ([self.alternateEventLocationLabel.text length] > 0)
+            {
+                self.alternateEventLocationImageView.alpha = 1.0f;
+            }
+            else
+            {
+                self.alternateEventLocationImageView.alpha = 0.0f;
+            }
+            
+            self.alternateCalendarView.alpha = 1.0f;
+            self.alternateCalendarView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
+        }
+        
+        [self.headerAlernateDetailView crossfadeWithDuration:0.1f];
+    }];
+    
     // Set up the table view mask
     [self setupTableViewMask];
-    
-    // Set our custom colours
-    self.eventTitleLabel.textColor = [UIColor headerTextColor];
-    self.eventLocationLabel.textColor = [UIColor headerTextColor];
-    self.eventTimeLabel.textColor = [UIColor headerTextColor];
-    
+        
     // Remove the default table view background
     UIView *backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
     backgroundView.backgroundColor = [UIColor clearColor];
@@ -338,9 +378,9 @@ const CGFloat kHeaderHeight = 72.0f;
 
 static CGFloat pullDownDistance = 7.0f;
 
-static CGFloat pullDownAnimationDuration = 0.075f;
-static CGFloat pullUpAnimationDuration = 0.15f;
-static CGFloat fallDownAnimationDuration = 0.15f;
+static CGFloat pullDownAnimationDuration = 0.05f;
+static CGFloat pullUpAnimationDuration = 0.1f;
+static CGFloat fallDownAnimationDuration = 0.1f;
 static CGFloat interAnimationDelay = 0.05f;
 
 -(void)hideHeaderView
@@ -351,13 +391,13 @@ static CGFloat interAnimationDelay = 0.05f;
         [UIView animateWithDuration:pullUpAnimationDuration delay:0.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
             self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
         } completion:^(BOOL finished) {
-            self.headerClockView.alpha = 1.0f;
-            self.headerClockView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerClockView.frame));
+            self.headerAlernateDetailView.alpha = 1.0f;
+            self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerAlernateDetailView.frame));
             [UIView animateWithDuration:fallDownAnimationDuration delay:interAnimationDelay options:UIViewAnimationOptionCurveEaseOut animations:^{
-                self.headerClockView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
+                self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
             } completion:^(BOOL finished) {
                 [UIView animateWithDuration:pullDownAnimationDuration animations:^{
-                    self.headerClockView.transform = CGAffineTransformIdentity;
+                    self.headerAlernateDetailView.transform = CGAffineTransformIdentity;
                 }];
             }];
         }];
@@ -366,30 +406,40 @@ static CGFloat interAnimationDelay = 0.05f;
 
 -(void)showHeaderView
 {
-    [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
+    //[[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     [UIView animateWithDuration:pullDownAnimationDuration animations:^{
-        self.headerClockView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
+        self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
     } completion:^(BOOL finished) {
         [UIView animateWithDuration:pullUpAnimationDuration delay:0.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-            self.headerClockView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
+            self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
         } completion:^(BOOL finished) {
-            self.headerClockView.alpha = 0.0f;
+            self.headerAlernateDetailView.alpha = 0.0f;
             [UIView animateWithDuration:fallDownAnimationDuration delay:interAnimationDelay options:UIViewAnimationOptionCurveEaseOut animations:^{
                 self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
             } completion:^(BOOL finished) {
                 [UIView animateWithDuration:pullDownAnimationDuration animations:^{
                     self.headerDetailView.transform = CGAffineTransformIdentity;
                 } completion:^(BOOL finished) {
-                    [[UIApplication sharedApplication] endIgnoringInteractionEvents];
+                    //[[UIApplication sharedApplication] endIgnoringInteractionEvents];
                 }];
             }];
         }];
     }];
 }
 
--(void)updateTimeRatio:(CGFloat)timeRatio
+-(void)updateTimeRatio:(CGFloat)timeRatio event:(EKEvent *)event
 {
-    self.headerClockView.timeRatio = timeRatio;
+    NSInteger hours = floorf(timeRatio * 24);
+    NSInteger minutes = (int)(floorf(timeRatio * 3600)) % 60;
+    
+    // Convert from 24-hour format
+    if (hours > 12) hours -= 12;
+    if (hours == 0) hours += 12;
+    
+    
+    self.alternateAbsoluteTimeLabel.text = [NSString stringWithFormat:@"%d:%02d", hours, minutes];
+    
+    [self.alternateEventSubject sendNext:event];
 }
 
 @end
