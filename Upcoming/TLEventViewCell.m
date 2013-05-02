@@ -25,13 +25,14 @@
 }
 
 - (void)drawRect:(CGRect)rect {
-    float alpha = 0.4;
+    float alpha = 0.3;
     if (self.titleLabel.text.length > 0) {
         alpha = 1;
     }
     
     TLAppDelegate *appDelegate = (TLAppDelegate *)[UIApplication sharedApplication].delegate;
     TLRootViewController *rootViewController = appDelegate.viewController;
+    NSLog(@"DRAW %@", rootViewController.gradientImage);
     
     CGRect imageRect = CGRectMake(0, 0, self.backgroundImage.frame.size.width, self.backgroundImage.frame.size.height);
     UIGraphicsBeginImageContext(imageRect.size);
