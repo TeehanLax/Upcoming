@@ -60,10 +60,11 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     [self.collectionView addGestureRecognizer:self.touchDown];
     
     @weakify(self);
-    [[RACSignal interval:60.0f] subscribeNext:^(id x) {
+    [[[RACSignal interval:60.0f] deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(id x) {
         @strongify(self);
         [self updateBackgroundGradient];
     }];
+    
     
     self.backgroundGradientView = [[TLBackgroundGradientView alloc] initWithFrame:self.view.bounds];
     [self.view insertSubview:self.backgroundGradientView atIndex:0];
@@ -243,7 +244,11 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     
     NSCalendar *calendar = [NSCalendar currentCalendar];
     NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
-    supplementaryView.timeString = [NSString stringWithFormat:@"%d:%02d", components.hour % 12, components.minute];
+    
+    NSInteger hours = components.hour % 12;
+    if (hours == 0) hours = 12;
+    
+    supplementaryView.timeString = [NSString stringWithFormat:@"%d:%02d", hours, components.minute];
         
     return supplementaryView;
 }
