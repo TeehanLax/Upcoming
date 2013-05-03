@@ -14,10 +14,6 @@
 #import "TLRootViewController.h"
 #import "TLHourSupplementaryView.h"
 
-#import <NSDate-Utilities.h>
-#import <EXTScope.h>
-#import <ReactiveCocoa.h>
-
 #define NUMBER_OF_ROWS 24
 #define EXPANDED_ROWS 4
 #define MAX_ROW_HEIGHT 38.f

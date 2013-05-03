@@ -15,7 +15,6 @@
 #import "TLProfiling.h"
 
 #import <BlocksKit.h>
-#import <EXTScope.h>
 
 @interface TLRootViewController ()
 

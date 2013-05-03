@@ -10,10 +10,6 @@
 #import "EKEventManager.h"
 #import "TLCalendarDotView.h"
 
-#import <ReactiveCocoa.h>
-#import <EXTScope.h>
-#import <NSDate-Utilities.h>
-
 const CGFloat TLUpcomingEventViewControllerHiddenHeight = 5.0f;
 const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
 
