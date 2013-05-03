@@ -32,7 +32,6 @@
     
     TLAppDelegate *appDelegate = (TLAppDelegate *)[UIApplication sharedApplication].delegate;
     TLRootViewController *rootViewController = appDelegate.viewController;
-    NSLog(@"DRAW %@", rootViewController.gradientImage);
     
     CGRect imageRect = CGRectMake(0, 0, self.backgroundImage.frame.size.width, self.backgroundImage.frame.size.height);
     UIGraphicsBeginImageContext(imageRect.size);

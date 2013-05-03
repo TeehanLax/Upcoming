@@ -66,12 +66,13 @@ const CGFloat kHeaderHeight = 72.0f;
     
     self.view.backgroundColor = [UIColor clearColor];
     
-    // Update our header labels with the next event whenever it changes. 
-    //    @weakify(self);
-    [[[[[RACSignal combineLatest:@[RACAbleWithStart([EKEventManager sharedInstance], events), RACAbleWithStart([EKEventManager sharedInstance], nextEvent)]
-                        reduce:^id(NSArray *eventArray, EKEvent *nextEvent)
+    RACSignal *timerSignal = [[RACSignal interval:60] startWith:[NSDate date]];
+    
+    // Update our header labels with the next event whenever it changes.
+    @weakify(self);
+    [[[[RACSignal combineLatest:@[RACAbleWithStart([EKEventManager sharedInstance], events), RACAbleWithStart([EKEventManager sharedInstance], nextEvent), timerSignal]
+                        reduce:^id(NSArray *eventArray, EKEvent *nextEvent, NSDate *fireDate)
        {
-           
            NSArray *filteredArray = [[eventArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(EKEvent *event, NSDictionary *bindings) {
                return [event.startDate isLaterThanDate:[NSDate date]];
            }]] sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
@@ -87,8 +88,9 @@ const CGFloat kHeaderHeight = 72.0f;
                return filteredArray[0];
            }
            
-       }] deliverOn:[RACScheduler mainThreadScheduler]] distinctUntilChanged] throttle:0.25f]
+       }] deliverOn:[RACScheduler mainThreadScheduler]] throttle:0.25f]
      subscribeNext:^(EKEvent *event) {
+         @strongify(self);
          
          if (event == nil)
          {
@@ -122,11 +124,11 @@ const CGFloat kHeaderHeight = 72.0f;
              
              if (numberOfMonths == 1)
              {
-                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Month", @"Month unit singular");
+                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"MONTH", @"Month unit singular");
              }
              else
              {
-                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Months", @"Month unit plural");
+                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"MONTHS", @"Month unit plural");
              }
          }
          else if (startTimeComponents.day > 0)
@@ -135,14 +137,14 @@ const CGFloat kHeaderHeight = 72.0f;
              
              if (startTimeComponents.day == 1)
              {
-                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Day", @"Day unit singular");
+                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"DAY", @"Day unit singular");
              }
              else
              {
-                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Days", @"Day unit plural");
+                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"DAYS", @"Day unit plural");
              }
          }
-         else if (startTimeComponents.hour > 0)
+         else if (startTimeComponents.hour > 0 && !(startTimeComponents.hour == 1 && startTimeComponents.minute < 30))
          {
              NSInteger numberOfHours = startTimeComponents.hour;
              
@@ -155,24 +157,26 @@ const CGFloat kHeaderHeight = 72.0f;
              
              if (numberOfHours == 1)
              {
-                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Hour", @"Hour unit singular");
+                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"HOUR", @"Hour unit singular");
              }
              else
              {
-                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Hours", @"Hour unit plural");
+                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"HOURS", @"Hour unit plural");
              }
          }
-         else if (startTimeComponents.minute > 0)
+         else 
          {
-             self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", startTimeComponents.minute];
+             NSInteger numberOfMinutes = [event.startDate minutesAfterDate:[NSDate date]];
              
-             if (startTimeComponents.minute == 1)
+             self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", numberOfMinutes];
+             
+             if (numberOfMinutes == 1)
              {
-                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Minute", @"Minute unit singular");
+                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"MIN", @"Minute unit singular");
              }
              else
              {
-                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Minutes", @"Minute unit plural");
+                 self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"MINS", @"Minute unit plural");
              }
          }
          
