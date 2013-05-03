@@ -199,13 +199,15 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     CGFloat viewHeight = attributes.size.height;
     CGFloat minuteAdjustment = attributes.size.height * (CGFloat)(currentMinute / 60);
     
-    return CGRectMake(0, attributes.frame.origin.y + minuteAdjustment, CGRectGetWidth(self.view.bounds), viewHeight);
+    const CGFloat height = 20.0f;
+    
+    return CGRectMake(0, attributes.frame.origin.y + minuteAdjustment + (viewHeight - height) / 2.0f, CGRectGetWidth(self.view.bounds), height);
 }
 
--(CGFloat)collectionView:(UICollectionView *)collectionView alphaForHourViewInLayout:(TLCollectionViewLayout *)layout
+-(CGFloat)collectionView:(UICollectionView *)collectionView heightForHourLineViewInLayout:(TLCollectionViewLayout *)layout
 {
     if (self.touch)
-        return 0.0f;
+        return 2.0f;
     else
         return 1.0f;
 }

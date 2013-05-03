@@ -8,6 +8,7 @@
 
 #import "TLCollectionViewLayout.h"
 #import "TLHourSupplementaryView.h"
+#import "TLCollectionViewLayoutAttributes.h"
 
 @implementation TLCollectionViewLayout
 
@@ -17,6 +18,11 @@
 
 - (CGFloat)minimumLineSpacing {
     return 0.f;
+}
+
++(Class)layoutAttributesClass
+{
+    return [TLCollectionViewLayoutAttributes class];
 }
 
 -(NSArray *)layoutAttributesForElementsInRect:(CGRect)rect
@@ -35,19 +41,19 @@
     if (![kind isEqualToString:[TLHourSupplementaryView kind]])
         return nil;
     
-    UICollectionViewLayoutAttributes* attributes = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind withIndexPath:indexPath];
+    TLCollectionViewLayoutAttributes* attributes = [TLCollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind withIndexPath:indexPath];
     
     CGRect frame = CGRectZero;
-    CGFloat alpha = 1.0f;
+    CGFloat height = 1.0f;
     
     if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)])
     {
         frame = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView frameForHourViewInLayout:self];
-        alpha = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView alphaForHourViewInLayout:self];
+        height = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView heightForHourLineViewInLayout:self];
     }
     
     attributes.frame = frame;
-    attributes.alpha = alpha;
+    attributes.hourLineHeight = height;
     attributes.zIndex = 1;
     
     return attributes;

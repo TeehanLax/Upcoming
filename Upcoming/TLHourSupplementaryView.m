@@ -8,6 +8,14 @@
 
 #import "TLHourSupplementaryView.h"
 #import "UIFont+AppFonts.h"
+#import "TLCollectionViewLayoutAttributes.h"
+#import <ViewUtils.h>
+
+@interface TLHourSupplementaryView ()
+
+@property (nonatomic, assign) CGFloat lineHeight;
+
+@end
 
 @implementation TLHourSupplementaryView
 
@@ -32,6 +40,14 @@
     [self setNeedsDisplay];
 }
 
+-(void)applyLayoutAttributes:(TLCollectionViewLayoutAttributes *)layoutAttributes
+{
+    [super applyLayoutAttributes:layoutAttributes];
+    
+    self.lineHeight = layoutAttributes.hourLineHeight;
+    [self setNeedsDisplay];
+}
+
 - (void)drawRect:(CGRect)rect
 {
     CGContextRef context = UIGraphicsGetCurrentContext();
@@ -51,7 +67,7 @@
         
         CGContextSaveGState(context);
         {
-            CGContextSetLineWidth(context, 1);
+            CGContextSetLineWidth(context, self.lineHeight);
             CGContextSetRGBStrokeColor(context, 0.0f, 0.0f, 0.0f, 0.2f);
             CGContextBeginPath(context);
             CGContextMoveToPoint(context, 0, (int)CGRectGetMidY(self.bounds) + 1);
@@ -63,7 +79,7 @@
         
         CGContextSaveGState(context);
         {
-            CGContextSetLineWidth(context, 1);
+            CGContextSetLineWidth(context, self.lineHeight);
             CGContextSetRGBStrokeColor(context, 1.0f, 1.0f, 1.0f, 1.0f);
             CGContextBeginPath(context);
             CGContextMoveToPoint(context, 0, (int)CGRectGetMidY(self.bounds));
