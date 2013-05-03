@@ -171,18 +171,20 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     {
         NSDateComponents *differenceComponents = [calendar components:NSDayCalendarUnit fromDate:startDate toDate:endDate options:0];
         
+        NSString *startDateString = [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle];
+        
         if (differenceComponents.day > 0)
         {
             // This event spans multiple days.
             
             timeString = [NSString stringWithFormat:@"%@ – %@",
-                          [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle],
+                          startDateString,
                           [NSDateFormatter localizedStringFromDate:endDate dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterNoStyle]];
         }
         else
         {
             timeString = [NSString stringWithFormat:@"%@ – %@",
-                          [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle],
+                          startDateString,
                           [NSDateFormatter localizedStringFromDate:endDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle]];
         }
     }
@@ -195,6 +197,13 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     else if ([startDate isTomorrow])
     {
         dateString = NSLocalizedString(@"Tomorrow", @"Tomorrow time string");
+    }
+    else if ([startDate daysAfterDate:[NSDate date]] < 7)
+    {
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.locale = [NSLocale currentLocale];
+        dateFormatter.dateFormat = @"EEEE";
+        dateString = [dateFormatter stringFromDate:event.startDate];
     }
     else
     {
