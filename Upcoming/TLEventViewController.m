@@ -91,6 +91,7 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     // Convert from 24-hour format
     if (hour > 12) hour -= 12;
     if (hour == 0) hour += 12;
+    if (minute < 0) minute = 0; // Weird rounding error
     
     
     [self.collectionView performBatchUpdates:^{
