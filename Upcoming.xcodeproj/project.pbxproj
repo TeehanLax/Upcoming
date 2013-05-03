@@ -478,13 +478,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CB35EE43CD0E4DBFBCC0B9D3 /* Pods.xcconfig */;
 			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Teehan + Lax (65VE89H89D)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Upcoming/Upcoming-Prefix.pch";
 				INFOPLIST_FILE = "Upcoming/Upcoming-Info.plist";
 				LIBRARY_SEARCH_PATHS = "$(SYMROOT)/../Pods/build/Debug$(EFFECTIVE_PLATFORM_NAME)";
 				PRODUCT_NAME = Upcoming;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "7D5C2B22-D650-4ABB-8469-30485134D460";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
