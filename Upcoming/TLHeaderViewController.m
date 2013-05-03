@@ -11,7 +11,6 @@
 #import "TLCalendarDotView.h"
 #import "TLCalendarSelectCell.h"
 
-#import <EXTScope.h>
 #import <ViewUtils.h>
 
 const CGFloat kHeaderHeight = 72.0f;
@@ -73,9 +72,9 @@ const CGFloat kHeaderHeight = 72.0f;
                         reduce:^id(NSArray *eventArray, EKEvent *nextEvent)
        {
            
-           NSArray *filteredArray = [[[eventArray.rac_sequence filter:^BOOL(EKEvent *event) {
-               return [event.startDate compare:[NSDate date]] == NSOrderedDescending;
-           }] array] sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+           NSArray *filteredArray = [[eventArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(EKEvent *event, NSDictionary *bindings) {
+               return [event.startDate isLaterThanDate:[NSDate date]];
+           }]] sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
                return [[obj1 startDate] compare:[obj2 startDate]];
            }];
            
@@ -93,7 +92,6 @@ const CGFloat kHeaderHeight = 72.0f;
          
          if (event == nil)
          {
-             
              self.eventTitleLabel.text = NSLocalizedString(@"No Upcoming Event", @"No upcoming event header text");
              self.eventLocationLabel.text = @"";
              self.eventTimeLabel.text = @"";
