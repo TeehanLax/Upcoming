@@ -31,7 +31,6 @@
 @property (nonatomic, strong) UIPanGestureRecognizer *panHeaderUpGestureRecognizer;
 @property (nonatomic, strong) UITapGestureRecognizer *tapGestureRecognizer;
 @property (nonatomic, strong) UIPanGestureRecognizer *panFooterUpGestureRecognizer;
-@property (nonatomic, strong) UIPanGestureRecognizer *panFooterDownGestureRecognizer;
 
 // Two subjects used to receive translations from the gesture recognizers
 @property (nonatomic, strong) RACSubject *headerPanSubject;
@@ -55,7 +54,7 @@
 static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
 
 // We have to use a #define here to get the compiler to expand this macro
-#define kMaximumFooterTranslationThreshold (-CGRectGetMidY(self.view.bounds) - CGRectGetHeight(self.footerViewController.view.bounds) / 2.0f)
+#define kMaximumFooterTranslationThreshold (-CGRectGetMidY(self.view.bounds)/4.0f - CGRectGetHeight(self.footerViewController.view.bounds) / 2.0f)
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -306,7 +305,6 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     RAC(self.panHeaderDownGestureRecognizer.enabled) = canOpenMenuSignal;
     RAC(self.panFooterUpGestureRecognizer.enabled) = canOpenMenuSignal;
     RAC(self.dayListViewController.view.userInteractionEnabled) = canOpenMenuSignal;
-    RAC(self.panFooterDownGestureRecognizer.enabled) = self.footerFinishedTransitionSubject;
     RAC(self.panHeaderUpGestureRecognizer.enabled) = self.headerFinishedTransitionSubject;
     RAC(self.tapGestureRecognizer.enabled) = self.headerFinishedTransitionSubject;
     
@@ -440,7 +438,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         else if (state == UIGestureRecognizerStateEnded)
         {
             // Determine the direction the finger is moving and ensure if it was moving down, that it exceeds the minimum threshold for opening the menu.
-            BOOL movingUp = [recognizer velocityInView:self.view].y < 0;
+            BOOL movingUp = NO;//[recognizer velocityInView:self.view].y < 0;
             
             // Animate the change
             [UIView animateWithDuration:0.25f animations:^{
@@ -460,37 +458,6 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     self.panFooterUpGestureRecognizer.delegate = self;
     [self.view addGestureRecognizer:self.panFooterUpGestureRecognizer];
     [self.dayListViewController.touchDown requireGestureRecognizerToFail:self.panFooterUpGestureRecognizer];
-    
-    self.panFooterDownGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
-        UIPanGestureRecognizer *recognizer = (UIPanGestureRecognizer *)sender;
-        
-        CGPoint translation = [recognizer translationInView:self.view];
-        if (state == UIGestureRecognizerStateChanged)
-        {
-            [self.footerPanSubject sendNext:@(kMaximumFooterTranslationThreshold + translation.y)];
-        }
-        else if (state == UIGestureRecognizerStateEnded)
-        {
-            // Determine the direction the finger is moving
-            BOOL movingDown = ([recognizer velocityInView:self.view].y > 0);
-            
-            // Animate the change
-            [UIView animateWithDuration:0.25f animations:^{
-                if (movingDown)
-                {
-                    [self.footerPanSubject sendNext:@(CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight)];
-                }
-                else
-                {
-                    [self.footerPanSubject sendNext:@(kMaximumFooterTranslationThreshold)];
-                }
-            } completion:^(BOOL finished) {
-                [self.footerFinishedTransitionSubject sendNext:@(!movingDown)];
-            }];
-        }
-    }];
-    self.panFooterDownGestureRecognizer.delegate = self;
-    [self.view addGestureRecognizer:self.panFooterDownGestureRecognizer];
 }
 
 -(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
