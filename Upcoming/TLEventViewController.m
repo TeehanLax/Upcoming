@@ -256,17 +256,20 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     CGFloat soonestEvent = NSIntegerMax;
     for (EKEvent *event in events)
     {
-        if ([event.startDate isEarlierThanDate:[NSDate date]] && ![event.endDate isEarlierThanDate:[NSDate date]])
+        if (!event.isAllDay)
         {
-            // There's an event going on NOW.
-            soonestEvent = 0;
-        }
-        else if (![event.startDate isEarlierThanDate:[NSDate date]])
-        {
-            NSTimeInterval interval = [event.startDate timeIntervalSinceNow];
-            NSInteger numberOfMinutes = interval / 60;
-            
-            soonestEvent = MIN(soonestEvent, numberOfMinutes);
+            if ([event.startDate isEarlierThanDate:[NSDate date]] && ![event.endDate isEarlierThanDate:[NSDate date]])
+            {
+                // There's an event going on NOW.
+                soonestEvent = 0;
+            }
+            else if (![event.startDate isEarlierThanDate:[NSDate date]])
+            {
+                NSTimeInterval interval = [event.startDate timeIntervalSinceNow];
+                NSInteger numberOfMinutes = interval / 60;
+                
+                soonestEvent = MIN(soonestEvent, numberOfMinutes);
+            }
         }
     }
     
