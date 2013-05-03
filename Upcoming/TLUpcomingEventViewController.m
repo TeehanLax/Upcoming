@@ -114,9 +114,11 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     }
     else if (startTimeComponents.day > 0)
     {
-        self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", startTimeComponents.day];
+        NSInteger numberOfDays = [[NSDate date] daysBeforeDate:event.startDate];
+                
+        self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", numberOfDays];
         
-        if (startTimeComponents.day == 1)
+        if (numberOfDays == 1)
         {
             self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Day", @"Day unit singular");
         }
