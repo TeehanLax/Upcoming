@@ -47,6 +47,13 @@
 		5EB4E58517187E1500EC8E1C /* TLHeaderViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5EB4E58317187E1500EC8E1C /* TLHeaderViewController.xib */; };
 		5EB951B117203DE600A5089B /* TLCalendarSelectCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EB951B017203DE600A5089B /* TLCalendarSelectCell.m */; };
 		5EC7DFF017344D8300FB3C55 /* TLCollectionViewLayoutAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EC7DFEF17344D8300FB3C55 /* TLCollectionViewLayoutAttributes.m */; };
+		5EC7DFF217381B1A00FB3C55 /* logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5EC7DFF117381B1A00FB3C55 /* logo@2x.png */; };
+		5EC7DFF417381B7300FB3C55 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 5EC7DFF317381B7300FB3C55 /* logo.png */; };
+		5EC7DFF717381BF400FB3C55 /* upArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 5EC7DFF517381BF400FB3C55 /* upArrow.png */; };
+		5EC7DFF817381BF400FB3C55 /* upArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5EC7DFF617381BF400FB3C55 /* upArrow@2x.png */; };
+		5EC7DFFB17381F5600FB3C55 /* TLLoveButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EC7DFFA17381F5600FB3C55 /* TLLoveButton.m */; };
+		5EC7DFFD17383DFF00FB3C55 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 5EC7DFFC17383DFF00FB3C55 /* Icon.png */; };
+		5EC7DFFF17383E0200FB3C55 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5EC7DFFE17383E0200FB3C55 /* Icon@2x.png */; };
 		5ED60CCB171C57E000F55891 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ED60CCA171C57E000F55891 /* QuartzCore.framework */; };
 		A85CD65D1730058B00B9BBC9 /* TLCollectionViewLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = A85CD65C1730058B00B9BBC9 /* TLCollectionViewLayout.m */; };
 		A85CD66317305C9600B9BBC9 /* TLEventViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A85CD66217305C9600B9BBC9 /* TLEventViewCell.m */; };
@@ -115,6 +122,14 @@
 		5EB951B017203DE600A5089B /* TLCalendarSelectCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLCalendarSelectCell.m; sourceTree = "<group>"; };
 		5EC7DFEE17344D8300FB3C55 /* TLCollectionViewLayoutAttributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLCollectionViewLayoutAttributes.h; sourceTree = "<group>"; };
 		5EC7DFEF17344D8300FB3C55 /* TLCollectionViewLayoutAttributes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLCollectionViewLayoutAttributes.m; sourceTree = "<group>"; };
+		5EC7DFF117381B1A00FB3C55 /* logo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "logo@2x.png"; path = "Images/logo@2x.png"; sourceTree = "<group>"; };
+		5EC7DFF317381B7300FB3C55 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = logo.png; path = Images/logo.png; sourceTree = "<group>"; };
+		5EC7DFF517381BF400FB3C55 /* upArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = upArrow.png; path = Images/upArrow.png; sourceTree = "<group>"; };
+		5EC7DFF617381BF400FB3C55 /* upArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "upArrow@2x.png"; path = "Images/upArrow@2x.png"; sourceTree = "<group>"; };
+		5EC7DFF917381F5600FB3C55 /* TLLoveButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLLoveButton.h; sourceTree = "<group>"; };
+		5EC7DFFA17381F5600FB3C55 /* TLLoveButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLLoveButton.m; sourceTree = "<group>"; };
+		5EC7DFFC17383DFF00FB3C55 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = ../Icon.png; sourceTree = "<group>"; };
+		5EC7DFFE17383E0200FB3C55 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "../Icon@2x.png"; sourceTree = "<group>"; };
 		5ED60CCA171C57E000F55891 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		A85CD65B1730058B00B9BBC9 /* TLCollectionViewLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLCollectionViewLayout.h; sourceTree = "<group>"; };
 		A85CD65C1730058B00B9BBC9 /* TLCollectionViewLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLCollectionViewLayout.m; sourceTree = "<group>"; };
@@ -148,6 +163,10 @@
 		5E18D2AD172AFA540010F8FF /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				5EC7DFF517381BF400FB3C55 /* upArrow.png */,
+				5EC7DFF617381BF400FB3C55 /* upArrow@2x.png */,
+				5EC7DFF117381B1A00FB3C55 /* logo@2x.png */,
+				5EC7DFF317381B7300FB3C55 /* logo.png */,
 				5E18D2FE172FFF560010F8FF /* location@2x.png */,
 				A85CD6661730605E00B9BBC9 /* event-row-bg@2x.png */,
 				5E18D2FA172EEA6B0010F8FF /* upcomingEventBackground@2x.png */,
@@ -251,6 +270,8 @@
 				5EB4E5631717374E00EC8E1C /* Default.png */,
 				5EB4E5651717374E00EC8E1C /* Default@2x.png */,
 				5EB4E5671717374E00EC8E1C /* Default-568h@2x.png */,
+				5EC7DFFE17383E0200FB3C55 /* Icon@2x.png */,
+				5EC7DFFC17383DFF00FB3C55 /* Icon.png */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -287,6 +308,8 @@
 				A85CD66417305D7400B9BBC9 /* TLEventViewCell.xib */,
 				5E18D30A1732D7000010F8FF /* TLHourSupplementaryView.h */,
 				5E18D30B1732D7000010F8FF /* TLHourSupplementaryView.m */,
+				5EC7DFF917381F5600FB3C55 /* TLLoveButton.h */,
+				5EC7DFFA17381F5600FB3C55 /* TLLoveButton.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -360,6 +383,12 @@
 				5E18D309173170970010F8FF /* soundeffect.wav in Resources */,
 				A85CD66517305D7400B9BBC9 /* TLEventViewCell.xib in Resources */,
 				A85CD6671730605E00B9BBC9 /* event-row-bg@2x.png in Resources */,
+				5EC7DFF217381B1A00FB3C55 /* logo@2x.png in Resources */,
+				5EC7DFF417381B7300FB3C55 /* logo.png in Resources */,
+				5EC7DFF717381BF400FB3C55 /* upArrow.png in Resources */,
+				5EC7DFF817381BF400FB3C55 /* upArrow@2x.png in Resources */,
+				5EC7DFFD17383DFF00FB3C55 /* Icon.png in Resources */,
+				5EC7DFFF17383E0200FB3C55 /* Icon@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -407,6 +436,7 @@
 				A85CD66317305C9600B9BBC9 /* TLEventViewCell.m in Sources */,
 				5E18D30C1732D7000010F8FF /* TLHourSupplementaryView.m in Sources */,
 				5EC7DFF017344D8300FB3C55 /* TLCollectionViewLayoutAttributes.m in Sources */,
+				5EC7DFFB17381F5600FB3C55 /* TLLoveButton.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
