@@ -10,7 +10,16 @@
 
 @class EKEvent;
 
+@class TLHeaderViewController;
+
+@protocol TLHeaderViewControllerDelegate <NSObject>
+
+-(void)userDidTapDismissHeaderButton;
+
+@end
+
 extern const CGFloat kHeaderHeight;
+extern const CGFloat kUpperHeaderHeight;
 
 @interface TLHeaderViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
@@ -19,5 +28,7 @@ extern const CGFloat kHeaderHeight;
 -(void)hideHeaderView;
 -(void)showHeaderView;
 -(void)updateHour:(NSInteger)hours minute:(NSInteger)minutes event:(EKEvent *)event;
+
+@property (nonatomic, weak) id<TLHeaderViewControllerDelegate> delegate;
 
 @end

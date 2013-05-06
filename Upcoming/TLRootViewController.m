@@ -8,7 +8,6 @@
 
 #import "TLRootViewController.h"
 
-#import "TLHeaderViewController.h"
 #import "TLUpcomingEventViewController.h"
 
 #import "UIImage+Blur.h"
@@ -29,7 +28,6 @@
 // Gesture recognizers to reveal/hide the headeer menu.
 @property (nonatomic, strong) UIPanGestureRecognizer *panHeaderDownGestureRecognizer;
 @property (nonatomic, strong) UIPanGestureRecognizer *panHeaderUpGestureRecognizer;
-@property (nonatomic, strong) UITapGestureRecognizer *tapGestureRecognizer;
 @property (nonatomic, strong) UIPanGestureRecognizer *panFooterUpGestureRecognizer;
 
 // Two subjects used to receive translations from the gesture recognizers
@@ -49,11 +47,8 @@
 
 @implementation TLRootViewController
 
-// This is the height of the hidden portion of the menu.
-// The total height of the header is kHeaderHeight + kMaximumTranslationThreshold.
-static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
-
-// We have to use a #define here to get the compiler to expand this macro
+// We have to use #define's here to get the compiler to expand these macros
+#define kMaximumHeaderTranslationThreshold (CGRectGetHeight(self.view.bounds))
 #define kMaximumFooterTranslationThreshold (-CGRectGetMidY(self.view.bounds)/4.0f - CGRectGetHeight(self.footerViewController.view.bounds) / 2.0f)
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -66,6 +61,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     [self addChildViewController:self.dayListViewController];
     
     self.headerViewController = [[TLHeaderViewController alloc] initWithNibName:@"TLHeaderViewController" bundle:nil];
+    self.headerViewController.delegate = self;
     [self addChildViewController:self.headerViewController];
     
     self.footerViewController = [[TLUpcomingEventViewController alloc] initWithNibName:@"TLUpcomingEventViewController" bundle:nil];
@@ -181,7 +177,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
         // Values greater than one are valid and will be extrapolated beyond the fully open menu.
         CGFloat ratio = [value floatValue];
         
-        CGRect headerFrame = CGRectMake(0, 0, CGRectGetWidth(self.view.bounds), kHeaderHeight + ratio * kMaximumHeaderTranslationThreshold);
+        CGRect headerFrame = CGRectMake(0, -((1.0f - ratio) * kMaximumHeaderTranslationThreshold), CGRectGetWidth(self.view.bounds), kHeaderHeight + kMaximumHeaderTranslationThreshold);
         
         if (ratio < 0)
         {
@@ -306,9 +302,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     RAC(self.panHeaderDownGestureRecognizer.enabled) = canOpenMenuSignal;
     RAC(self.panFooterUpGestureRecognizer.enabled) = canOpenMenuSignal;
     RAC(self.dayListViewController.view.userInteractionEnabled) = canOpenMenuSignal;
-    RAC(self.panHeaderUpGestureRecognizer.enabled) = self.headerFinishedTransitionSubject;
-    RAC(self.tapGestureRecognizer.enabled) = self.headerFinishedTransitionSubject;
-    
+    RAC(self.panHeaderUpGestureRecognizer.enabled) = self.headerFinishedTransitionSubject;    
         
     return self;
 }
@@ -342,16 +336,6 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     
     // Set up our gesture recognizers.
     // These mostly grab their translations and feed them into the appropriate subjects.
-    
-    self.tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
-        [UIView animateWithDuration:0.25f animations:^{
-            [self.headerPanSubject sendNext:@(0)];
-        } completion:^(BOOL finished) {
-            [self.headerFinishedTransitionSubject sendNext:@(NO)];
-        }];
-    }];
-    self.tapGestureRecognizer.delegate = self;
-    [self.dayListOverlayView addGestureRecognizer:self.tapGestureRecognizer];
     
     // This is the number of points beyond which the user need to move their finger in order to trigger the menu moving down. 
     const CGFloat kMoveDownThreshold = 30.0f;
@@ -466,13 +450,7 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
     if (gestureRecognizer == self.panHeaderUpGestureRecognizer)
     {
         // Only allow the pan up to take place on the header section of the header menu.
-        return CGRectContainsPoint(CGRectMake(0, CGRectGetHeight(self.headerViewController.view.bounds) - kHeaderHeight, CGRectGetWidth(self.view.bounds), kHeaderHeight), [touch locationInView:self.view]);
-    }
-    else if (gestureRecognizer == self.tapGestureRecognizer)
-    {        
-        // Only allow the tap to take place in the area beneath the header menu.
-        CGFloat menuHeight = kHeaderHeight + kMaximumHeaderTranslationThreshold;
-        return CGRectContainsPoint(CGRectMake(0, menuHeight, CGRectGetWidth(self.view.bounds), CGRectGetHeight(self.view.bounds) - menuHeight), [touch locationInView:self.view]);
+        return CGRectContainsPoint(CGRectMake(0, CGRectGetHeight(self.headerViewController.view.bounds) - kHeaderHeight - kUpperHeaderHeight, CGRectGetWidth(self.view.bounds), kHeaderHeight), [touch locationInView:self.view]);
     }
     else if (gestureRecognizer == self.panFooterUpGestureRecognizer)
     {
@@ -501,6 +479,17 @@ static const CGFloat kMaximumHeaderTranslationThreshold = 320.0f;
 -(void)userDidInteractWithDayListView:(TLEventViewController *)controller updateTimeHour:(NSInteger)hour minute:(NSInteger)minute event:(EKEvent *)event
 {
     [self.headerViewController updateHour:hour minute:minute event:event];
+}
+
+#pragma mark -TLHeaderViewControllerDelegate Methods
+
+-(void)userDidTapDismissHeaderButton
+{
+    [UIView animateWithDuration:0.5f animations:^{
+        [self.headerPanSubject sendNext:@(0)];
+    } completion:^(BOOL finished) {
+        [self.headerFinishedTransitionSubject sendNext:@(NO)];
+    }];
 }
 
 @end

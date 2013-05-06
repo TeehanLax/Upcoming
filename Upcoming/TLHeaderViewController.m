@@ -14,6 +14,7 @@
 #import <ViewUtils.h>
 
 const CGFloat kHeaderHeight = 72.0f;
+const CGFloat kUpperHeaderHeight = 52.0f;
 
 @interface TLHeaderViewController ()
 
@@ -233,9 +234,6 @@ const CGFloat kHeaderHeight = 72.0f;
         
         [self.headerAlernateDetailView crossfadeWithDuration:0.1f];
     }];
-    
-    // Set up the table view mask
-    [self setupTableViewMask];
         
     // Remove the default table view background
     UIView *backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
@@ -243,10 +241,20 @@ const CGFloat kHeaderHeight = 72.0f;
     self.calendarTableView.backgroundView = backgroundView;
 }
 
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    // Set up the table view mask
+    [self setupTableViewMask];
+}
+
 -(void)setupTableViewMask
 {
     // This method sets up the mask for the view which contains the table view,
     // making it appear to "fade out" as it reaches the bottom.
+    
+    if (self.tableMaskingView.layer.mask) return;
     
     CALayer *maskLayer = [CALayer layer];
     maskLayer.frame = self.tableMaskingView.bounds;
@@ -434,6 +442,18 @@ static CGFloat interAnimationDelay = 0.05f;
     self.alternateAbsoluteTimeLabel.text = [NSString stringWithFormat:@"%d:%02d", hours, minutes];
     
     [self.alternateEventSubject sendNext:event];
+}
+
+#pragma mark - IBAction Methods
+
+-(IBAction)userDidPressDismissButton
+{
+    [self.delegate userDidTapDismissHeaderButton];
+}
+
+-(IBAction)userDidPressTLButton:(id)sender
+{
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://www.teehanlax.com/"]];
 }
 
 @end
