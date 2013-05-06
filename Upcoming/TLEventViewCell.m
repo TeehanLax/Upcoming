@@ -68,6 +68,10 @@
     UIGraphicsBeginImageContext(self.backgroundImage.frame.size);
     [img drawAtPoint:CGPointZero blendMode:kCGBlendModeSoftLight alpha:1];
     [aImage drawAtPoint:CGPointZero blendMode:kCGBlendModeSoftLight alpha:alpha];
+    if (self.titleLabel.text.length > 0) {
+        // draw the shape again per design
+        [aImage drawAtPoint:CGPointZero blendMode:kCGBlendModeSoftLight alpha:alpha];
+    }
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     
