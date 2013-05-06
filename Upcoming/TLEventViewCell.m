@@ -26,6 +26,7 @@
 }
 
 - (void)prepareForReuse {
+    [super prepareForReuse];
     self.titleLabel.text = @"";
     [self setNeedsDisplay];
 }
