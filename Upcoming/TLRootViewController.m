@@ -95,7 +95,7 @@
                                                  {
                                                      NSCalendar *calendar = [NSCalendar currentCalendar];
                                                      NSDateComponents *components = [calendar components:NSHourCalendarUnit fromDate:nextEvent.startDate];
-                                                     if (components.hour < 12)// && !nextEvent.isAllDay)
+                                                     if (components.hour < 12 && !nextEvent.isAllDay)
                                                      {
                                                          return nextEvent;
                                                      }
