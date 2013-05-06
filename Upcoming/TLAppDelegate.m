@@ -7,8 +7,8 @@
 //
 
 #import "TLAppDelegate.h"
-
 #import "TLRootViewController.h"
+#import "EKEventManager.h"
 
 #include <sys/types.h>
 #include <sys/sysctl.h>
@@ -26,6 +26,10 @@
     [self setupDevice];
         
     return YES;
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+    [[EKEventManager sharedInstance] refresh];
 }
 
 -(void)setupDevice
