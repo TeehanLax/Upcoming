@@ -45,15 +45,18 @@
     
     CGRect frame = CGRectZero;
     CGFloat height = 1.0f;
+    CGFloat hourLineProgression = 0.5f;
     
     if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)])
     {
         frame = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView frameForHourViewInLayout:self];
         height = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView heightForHourLineViewInLayout:self];
+        hourLineProgression = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView hourProgressionForHourLineViewInLayout:self];
     }
     
     attributes.frame = frame;
     attributes.hourLineHeight = height;
+    attributes.hourLineProgressRatio = hourLineProgression;
     attributes.zIndex = 1;
     
     return attributes;

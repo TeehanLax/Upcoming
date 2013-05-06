@@ -191,21 +191,15 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
 -(CGRect)collectionView:(UICollectionView *)collectionView frameForHourViewInLayout:(TLCollectionViewLayout *)layout {
     
     NSCalendar *calendar = [NSCalendar currentCalendar];
-    NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
+    NSDateComponents *components = [calendar components:NSHourCalendarUnit fromDate:[NSDate date]];
     
     NSInteger currentHour = components.hour;
-    NSInteger currentMinute = components.minute;
     
     UICollectionViewLayoutAttributes *attributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:currentHour inSection:0]];
     
     CGFloat viewHeight = attributes.size.height;
-    CGFloat minuteAdjustment = attributes.size.height * (CGFloat)(currentMinute / 60);
-    
-    //TODO: Snap to events while hour line is over an event: https://github.com/TeehanLax/Upcoming/issues/28
-    
-    const CGFloat height = 20.0f;
-    
-    return CGRectMake(0, attributes.frame.origin.y + minuteAdjustment + (viewHeight - height) / 2.0f, CGRectGetWidth(self.view.bounds), height);
+       
+    return CGRectMake(0, attributes.frame.origin.y, CGRectGetWidth(self.view.bounds), viewHeight);
 }
 
 -(CGFloat)collectionView:(UICollectionView *)collectionView heightForHourLineViewInLayout:(TLCollectionViewLayout *)layout
@@ -218,6 +212,16 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     {
         return 1.0f;
     }
+}
+
+-(CGFloat)collectionView:(UICollectionView *)collectionView hourProgressionForHourLineViewInLayout:(TLCollectionViewLayout *)layout{
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    
+    NSDateComponents *components = [calendar components:NSMinuteCalendarUnit fromDate:[NSDate date]];
+    
+    NSInteger currentMinute = components.minute;
+    
+    return (float)currentMinute / 60.0f;
 }
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
@@ -247,7 +251,7 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
 }
 
 -(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
-    
+    // We only ever have one supplementary view. 
     if (!self.supplementaryView)
     {
         self.supplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kSupplementaryViewIdentifier forIndexPath:indexPath];
