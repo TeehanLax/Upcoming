@@ -11,6 +11,10 @@
 @interface TLEventViewCell : UICollectionViewCell
 
 @property (nonatomic, strong) IBOutlet UILabel *titleLabel;
+@property (nonatomic, strong) IBOutlet UIView *background;
 @property (nonatomic, strong) IBOutlet UIImageView *backgroundImage;
+
+@property (nonatomic, assign) float minY;
+@property (nonatomic, assign) float maxY;
 
 @end
