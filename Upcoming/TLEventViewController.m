@@ -95,9 +95,8 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     if (hour == 0) hour += 12;
     if (minute < 0) minute = 0; // Weird rounding error
     
-    
-    [self.collectionView performBatchUpdates:^{
-        if (recognizer.state == UIGestureRecognizerStateBegan) {
+    if (recognizer.state == UIGestureRecognizerStateBegan) {
+        [self.collectionView performBatchUpdates:^{
             [self.backgroundGradientView setDarkened:YES];
             self.eventUnderFinger = nil;
             self.indexPathUnderFinger = indexPath;
@@ -107,35 +106,39 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
                 [AppDelegate playTouchDownSound];
                 [self.delegate userDidInteractWithDayListView:self updateTimeHour:hour minute:minute event:event];
             }
-        } else if (recognizer.state == UIGestureRecognizerStateChanged) {
-            if ([self.eventUnderFinger compareStartDateWithEvent:event] != NSOrderedSame ||
-                (self.eventUnderFinger == nil && event != nil) ||
-                (self.eventUnderFinger != nil && event == nil))
+        } completion:nil];
+    } else if (recognizer.state == UIGestureRecognizerStateChanged) {
+        [self.collectionView.collectionViewLayout invalidateLayout];
+        
+        if ([self.eventUnderFinger compareStartDateWithEvent:event] != NSOrderedSame ||
+            (self.eventUnderFinger == nil && event != nil) ||
+            (self.eventUnderFinger != nil && event == nil))
+        {
+            [AppDelegate playTouchNewEventSound];
+            self.eventUnderFinger = event;
+        }
+        else
+        {
+            if ([indexPath compare:self.indexPathUnderFinger] != NSOrderedSame)
             {
-                [AppDelegate playTouchNewEventSound];
-                self.eventUnderFinger = event;
+                [AppDelegate playTouchNewHourSound];
+                self.indexPathUnderFinger = indexPath;
             }
-            else
-            {
-                if ([indexPath compare:self.indexPathUnderFinger] != NSOrderedSame)
-                {
-                    [AppDelegate playTouchNewHourSound];
-                    self.indexPathUnderFinger = indexPath;
-                }
-            }
-            
-            if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
-                [self.delegate userDidInteractWithDayListView:self updateTimeHour:hour minute:minute event:event];
-            }
-        } else if (recognizer.state == UIGestureRecognizerStateEnded) {
+        }
+        
+        if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
+            [self.delegate userDidInteractWithDayListView:self updateTimeHour:hour minute:minute event:event];
+        }
+    } else if (recognizer.state == UIGestureRecognizerStateEnded) {
+        [self.collectionView performBatchUpdates:^{
             [self.backgroundGradientView setDarkened:NO];
             self.eventUnderFinger = nil;
             self.indexPathUnderFinger = nil;
             self.touch = NO;
             [self.delegate userDidEndInteractingWithDayListViewController:self];
             [AppDelegate playTouchUpSound];
-        }
-    } completion:nil];
+        } completion:nil];
+    }
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
@@ -175,12 +178,22 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
         if (diff > 0) diff = 0;
     }
     
-    CGFloat size = (minSize + MAX_ROW_HEIGHT) * ((EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS);
+    CGFloat delta = ((EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS);
+    
+    CGFloat size = (minSize + MAX_ROW_HEIGHT) * delta;
     
     if (![self.activeCells containsObject:[NSNumber numberWithInt:indexPath.row]]) {
-        cell.contentView.alpha = (EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS;
+        cell.contentView.alpha = delta;
     }
-    cell.titleLabel.alpha = (EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS;
+    cell.titleLabel.alpha = delta;
+    
+    // position sampled background image
+    CGFloat yDistance = cell.maxY - cell.minY;
+    CGFloat yDelta = cell.frame.origin.y - cell.minY;
+    
+    CGRect backgroundImageFrame = cell.backgroundImage.frame;
+    backgroundImageFrame.origin.y = (cell.frame.size.height - backgroundImageFrame.size.height) * (yDelta / yDistance);
+    cell.backgroundImage.frame = backgroundImageFrame;
     
     if (size > MAX_ROW_HEIGHT) size = MAX_ROW_HEIGHT;
     if (size < minSize) size = minSize;

@@ -10,6 +10,7 @@
 #import "UIColor+CustomizedColors.h"
 #import "TLAppDelegate.h"
 #import "TLRootViewController.h"
+#import "TLEventViewController.h"
 
 @implementation TLEventViewCell
 
@@ -18,9 +19,14 @@
     self.titleLabel.font = [[UIFont tl_mediumAppFont] fontWithSize:14];
     self.titleLabel.textColor = [UIColor colorFromRGB:0x444444];
     
-    [self.backgroundImage.layer setCornerRadius:3.0f];
-    [self.backgroundImage.layer setMasksToBounds:YES];
+    [self.background.layer setCornerRadius:3.0f];
+    [self.background.layer setMasksToBounds:YES];
     
+    [self setNeedsDisplay];
+}
+
+- (void)prepareForReuse {
+    self.titleLabel.text = @"";
     [self setNeedsDisplay];
 }
 
@@ -33,8 +39,19 @@
     TLAppDelegate *appDelegate = (TLAppDelegate *)[UIApplication sharedApplication].delegate;
     TLRootViewController *rootViewController = appDelegate.viewController;
     
+    UICollectionView *collectionView = (UICollectionView *)[self superview];
+    NSIndexPath *indexPath = [collectionView indexPathForCell:self];
+    
+    CGFloat minSize = (collectionView.frame.size.height - (MAX_ROW_HEIGHT * EXPANDED_ROWS)) / 20;
+    self.minY = minSize * indexPath.row;
+    self.maxY = (collectionView.frame.size.height - (minSize * 24)) + self.minY;
+    
+    CGRect backgroundImageFrame = self.backgroundImage.frame;
+    backgroundImageFrame.size.height = self.maxY - self.minY;
+    self.backgroundImage.frame = backgroundImageFrame;
+    
     CGRect imageRect = CGRectMake(0, 0, self.backgroundImage.frame.size.width, self.backgroundImage.frame.size.height);
-    UIGraphicsBeginImageContext(imageRect.size);
+    UIGraphicsBeginImageContextWithOptions(imageRect.size, YES, 0);
     [[UIColor whiteColor] set];
     UIRectFill(imageRect);
     UIImage *aImage = UIGraphicsGetImageFromCurrentImageContext();
@@ -43,16 +60,17 @@
     CGPoint p = self.frame.origin;
     CGSize s = self.frame.size;
     
-    CGImageRef imageRef = CGImageCreateWithImageInRect([rootViewController.gradientImage CGImage], CGRectMake(p.x, p.y + self.superview.frame.origin.y, s.width, 34));
+    CGImageRef imageRef = CGImageCreateWithImageInRect([rootViewController.gradientImage CGImage], CGRectMake(p.x, self.minY + self.superview.frame.origin.y, s.width, self.maxY - self.minY));
     UIImage *img = [UIImage imageWithCGImage:imageRef];
     CGImageRelease(imageRef);
     
     UIGraphicsBeginImageContext(self.backgroundImage.frame.size);
-    [img drawInRect:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height) blendMode:kCGBlendModeSoftLight alpha:1];
-    [aImage drawInRect:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height) blendMode:kCGBlendModeSoftLight alpha:alpha];
+    [img drawAtPoint:CGPointZero blendMode:kCGBlendModeSoftLight alpha:1];
+    [aImage drawAtPoint:CGPointZero blendMode:kCGBlendModeSoftLight alpha:alpha];
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     
+    self.backgroundImage.contentMode = UIViewContentModeScaleAspectFill;
     self.backgroundImage.image = image;
 }
 
