@@ -27,6 +27,7 @@
     if (self) {
         self.backgroundColor = [UIColor clearColor];
         self.userInteractionEnabled = NO;
+        self.lineHeight = 1.0f;
         
         self.timeLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         self.timeLabel.font = [[UIFont tl_appFont] fontWithSize:14];
@@ -57,7 +58,6 @@
 {
     [super applyLayoutAttributes:layoutAttributes];
     
-    self.lineHeight = layoutAttributes.hourLineHeight;
     self.hourLineProgressionRatio = layoutAttributes.hourLineProgressRatio;
     [self setNeedsDisplay];
 }

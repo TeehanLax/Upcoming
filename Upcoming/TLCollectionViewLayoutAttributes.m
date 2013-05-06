@@ -14,7 +14,6 @@
 {
     TLCollectionViewLayoutAttributes *otherAttributes = [super copyWithZone:zone];
     
-    otherAttributes.hourLineHeight = self.hourLineHeight;
     otherAttributes.hourLineProgressRatio = self.hourLineProgressRatio;
     
     return otherAttributes;

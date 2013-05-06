@@ -218,26 +218,17 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     return CGRectMake(0, attributes.frame.origin.y, CGRectGetWidth(self.view.bounds), viewHeight);
 }
 
--(CGFloat)collectionView:(UICollectionView *)collectionView heightForHourLineViewInLayout:(TLCollectionViewLayout *)layout
-{
-    if (self.touch)
-    {
-        return 2.0f;
+-(CGFloat)collectionView:(UICollectionView *)collectionView alphaForHourLineViewInLayout:(TLCollectionViewLayout *)layout {
+    if (self.touch) {
+        return 0.0f;
     }
-    else
-    {
+    else {
         return 1.0f;
     }
 }
 
 -(CGFloat)collectionView:(UICollectionView *)collectionView hourProgressionForHourLineViewInLayout:(TLCollectionViewLayout *)layout{
-    NSCalendar *calendar = [NSCalendar currentCalendar];
-    
-    NSDateComponents *components = [calendar components:NSMinuteCalendarUnit fromDate:[NSDate date]];
-    
-    NSInteger currentMinute = components.minute;
-    
-    return (float)currentMinute / 60.0f;
+    return 0.5f;
 }
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
