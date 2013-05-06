@@ -8,6 +8,7 @@
 
 #import "TLHeaderViewController.h"
 #import "EKEventManager.h"
+#import "TLLoveButton.h"
 #import "TLCalendarDotView.h"
 #import "TLCalendarSelectCell.h"
 
@@ -42,6 +43,8 @@ const CGFloat kUpperHeaderHeight = 52.0f;
 
 
 @property (nonatomic, weak) IBOutlet UIView *tableMaskingView;
+
+@property (nonatomic, weak) IBOutlet UIButton *arrowButton;
 
 @end
 
@@ -442,6 +445,13 @@ static CGFloat interAnimationDelay = 0.05f;
     self.alternateAbsoluteTimeLabel.text = [NSString stringWithFormat:@"%d:%02d", hours, minutes];
     
     [self.alternateEventSubject sendNext:event];
+}
+
+-(void)setArrowRotationRatio:(CGFloat)arrowRotationRatio
+{
+    _arrowRotationRatio = arrowRotationRatio;
+    
+    self.arrowButton.transform = CGAffineTransformMakeRotation(M_PI * arrowRotationRatio + M_PI);
 }
 
 #pragma mark - IBAction Methods

@@ -31,4 +31,6 @@ extern const CGFloat kUpperHeaderHeight;
 
 @property (nonatomic, weak) id<TLHeaderViewControllerDelegate> delegate;
 
+@property (nonatomic, assign) CGFloat arrowRotationRatio;
+
 @end
