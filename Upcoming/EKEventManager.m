@@ -141,13 +141,8 @@ NSString * const EKEventManagerSourcesKeyPath = @"sources";
 }
 
 - (void)loadEvents {
-    [self willChangeValueForKey:EKEventManagerEventsKeyPath];
     [_events removeAllObjects];
-    [self didChangeValueForKey:EKEventManagerEventsKeyPath];
-    
-    [self willChangeValueForKey:EKEventManagerNextEventKeyPath];
     _nextEvent = nil;
-    [self didChangeValueForKey:EKEventManagerNextEventKeyPath];
     
     // Get the appropriate calendar
     NSCalendar *calendar = [NSCalendar currentCalendar];
@@ -171,6 +166,8 @@ NSString * const EKEventManagerSourcesKeyPath = @"sources";
     
     // no calendars selected. Empty views
     if (calendars == nil || [calendars count] == 0) {
+        [self didChangeValueForKey:EKEventManagerEventsKeyPath];
+        [self didChangeValueForKey:EKEventManagerNextEventKeyPath];
         return;
     }
     
