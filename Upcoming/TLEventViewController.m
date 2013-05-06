@@ -31,6 +31,9 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
 @property (nonatomic, strong) NSIndexPath *indexPathUnderFinger;
 @property (nonatomic, strong) EKEvent *eventUnderFinger;
 
+// Not completely OK to keep this around, but we can guarantee we only ever want one on screen, so it's OK. 
+@property (nonatomic, strong) TLHourSupplementaryView *supplementaryView;
+
 @end
 
 @implementation TLEventViewController
@@ -60,8 +63,7 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
         @strongify(self);
         [self updateBackgroundGradient];
     }];
-    
-    
+        
     self.backgroundGradientView = [[TLBackgroundGradientView alloc] initWithFrame:self.view.bounds];
     [self.view insertSubview:self.backgroundGradientView atIndex:0];
 }
@@ -209,9 +211,13 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
 -(CGFloat)collectionView:(UICollectionView *)collectionView heightForHourLineViewInLayout:(TLCollectionViewLayout *)layout
 {
     if (self.touch)
+    {
         return 2.0f;
+    }
     else
+    {
         return 1.0f;
+    }
 }
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
@@ -240,18 +246,48 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     return cell;
 }
 
--(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {    
-    TLHourSupplementaryView *supplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kSupplementaryViewIdentifier forIndexPath:indexPath];
+-(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
     
-    NSCalendar *calendar = [NSCalendar currentCalendar];
-    NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
-    
-    NSInteger hours = components.hour % 12;
-    if (hours == 0) hours = 12;
-    
-    supplementaryView.timeString = [NSString stringWithFormat:@"%d:%02d", hours, components.minute];
+    if (!self.supplementaryView)
+    {
+        self.supplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kSupplementaryViewIdentifier forIndexPath:indexPath];
         
-    return supplementaryView;
+        RACSubject *updateSubject = [RACSubject subject];
+                
+        NSCalendar *calendar = [NSCalendar currentCalendar];
+        NSDateComponents *components = [calendar components:NSSecondCalendarUnit fromDate:[NSDate date]];
+        
+        NSInteger delay = 60 - components.second;
+        
+        NSLog(@"Scheduling subscription every minute for supplementary view in %d seconds", delay);
+        
+        double delayInSeconds = delay;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            
+            NSLog(@"Creating initial subscription for supplementary view.");
+            [updateSubject sendNext:[NSDate date]];
+            
+            [[RACSignal interval:60] subscribeNext:^(id x) {
+                NSLog(@"Updating minute of supplementary view.");
+                [updateSubject sendNext:x];
+            }];
+        });
+        
+        RAC(self.supplementaryView.timeString) = [updateSubject map:^id(NSDate *date) {
+            
+            NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:date];
+            
+            NSInteger hours = components.hour % 12;
+            if (hours == 0) hours = 12;
+            
+            return [NSString stringWithFormat:@"%d:%02d", hours, components.minute];
+        }];
+        
+        [updateSubject sendNext:[NSDate date]];
+    }
+    
+    return self.supplementaryView;
 }
 
 #pragma mark - Private Methods
@@ -291,7 +327,7 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     }
     else
     {
-        CGFloat ratio = soonestEvent / fadeTime;
+        CGFloat ratio = (fadeTime - soonestEvent) / fadeTime;
         
         [self.backgroundGradientView setAlertRatio:ratio animated:YES];
     }
