@@ -12,6 +12,7 @@
 
 #import "UIImage+Blur.h"
 #import "TLProfiling.h"
+#import "EKEventManager.h"
 
 #import <BlocksKit.h>
 
@@ -69,7 +70,39 @@
     
     
     @weakify(self);
-        
+    
+    // If there are no remaining events in the day *and* the event occurs the first thing in the
+    // day tomorrow (ie: before noon), then move it up.
+    RACSignal *filteredUpdateSignal = [[[RACSignal interval:60.0f] startWith:[NSDate date]] map:^id(NSDate *now) {
+        NSArray *upcomingEvents = [[[EKEventManager sharedInstance] events] filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(EKEvent *event, NSDictionary *bindings) {
+            return [event.startDate isLaterThanDate:now];
+        }]];
+        return @(upcomingEvents.count == 0);
+    }];
+    
+    // Have to map - value in the filter block is nil for some reason. 
+    RACSignal *nextEventSignal = [[[RACAbleWithStart([EKEventManager sharedInstance], nextEvent) filter:^BOOL(id value) {
+        return [[EKEventManager sharedInstance] nextEvent] != nil;
+    }] map:^id(id value) {
+        return [[EKEventManager sharedInstance] nextEvent];
+    }] deliverOn:[RACScheduler mainThreadScheduler]];
+    
+    RACSignal *nextApplicableEventSignal = [[RACSignal
+                                             combineLatest:@[filteredUpdateSignal, nextEventSignal]
+                                             reduce:^id(NSNumber *noFurtherEventsToday, EKEvent *nextEvent){
+                                                 if (noFurtherEventsToday.boolValue)
+                                                 {
+                                                     NSCalendar *calendar = [NSCalendar currentCalendar];
+                                                     NSDateComponents *components = [calendar components:NSHourCalendarUnit fromDate:nextEvent.startDate];
+                                                     if (components.hour < 12)// && !nextEvent.isAllDay)
+                                                     {
+                                                         return nextEvent;
+                                                     }
+                                                 }
+                                                 
+                                                 return nil;
+                                             }] distinctUntilChanged];
+    
     // These subjects are responsible for adding/removing the overlay view to our hierarchy.
     // We're using an explicit subject here because it maintains state (whether or not the overlay view is in the hierarchy).
     self.dayListOverlaySubject = [RACSubject subject];
@@ -219,10 +252,12 @@
                                          }];
     
     // Need to combine latest on the two signals since the footer moves with both
-    RACSignal *footerFrameSignal = [[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)]]
-                                                      reduce:^id(NSNumber *headerRatio, NSNumber *footerRatio){
+    RACSignal *footerFrameSignal = [[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)], [nextApplicableEventSignal startWith:nil]]
+                                                      reduce:^id(NSNumber *headerRatio, NSNumber *footerRatio, EKEvent *nextEvent){
+                                                          NSLog(@"EVENT: %@", nextEvent);
                                                           if (headerRatio.floatValue > 0) return @(-headerRatio.floatValue);
                                                           if (footerRatio.floatValue > 0) return footerRatio;
+                                                          if (nextEvent) return @(0.25f); // We have an event tomorrow we'd like to highlight. 
                                                           return @(0);
                                                       }]
                                     map:^id(id value) {

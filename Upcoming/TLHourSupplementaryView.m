@@ -63,7 +63,7 @@
 }
 
 
-static const CGFloat rightMargin = 12.0f;
+static const CGFloat leftMargin = 12.0f;
 
 -(void)layoutSubviews
 {
@@ -72,7 +72,7 @@ static const CGFloat rightMargin = 12.0f;
     UIFont *font = [[UIFont tl_appFont] fontWithSize:14];
     CGSize textSize = [self.timeString sizeWithFont:font];
     
-    CGRect textRect = CGRectMake(CGRectGetWidth(self.bounds) - rightMargin - textSize.width, CGRectGetMidY(self.bounds) - textSize.height / 2, textSize.width, textSize.height);
+    CGRect textRect = CGRectMake(leftMargin, CGRectGetMidY(self.bounds) - textSize.height / 2, textSize.width, textSize.height);
     self.timeLabel.frame = textRect;
 }
 

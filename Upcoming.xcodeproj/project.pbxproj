@@ -242,17 +242,14 @@
 				5E18D308173170970010F8FF /* soundeffect.wav */,
 				5E18D2AD172AFA540010F8FF /* Images */,
 				5EB951AE17203DD700A5089B /* Views */,
-				5EB4E5601717374E00EC8E1C /* TLAppDelegate.h */,
-				5EB4E5611717374E00EC8E1C /* TLAppDelegate.m */,
 				5E21DED8171EFCED00231263 /* EventManager */,
 				5EB4E57D17187DEF00EC8E1C /* View Controllers */,
 				5EA3D48D1726DD5200D9764F /* Categories */,
+				5EC7E0001738489900FB3C55 /* Collection View Extensions */,
 				5E2EF7B3172AC4FF00737A75 /* TLTouchDownGestureRecognizer.h */,
 				5E2EF7B4172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m */,
-				A85CD65B1730058B00B9BBC9 /* TLCollectionViewLayout.h */,
-				A85CD65C1730058B00B9BBC9 /* TLCollectionViewLayout.m */,
-				5EC7DFEE17344D8300FB3C55 /* TLCollectionViewLayoutAttributes.h */,
-				5EC7DFEF17344D8300FB3C55 /* TLCollectionViewLayoutAttributes.m */,
+				5EB4E5601717374E00EC8E1C /* TLAppDelegate.h */,
+				5EB4E5611717374E00EC8E1C /* TLAppDelegate.m */,
 				5EB4E5581717374E00EC8E1C /* Supporting Files */,
 			);
 			path = Upcoming;
@@ -312,6 +309,17 @@
 				5EC7DFFA17381F5600FB3C55 /* TLLoveButton.m */,
 			);
 			name = Views;
+			sourceTree = "<group>";
+		};
+		5EC7E0001738489900FB3C55 /* Collection View Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				A85CD65B1730058B00B9BBC9 /* TLCollectionViewLayout.h */,
+				A85CD65C1730058B00B9BBC9 /* TLCollectionViewLayout.m */,
+				5EC7DFEE17344D8300FB3C55 /* TLCollectionViewLayoutAttributes.h */,
+				5EC7DFEF17344D8300FB3C55 /* TLCollectionViewLayoutAttributes.m */,
+			);
+			name = "Collection View Extensions";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
