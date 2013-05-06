@@ -199,6 +199,8 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     CGFloat viewHeight = attributes.size.height;
     CGFloat minuteAdjustment = attributes.size.height * (CGFloat)(currentMinute / 60);
     
+    //TODO: Snap to events while hour line is over an event: https://github.com/TeehanLax/Upcoming/issues/28
+    
     const CGFloat height = 20.0f;
     
     return CGRectMake(0, attributes.frame.origin.y + minuteAdjustment + (viewHeight - height) / 2.0f, CGRectGetWidth(self.view.bounds), height);
