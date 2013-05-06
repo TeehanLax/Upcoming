@@ -109,7 +109,10 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
                 [AppDelegate playTouchDownSound];
                 [self.delegate userDidInteractWithDayListView:self updateTimeHour:hour minute:minute event:event];
             }
-        } completion:nil];
+            [NSTimer scheduledTimerWithTimeInterval:0.1 target:self.collectionView.collectionViewLayout selector:@selector(invalidateLayout) userInfo:nil repeats:3];
+        } completion:^(BOOL finished) {
+            [self.collectionView.collectionViewLayout invalidateLayout];
+        }];
     } else if (recognizer.state == UIGestureRecognizerStateChanged) {
         [self.collectionView.collectionViewLayout invalidateLayout];
         
@@ -140,7 +143,10 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
             self.touch = NO;
             [self.delegate userDidEndInteractingWithDayListViewController:self];
             [AppDelegate playTouchUpSound];
-        } completion:nil];
+            [NSTimer scheduledTimerWithTimeInterval:0.1 target:self.collectionView.collectionViewLayout selector:@selector(invalidateLayout) userInfo:nil repeats:3];
+        } completion:^(BOOL finished) {
+            [self.collectionView.collectionViewLayout invalidateLayout];
+        }];
     }
 }
 
@@ -156,6 +162,14 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     TLEventViewCell *cell = (TLEventViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
+    
+    // position sampled background image
+    CGFloat yDistance = cell.maxY - cell.minY;
+    CGFloat yDelta = cell.frame.origin.y - cell.minY;
+    
+    CGRect backgroundImageFrame = cell.backgroundImage.frame;
+    backgroundImageFrame.origin.y = (cell.frame.size.height - backgroundImageFrame.size.height) * (yDelta / yDistance);
+    cell.backgroundImage.frame = backgroundImageFrame;
     
     if (!self.touch) {
         // default size
@@ -189,14 +203,6 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
         cell.contentView.alpha = delta;
     }
     cell.titleLabel.alpha = delta;
-    
-    // position sampled background image
-    CGFloat yDistance = cell.maxY - cell.minY;
-    CGFloat yDelta = cell.frame.origin.y - cell.minY;
-    
-    CGRect backgroundImageFrame = cell.backgroundImage.frame;
-    backgroundImageFrame.origin.y = (cell.frame.size.height - backgroundImageFrame.size.height) * (yDelta / yDistance);
-    cell.backgroundImage.frame = backgroundImageFrame;
     
     if (size > MAX_ROW_HEIGHT) size = MAX_ROW_HEIGHT;
     if (size < minSize) size = minSize;
