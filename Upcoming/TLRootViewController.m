@@ -49,7 +49,6 @@
 
 // We have to use #define's here to get the compiler to expand these macros
 #define kMaximumHeaderTranslationThreshold (CGRectGetHeight(self.view.bounds))
-#define kMaximumHeaderTranslationBeforeTakeover (CGRectGetHeight(self.view.bounds) * 0.66f)
 #define kMaximumFooterTranslationThreshold (-CGRectGetMidY(self.view.bounds)/4.0f - CGRectGetHeight(self.footerViewController.view.bounds) / 2.0f)
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -354,20 +353,7 @@
         }
         else if (state == UIGestureRecognizerStateChanged)
         {
-            if (translation.y > kMaximumHeaderTranslationBeforeTakeover)
-            {
-                [recognizer setEnabled:NO];
-                [recognizer setEnabled:YES];
-                [UIView animateWithDuration:0.2f animations:^{
-                    [self.headerPanSubject sendNext:@(kMaximumHeaderTranslationThreshold)];
-                } completion:^(BOOL finished) {
-                    [self.headerFinishedTransitionSubject sendNext:@(YES)];
-                }];
-            }
-            else
-            {
-                [self.headerPanSubject sendNext:@(translation.y)];
-            }
+            [self.headerPanSubject sendNext:@(translation.y)];
         }
         else if (state == UIGestureRecognizerStateEnded)
         {
