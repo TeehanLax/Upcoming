@@ -38,19 +38,19 @@
     NSString *platform = [NSString stringWithCString:machine encoding:NSUTF8StringEncoding];
     free(machine);
     
-    if ([platform hasPrefix:@"iPhone2"] || [platform hasPrefix:@"iPod2"])
+    if ([platform hasPrefix:@"iPhone2"] || [platform hasPrefix:@"iPod2"] || [platform hasPrefix:@"iPod3"])
     {
         _device = TLAppDelegateDeviceIPhone3GS;
     }
-    else if ([platform hasPrefix:@"iPhone3"] || [platform hasPrefix:@"iPod3"])
+    else if ([platform hasPrefix:@"iPhone3"] || [platform hasPrefix:@"iPod4"])
     {
         _device = TLAppDelegateDeviceIPhone4;
     }
-    else if ([platform hasPrefix:@"iPhone4"] || [platform hasPrefix:@"iPod4"])
+    else if ([platform hasPrefix:@"iPhone4"] || [platform hasPrefix:@"iPod5"])
     {
         _device = TLAppDelegateDeviceIPhone4S;
     }
-    else if ([platform hasPrefix:@"iPhone5"] || [platform hasPrefix:@"iPod5"])
+    else if ([platform hasPrefix:@"iPhone5"])
     {
         _device = TLAppDelegateDeviceIPhone5;
     }
