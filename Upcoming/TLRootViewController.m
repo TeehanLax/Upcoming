@@ -15,6 +15,7 @@
 #import "EKEventManager.h"
 
 #import <BlocksKit.h>
+#import <ReactiveCocoaLayout.h>
 
 @interface TLRootViewController ()
 
@@ -94,7 +95,7 @@
                                                  {
                                                      NSCalendar *calendar = [NSCalendar currentCalendar];
                                                      NSDateComponents *components = [calendar components:NSHourCalendarUnit fromDate:nextEvent.startDate];
-                                                     if (components.hour < 12)// && !nextEvent.isAllDay)
+                                                     if (components.hour < 12 && !nextEvent.isAllDay)
                                                      {
                                                          return nextEvent;
                                                      }
@@ -252,7 +253,7 @@
                                          }];
     
     // Need to combine latest on the two signals since the footer moves with both
-    RACSignal *footerFrameSignal = [[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)], [nextApplicableEventSignal startWith:nil]]
+    RACSignal *footerFrameSignal = [[[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)], [nextApplicableEventSignal startWith:nil]]
                                                       reduce:^id(NSNumber *headerRatio, NSNumber *footerRatio, EKEvent *nextEvent){
                                                           NSLog(@"EVENT: %@", nextEvent);
                                                           if (headerRatio.floatValue > 0) return @(-headerRatio.floatValue);
@@ -272,7 +273,7 @@
                                         CGRect footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight + ratio * targetTranslation, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);
                                         
                                         return [NSValue valueWithCGRect:footerFrame];
-                                    }];
+                                    }] animateWithDuration:0.1f];
     
     RAC(self.footerViewController.view.frame) = footerFrameSignal;
     
