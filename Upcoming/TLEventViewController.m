@@ -63,9 +63,6 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
         @strongify(self);
         [self updateBackgroundGradient];
     }];
-        
-    self.backgroundGradientView = [[TLBackgroundGradientView alloc] initWithFrame:self.view.bounds];
-    [self.view insertSubview:self.backgroundGradientView atIndex:0];
 }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -78,6 +75,12 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     TLCollectionViewLayout *layout = [[TLCollectionViewLayout alloc] init];
     
     [self.collectionView setCollectionViewLayout:layout animated:animated];
+    
+    if (!self.backgroundGradientView)
+    {
+        self.backgroundGradientView = [[TLBackgroundGradientView alloc] initWithFrame:self.view.bounds];
+        [self.view insertSubview:self.backgroundGradientView atIndex:0];
+    }
 }
 
 - (void)touchDownHandler:(TLTouchDownGestureRecognizer *)recognizer {
