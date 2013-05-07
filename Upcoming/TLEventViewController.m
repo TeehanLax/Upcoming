@@ -17,12 +17,17 @@
 static NSString *kCellIdentifier = @"Cell";
 static NSString *kSupplementaryViewIdentifier = @"HourView";
 
+enum {
+    kBackgroundSection = 0,
+    kEventSection,
+    kNumberOfSections
+};
+
 @interface TLEventViewController ()
 
 @property (nonatomic, assign) CGPoint location;
 @property (nonatomic, assign) BOOL touch;
 @property (nonatomic, strong) TLBackgroundGradientView *backgroundGradientView;
-@property (nonatomic, strong) NSMutableSet *activeCells;
 
 @property (nonatomic, strong) NSIndexPath *indexPathUnderFinger;
 @property (nonatomic, strong) EKEvent *eventUnderFinger;
@@ -34,16 +39,20 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
 
 @implementation TLEventViewController
 
+#pragma mark - View Lifecycle Methods
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
     EKEventManager *eventManager = [EKEventManager sharedInstance];
-    [eventManager addObserver:self forKeyPath:EKEventManagerEventsKeyPath options:NSKeyValueObservingOptionInitial|NSKeyValueObservingOptionNew context:nil];
     
-    self.touch = NO;
+    RACSignal *newEventsSignal = [RACAbleWithStart(eventManager, events) deliverOn:[RACScheduler mainThreadScheduler]];
     
-    self.activeCells = [[NSMutableSet alloc] initWithCapacity:0];
+    [newEventsSignal subscribeNext:^(NSArray *events) {
+        [self.collectionView reloadData];
+        [self.collectionView.collectionViewLayout invalidateLayout];
+    }];
     
     [self.collectionView registerNib:[UINib nibWithNibName:@"TLEventViewCell" bundle:nil] forCellWithReuseIdentifier:kCellIdentifier];
     [self.collectionView registerClass:[TLHourSupplementaryView class] forSupplementaryViewOfKind:[TLHourSupplementaryView kind] withReuseIdentifier:kSupplementaryViewIdentifier];
@@ -78,6 +87,8 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
         [self.view insertSubview:self.backgroundGradientView atIndex:0];
     }
 }
+
+#pragma mark - Gesture Recognizer Methods
 
 - (void)touchDownHandler:(TLTouchDownGestureRecognizer *)recognizer {
     self.location = [recognizer locationInView:recognizer.view];
@@ -146,17 +157,7 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     }
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    if ([keyPath isEqualToString:EKEventManagerEventsKeyPath]) {
-        NSLog(@"GOT %d EVENTS", [[EKEventManager sharedInstance].events count]);
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.activeCells removeAllObjects];
-            [self.collectionView reloadData];
-            [self.collectionView.collectionViewLayout invalidateLayout];
-        });
-    }
-}
+#pragma mark - TLCollectionViewLayoutDelegate Methods
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     TLEventViewCell *cell = (TLEventViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
@@ -169,12 +170,14 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     backgroundImageFrame.origin.y = (cell.frame.size.height - backgroundImageFrame.size.height) * (yDelta / yDistance);
     cell.backgroundImage.frame = backgroundImageFrame;
     
+    //TODO: Necessary to use same cell background view? Much simpler if we use a different view. 
+    
     if (!self.touch) {
         // default size
-        [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState animations:^{
-            if (![self.activeCells containsObject:[NSNumber numberWithInt:indexPath.row]]) {
+        [UIView animateWithDuration:0.3 delay:0
+                            options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState
+                         animations:^{
                 cell.contentView.alpha = 0;
-            }
             cell.titleLabel.alpha = 0;
         } completion:nil];
         return CGSizeMake(320, collectionView.frame.size.height / NUMBER_OF_ROWS);
@@ -197,9 +200,7 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     
     CGFloat size = (minSize + MAX_ROW_HEIGHT) * delta;
     
-    if (![self.activeCells containsObject:[NSNumber numberWithInt:indexPath.row]]) {
-        cell.contentView.alpha = delta;
-    }
+    cell.contentView.alpha = delta;
     cell.titleLabel.alpha = delta;
     
     if (size > MAX_ROW_HEIGHT) size = MAX_ROW_HEIGHT;
@@ -235,28 +236,35 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     return 0.5f;
 }
 
+#pragma mark - UICollectionViewDataSource Methods
+
+-(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
+    return kNumberOfSections;
+}
+
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return NUMBER_OF_ROWS;
+    if (section == kEventSection)
+    {
+        //TODO: No events for now
+        return 0;
+    }
+    else
+    {
+        return NUMBER_OF_ROWS;
+    }
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     TLEventViewCell *cell = (TLEventViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:kCellIdentifier forIndexPath:indexPath];
     
-    cell.backgroundColor = [UIColor clearColor];
-    cell.contentView.backgroundColor = [UIColor clearColor];
-    cell.contentView.alpha = 0;
-    
-    for (EKEvent *event in [EKEventManager sharedInstance].events) {
-        NSCalendar *calendar = [NSCalendar currentCalendar];
-        NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:event.startDate];
-        NSInteger hour = [components hour];
-        if (hour == indexPath.row) {
-            [self.activeCells addObject:[NSNumber numberWithInt:indexPath.row]];
-            cell.contentView.alpha = 1;
-            cell.titleLabel.text = event.title;
-        }
+    if (indexPath.section == kEventSection)
+    {
+        [self configureEventCell:cell forIndexPath:indexPath];
     }
-    [cell setNeedsDisplay];
+    else
+    {
+        [self configureBackgroundCell:cell forIndexPath:indexPath];
+    }
     
     return cell;
 }
@@ -306,8 +314,8 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
 }
 
 #pragma mark - Private Methods
--(void)updateBackgroundGradient
-{
+
+-(void)updateBackgroundGradient {
     NSArray *events = [[EKEventManager sharedInstance] events];
     
     CGFloat soonestEvent = NSIntegerMax;
@@ -360,19 +368,34 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
 {
     EKEvent *eventUnderTouch;
     NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:point];
-    if ([self.activeCells containsObject:@(indexPath.row)])
-    {
-        for (EKEvent *event in [EKEventManager sharedInstance].events) {
-            NSCalendar *calendar = [NSCalendar currentCalendar];
-            NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:event.startDate];
-            NSInteger hour = [components hour];
-            if (hour == indexPath.row) {
-                eventUnderTouch = event;
-            }
+    for (EKEvent *event in [EKEventManager sharedInstance].events) {
+        NSCalendar *calendar = [NSCalendar currentCalendar];
+        NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:event.startDate];
+        NSInteger hour = [components hour];
+        if (hour == indexPath.row) {
+            eventUnderTouch = event;
         }
     }
     
     return eventUnderTouch;
+}
+
+#pragma mark - Private Methods
+
+-(void)configureEventCell:(TLEventViewCell *)cell forIndexPath:(NSIndexPath *)indexPath{
+    
+    for (EKEvent *event in [EKEventManager sharedInstance].events) {
+        NSCalendar *calendar = [NSCalendar currentCalendar];
+        NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:event.startDate];
+        NSInteger hour = [components hour];
+        if (hour == indexPath.row) {
+            cell.contentView.alpha = 1;
+            cell.titleLabel.text = event.title;
+        }
+    }
+}
+
+-(void)configureBackgroundCell:(TLEventViewCell *)cell forIndexPath:(NSIndexPath *)indexPath{
 }
 
 @end
