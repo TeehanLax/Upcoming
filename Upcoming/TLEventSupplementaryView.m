@@ -8,6 +8,13 @@
 
 #import "TLEventSupplementaryView.h"
 
+@interface TLEventSupplementaryView ()
+
+@property (nonatomic, strong) UILabel *timeLabel;
+@property (nonatomic, strong) UILabel *titleLabel;
+
+@end
+
 @implementation TLEventSupplementaryView
 
 - (id)initWithFrame:(CGRect)frame
@@ -16,6 +23,20 @@
     
     self.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.4f];
     
+    self.timeLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    self.timeLabel.font = [[UIFont tl_appFont] fontWithSize:14];
+    self.timeLabel.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+    self.timeLabel.backgroundColor = [UIColor clearColor];
+    self.timeLabel.textColor = [UIColor colorFromRGB:0x999999];
+    [self addSubview:self.timeLabel];
+    
+    self.titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    self.titleLabel.font = [[UIFont tl_appFont] fontWithSize:14];
+    self.titleLabel.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+    self.titleLabel.backgroundColor = [UIColor clearColor];
+    self.titleLabel.textColor = [UIColor colorFromRGB:0x444444];
+    [self addSubview:self.titleLabel];
+    
     return self;
 }
 
@@ -23,13 +44,31 @@
     return NSStringFromClass(self);
 }
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
+-(void)setTimeString:(NSString *)timeString
 {
-    // Drawing code
+    _timeString = timeString;
+    self.timeLabel.text = timeString;
+    [self setNeedsDisplay];
+    [self setNeedsLayout];
 }
-*/
+
+-(void)setTitleString:(NSString *)titleString
+{
+    _titleString = titleString;
+    self.titleLabel.text = titleString;
+    [self setNeedsDisplay];
+    [self setNeedsLayout];
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    self.timeLabel.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+    self.titleLabel.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+}
+
+- (void)drawRect:(CGRect)rect {
+    
+}
 
 @end
