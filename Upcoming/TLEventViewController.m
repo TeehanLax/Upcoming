@@ -9,44 +9,138 @@
 #import "TLEventViewController.h"
 #import "TLBackgroundGradientView.h"
 #import "EKEventManager.h"
-#import "TLEventViewCell.h"
+#import "TLHourCell.h"
 #import "TLAppDelegate.h"
 #import "TLRootViewController.h"
 #import "TLHourSupplementaryView.h"
+#import "TLEventSupplementaryView.h"
+#import "TLEventViewModel.h"
 
 static NSString *kCellIdentifier = @"Cell";
-static NSString *kSupplementaryViewIdentifier = @"HourView";
+static NSString *kHourSupplementaryViewIdentifier = @"HourView";
+static NSString *kEventSupplementaryViewIdentifier = @"EventView";
+
 
 @interface TLEventViewController ()
 
 @property (nonatomic, assign) CGPoint location;
 @property (nonatomic, assign) BOOL touch;
 @property (nonatomic, strong) TLBackgroundGradientView *backgroundGradientView;
-@property (nonatomic, strong) NSMutableSet *activeCells;
 
 @property (nonatomic, strong) NSIndexPath *indexPathUnderFinger;
 @property (nonatomic, strong) EKEvent *eventUnderFinger;
 
+@property (nonatomic, strong) NSArray *viewModelArray;
+
 // Not completely OK to keep this around, but we can guarantee we only ever want one on screen, so it's OK. 
-@property (nonatomic, strong) TLHourSupplementaryView *supplementaryView;
+@property (nonatomic, strong) TLHourSupplementaryView *hourSupplementaryView;
 
 @end
 
 @implementation TLEventViewController
+
+#pragma mark - View Lifecycle Methods
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
     EKEventManager *eventManager = [EKEventManager sharedInstance];
-    [eventManager addObserver:self forKeyPath:EKEventManagerEventsKeyPath options:NSKeyValueObservingOptionInitial|NSKeyValueObservingOptionNew context:nil];
     
-    self.touch = NO;
+    RACSignal *newEventsSignal = [RACAbleWithStart(eventManager, events) deliverOn:[RACScheduler mainThreadScheduler]];
     
-    self.activeCells = [[NSMutableSet alloc] initWithCapacity:0];
+    RAC(self.viewModelArray) = [[[newEventsSignal distinctUntilChanged] map:^id(NSArray *eventsArray) {
+        // First, sort the array first by size then by start time.
+        
+        NSArray *sortedArray = [eventsArray sortedArrayUsingComparator:^NSComparisonResult(EKEvent *obj1, EKEvent *obj2) {
+            NSTimeInterval interval1 = [obj1.endDate timeIntervalSinceDate:obj1.startDate];
+            NSTimeInterval interval2 = [obj2.endDate timeIntervalSinceDate:obj2.startDate];
+            
+            if (interval1 > interval2) {
+                return NSOrderedAscending;
+            }
+            else if (interval1 < interval2) {
+                return NSOrderedDescending;
+            }
+            else
+            {
+                if ([obj1.startDate isEarlierThanDate:obj2.startDate]) {
+                    return NSOrderedAscending;
+                }
+                else if ([obj1.startDate isLaterThanDate:obj2.startDate]) {
+                    return NSOrderedDescending;
+                }
+                else {
+                    return NSOrderedSame;
+                }
+            }
+        }];
+        
+        return sortedArray;
+        
+        // Then, create an array of TLEventViewModel objects based on that array.
+    }] map:^id(NSArray *sortedEventArray) {
+        NSMutableArray *mutableArray = [NSMutableArray arrayWithCapacity:sortedEventArray.count];
+        
+        //TODO: Construct array based on event array.
+        
+        for (EKEvent *event in sortedEventArray)
+        {
+            // Exclude all-day events
+            if (event.isAllDay) continue;
+            
+            // Create our view model.
+            TLEventViewModel *viewModel = [TLEventViewModel new];
+            viewModel.event = event;
+            viewModel.eventSpan = TLEventViewModelEventSpanFull;
+            
+            // Now determine if we're overlapping an existing event.
+            // Note: this isn't that efficient, but our data sets are small enough to warrant an n^2 algorithm.
+            for (TLEventViewModel *otherModel in mutableArray) {
+                BOOL overlaps =
+                ([viewModel.event.endDate isLaterThanDate:otherModel.event.startDate] && [viewModel.event.startDate isEarlierThanDate:otherModel.event.startDate]) ||
+                ([viewModel.event.startDate isEarlierThanDate:otherModel.event.endDate] && [viewModel.event.endDate isLaterThanDate:otherModel.event.endDate]) ||
+                ([viewModel.event.startDate isLaterThanDate:otherModel.event.startDate] && [viewModel.event.endDate isEarlierThanDate:otherModel.event.endDate]) ||
+                ([viewModel.event.startDate isEarlierThanDate:otherModel.event.startDate] && [viewModel.event.endDate isLaterThanDate:otherModel.event.endDate]);
+                
+                if (overlaps) {
+                    if (otherModel.eventSpan == TLEventViewModelEventSpanTooManyWarning) {
+                        otherModel.extraEventsCount++;
+                        viewModel = nil;
+                    }
+                    else if (otherModel.eventSpan == TLEventViewModelEventSpanRight) {
+                        otherModel.eventSpan = TLEventViewModelEventSpanTooManyWarning;
+                        otherModel.extraEventsCount = 2;
+                    }
+                    else if (otherModel.eventSpan == TLEventViewModelEventSpanLeft) {
+                        viewModel.eventSpan = TLEventViewModelEventSpanRight;
+                    }
+                    else if (otherModel.eventSpan == TLEventViewModelEventSpanFull)
+                    {
+                        otherModel.eventSpan = TLEventViewModelEventSpanLeft;
+                        viewModel.eventSpan = TLEventViewModelEventSpanRight;
+                    }
+                }
+            }
+            
+            if (viewModel) {
+                [mutableArray addObject:viewModel];
+            }
+        }
+        
+        NSLog(@"Constructed array of %d events. ", mutableArray.count);
+        
+        return mutableArray;
+    }];
     
-    [self.collectionView registerNib:[UINib nibWithNibName:@"TLEventViewCell" bundle:nil] forCellWithReuseIdentifier:kCellIdentifier];
-    [self.collectionView registerClass:[TLHourSupplementaryView class] forSupplementaryViewOfKind:[TLHourSupplementaryView kind] withReuseIdentifier:kSupplementaryViewIdentifier];
+    [RACAble(self.viewModelArray) subscribeNext:^(id x) {
+        [self.collectionView reloadData];
+        [self.collectionView.collectionViewLayout invalidateLayout];
+    }];
+    
+    [self.collectionView registerNib:[UINib nibWithNibName:@"TLHourCell" bundle:nil] forCellWithReuseIdentifier:kCellIdentifier];
+    [self.collectionView registerClass:[TLEventSupplementaryView class] forSupplementaryViewOfKind:[TLEventSupplementaryView kind] withReuseIdentifier:kEventSupplementaryViewIdentifier];
+    [self.collectionView registerClass:[TLHourSupplementaryView class] forSupplementaryViewOfKind:[TLHourSupplementaryView kind] withReuseIdentifier:kHourSupplementaryViewIdentifier];
     
     self.touchDown = [[TLTouchDownGestureRecognizer alloc] initWithTarget:self action:@selector(touchDownHandler:)];
     self.touchDown.cancelsTouchesInView = NO;
@@ -79,6 +173,8 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     }
 }
 
+#pragma mark - Gesture Recognizer Methods
+
 - (void)touchDownHandler:(TLTouchDownGestureRecognizer *)recognizer {
     self.location = [recognizer locationInView:recognizer.view];
     
@@ -105,7 +201,15 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
                 [AppDelegate playTouchDownSound];
                 [self.delegate userDidInteractWithDayListView:self updateTimeHour:hour minute:minute event:event];
             }
-            [NSTimer scheduledTimerWithTimeInterval:0.1 target:self.collectionView.collectionViewLayout selector:@selector(invalidateLayout) userInfo:nil repeats:3];
+            
+            for (NSInteger i = 0; i < 3; i++)
+            {
+                double delayInSeconds = i * 0.1;
+                dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+                dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                    [self.collectionView.collectionViewLayout invalidateLayout];
+                });
+            }
         } completion:^(BOOL finished) {
             [self.collectionView.collectionViewLayout invalidateLayout];
         }];
@@ -139,27 +243,25 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
             self.touch = NO;
             [self.delegate userDidEndInteractingWithDayListViewController:self];
             [AppDelegate playTouchUpSound];
-            [NSTimer scheduledTimerWithTimeInterval:0.1 target:self.collectionView.collectionViewLayout selector:@selector(invalidateLayout) userInfo:nil repeats:3];
+            
+            for (NSInteger i = 0; i < 3; i++)
+            {
+                double delayInSeconds = i * 0.1;
+                dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+                dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                    [self.collectionView.collectionViewLayout invalidateLayout];
+                });
+            }
         } completion:^(BOOL finished) {
             [self.collectionView.collectionViewLayout invalidateLayout];
         }];
     }
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    if ([keyPath isEqualToString:EKEventManagerEventsKeyPath]) {
-        NSLog(@"GOT %d EVENTS", [[EKEventManager sharedInstance].events count]);
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.activeCells removeAllObjects];
-            [self.collectionView reloadData];
-            [self.collectionView.collectionViewLayout invalidateLayout];
-        });
-    }
-}
+#pragma mark - TLCollectionViewLayoutDelegate Methods
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    TLEventViewCell *cell = (TLEventViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
+    TLHourCell *cell = (TLHourCell *)[collectionView cellForItemAtIndexPath:indexPath];
     
     // position sampled background image
     CGFloat yDistance = cell.maxY - cell.minY;
@@ -171,25 +273,26 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     
     if (!self.touch) {
         // default size
-        [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState animations:^{
-            if (![self.activeCells containsObject:[NSNumber numberWithInt:indexPath.row]]) {
-                cell.contentView.alpha = 0;
-            }
-            cell.titleLabel.alpha = 0;
-        } completion:nil];
-        return CGSizeMake(320, collectionView.frame.size.height / NUMBER_OF_ROWS);
+        [UIView animateWithDuration:0.3 delay:0
+                            options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState
+                         animations:^{
+                             cell.contentView.alpha = 0;
+                         } completion:nil];
+        return CGSizeMake(CGRectGetWidth(self.view.bounds), collectionView.frame.size.height / NUMBER_OF_ROWS);
     }
     
     CGFloat minSize = (collectionView.frame.size.height - (MAX_ROW_HEIGHT * EXPANDED_ROWS)) / 20;
     
     CGFloat dayLocation = (self.location.y / self.collectionView.frame.size.height) * 24;
     
-    CGFloat diff = dayLocation - (float)indexPath.row;
+    CGFloat effectiveHour = indexPath.row;;
+    
+    CGFloat diff = dayLocation - effectiveHour;
     
     // prevent reducing size of min / max rows
-    if (indexPath.row < EXPANDED_ROWS) {
+    if (effectiveHour < EXPANDED_ROWS) {
         if (diff < 0) diff = 0;
-    } else if (indexPath.row > NUMBER_OF_ROWS - EXPANDED_ROWS - 1) {
+    } else if (effectiveHour > NUMBER_OF_ROWS - EXPANDED_ROWS - 1) {
         if (diff > 0) diff = 0;
     }
     
@@ -197,15 +300,12 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     
     CGFloat size = (minSize + MAX_ROW_HEIGHT) * delta;
     
-    if (![self.activeCells containsObject:[NSNumber numberWithInt:indexPath.row]]) {
-        cell.contentView.alpha = delta;
-    }
-    cell.titleLabel.alpha = delta;
+    cell.contentView.alpha = delta;
     
     if (size > MAX_ROW_HEIGHT) size = MAX_ROW_HEIGHT;
     if (size < minSize) size = minSize;
     
-    return CGSizeMake(320, size);
+    return CGSizeMake(CGRectGetWidth(self.view.bounds), size);
 }
 
 -(CGRect)collectionView:(UICollectionView *)collectionView frameForHourViewInLayout:(TLCollectionViewLayout *)layout {
@@ -235,79 +335,130 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
     return 0.5f;
 }
 
+-(NSUInteger)collectionView:(UICollectionView *)collectionView numberOfEventSupplementaryViewsInLayout:(TLCollectionViewLayout *)layout {
+    return self.viewModelArray.count;
+}
+
+-(CGRect)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout frameForEventSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath
+{
+    TLEventViewModel *model = self.viewModelArray[indexPath.row];
+    
+    CGFloat startY = 0;
+    CGFloat endY = 0;
+    CGFloat x;
+    CGFloat width = CGRectGetWidth(self.view.bounds);
+    
+    // Grab the date components from the startDate and use the to find the hour and minutes of the event
+    NSCalendar *currentCalendar = [NSCalendar currentCalendar];
+    NSDateComponents *components = [currentCalendar components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
+    NSInteger hour = components.hour;
+    
+    // Use the collection view's calculations for the hour cell representing the start hour, and adjust based on minutes if necessary
+    UICollectionViewLayoutAttributes *startHourAttributes = [self.collectionView layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:hour inSection:0]];
+    startY = CGRectGetMinY(startHourAttributes.frame);
+    if (components.minute >= 30) {
+        startY += CGRectGetHeight(startHourAttributes.frame) / 2.0f;
+    }
+    
+    // Now grab the components of the end hour ...
+    components = [currentCalendar components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.endDate];
+    hour = components.hour;
+    
+    // And do the same calculation for the max Y. 
+    UICollectionViewLayoutAttributes *endHourAttributes = [self.collectionView layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:hour inSection:0]];
+    endY = CGRectGetMinY(endHourAttributes.frame);
+    if (components.minute >= 30)
+    {
+        endY += CGRectGetHeight(endHourAttributes.frame) / 2.0f;
+    }
+    
+    // Finally, we need to calculate the X value and the width of the supplementary view. 
+    if (model.eventSpan == TLEventViewModelEventSpanFull ||  model.eventSpan == TLEventViewModelEventSpanLeft) {
+        x = 0;
+    }
+    else // implicitly, this is true: (model.eventSpan == TLEventViewModelEventSpanRight || model.eventSpan == TLEventViewModelEventSpanTooManyWarning)
+    {
+        x = CGRectGetMidX(self.view.bounds) + 1;
+    }
+    
+    // All other event spans are half the horizontal size. 
+    if (model.eventSpan != TLEventViewModelEventSpanFull)
+    {
+        width /= 2.0f;
+    }
+    
+    return CGRectMake(x, startY, width, endY - startY);
+}
+
+#pragma mark - UICollectionViewDataSource Methods
+
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     return NUMBER_OF_ROWS;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    TLEventViewCell *cell = (TLEventViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:kCellIdentifier forIndexPath:indexPath];
+    TLHourCell *cell = (TLHourCell *)[collectionView dequeueReusableCellWithReuseIdentifier:kCellIdentifier forIndexPath:indexPath];
     
-    cell.backgroundColor = [UIColor clearColor];
-    cell.contentView.backgroundColor = [UIColor clearColor];
-    cell.contentView.alpha = 0;
-    
-    for (EKEvent *event in [EKEventManager sharedInstance].events) {
-        NSCalendar *calendar = [NSCalendar currentCalendar];
-        NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:event.startDate];
-        NSInteger hour = [components hour];
-        if (hour == indexPath.row) {
-            [self.activeCells addObject:[NSNumber numberWithInt:indexPath.row]];
-            cell.contentView.alpha = 1;
-            cell.titleLabel.text = event.title;
-        }
-    }
-    [cell setNeedsDisplay];
+    [self configureBackgroundCell:cell forIndexPath:indexPath];
     
     return cell;
 }
 
 -(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
-    // We only ever have one supplementary view. 
-    if (!self.supplementaryView)
+    if ([kind isEqualToString:[TLHourSupplementaryView kind]])
     {
-        self.supplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kSupplementaryViewIdentifier forIndexPath:indexPath];
-        
-        RACSubject *updateSubject = [RACSubject subject];
+        // We only ever have one hour supplementary view.
+        if (!self.hourSupplementaryView)
+        {
+            self.hourSupplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kHourSupplementaryViewIdentifier forIndexPath:indexPath];
+            
+            RACSubject *updateSubject = [RACSubject subject];
+            
+            NSCalendar *calendar = [NSCalendar currentCalendar];
+            NSDateComponents *components = [calendar components:NSSecondCalendarUnit fromDate:[NSDate date]];
+            
+            NSInteger delay = 60 - components.second;
+            
+            NSLog(@"Scheduling subscription every minute for supplementary view in %d seconds", delay);
+            
+            double delayInSeconds = delay;
+            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
                 
-        NSCalendar *calendar = [NSCalendar currentCalendar];
-        NSDateComponents *components = [calendar components:NSSecondCalendarUnit fromDate:[NSDate date]];
-        
-        NSInteger delay = 60 - components.second;
-        
-        NSLog(@"Scheduling subscription every minute for supplementary view in %d seconds", delay);
-        
-        double delayInSeconds = delay;
-        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                NSLog(@"Creating initial subscription for supplementary view.");
+                [updateSubject sendNext:[NSDate date]];
+                
+                [[RACSignal interval:60] subscribeNext:^(id x) {
+                    NSLog(@"Updating minute of supplementary view.");
+                    [updateSubject sendNext:x];
+                }];
+            });
             
-            NSLog(@"Creating initial subscription for supplementary view.");
-            [updateSubject sendNext:[NSDate date]];
-            
-            [[RACSignal interval:60] subscribeNext:^(id x) {
-                NSLog(@"Updating minute of supplementary view.");
-                [updateSubject sendNext:x];
+            RAC(self.hourSupplementaryView.timeString) = [updateSubject map:^id(NSDate *date) {
+                
+                NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:date];
+                
+                NSInteger hours = components.hour % 12;
+                if (hours == 0) hours = 12;
+                
+                return [NSString stringWithFormat:@"%d:%02d", hours, components.minute];
             }];
-        });
+            
+            [updateSubject sendNext:[NSDate date]];
+        }
         
-        RAC(self.supplementaryView.timeString) = [updateSubject map:^id(NSDate *date) {
-            
-            NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:date];
-            
-            NSInteger hours = components.hour % 12;
-            if (hours == 0) hours = 12;
-            
-            return [NSString stringWithFormat:@"%d:%02d", hours, components.minute];
-        }];
+        return self.hourSupplementaryView;
+    } else {
+        TLHourCell *supplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kEventSupplementaryViewIdentifier forIndexPath:indexPath];
         
-        [updateSubject sendNext:[NSDate date]];
+        return supplementaryView;
     }
-    
-    return self.supplementaryView;
 }
 
+
 #pragma mark - Private Methods
--(void)updateBackgroundGradient
-{
+
+-(void)updateBackgroundGradient {
     NSArray *events = [[EKEventManager sharedInstance] events];
     
     CGFloat soonestEvent = NSIntegerMax;
@@ -357,22 +508,25 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
 }
 
 -(EKEvent *)eventUnderPoint:(CGPoint)point
-{
+{    
     EKEvent *eventUnderTouch;
-    NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:point];
-    if ([self.activeCells containsObject:@(indexPath.row)])
-    {
-        for (EKEvent *event in [EKEventManager sharedInstance].events) {
-            NSCalendar *calendar = [NSCalendar currentCalendar];
-            NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:event.startDate];
-            NSInteger hour = [components hour];
-            if (hour == indexPath.row) {
-                eventUnderTouch = event;
-            }
+    
+    //TODO: should detect "extra events" and display that text to the user. 
+    
+    for (NSInteger i = 0; i < self.viewModelArray.count; i++) {
+        CGRect frame = [self collectionView:self.collectionView layout:(TLCollectionViewLayout *)self.collectionView.collectionViewLayout frameForEventSupplementaryViewAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
+        
+        if (CGRectContainsPoint(frame, point)) {
+            eventUnderTouch = [self.viewModelArray[i] event];
         }
     }
     
     return eventUnderTouch;
+}
+
+#pragma mark - Private Methods
+
+-(void)configureBackgroundCell:(TLHourCell *)cell forIndexPath:(NSIndexPath *)indexPath{
 }
 
 @end

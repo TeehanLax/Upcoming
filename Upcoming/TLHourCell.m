@@ -6,13 +6,19 @@
 //  Copyright (c) 2013 Teehan+Lax. All rights reserved.
 //
 
-#import "TLEventViewCell.h"
+#import "TLHourCell.h"
 #import "UIColor+CustomizedColors.h"
 #import "TLAppDelegate.h"
 #import "TLRootViewController.h"
 #import "TLEventViewController.h"
 
-@implementation TLEventViewCell
+@interface TLHourCell ()
+
+@property (nonatomic, strong) IBOutlet UILabel *titleLabel;
+
+@end
+
+@implementation TLHourCell
 
 - (void)awakeFromNib {
     self.titleLabel.clipsToBounds = NO;
@@ -22,13 +28,24 @@
     [self.background.layer setCornerRadius:3.0f];
     [self.background.layer setMasksToBounds:YES];
     
+    [self reset];
+}
+
+-(void)reset{
+    
+    self.titleLabel.text = @"";
+    self.backgroundColor = [UIColor clearColor];
+    self.contentView.backgroundColor = [UIColor clearColor];
+    self.contentView.alpha = 0;
+    
     [self setNeedsDisplay];
 }
 
 - (void)prepareForReuse {
     [super prepareForReuse];
-    self.titleLabel.text = @"";
-    [self setNeedsDisplay];
+    
+    [self reset];
+    
 }
 
 - (void)drawRect:(CGRect)rect {

@@ -43,7 +43,7 @@
 
 +(NSString *)kind
 {
-    return @"HourSupplementaryViewIdentifier";
+    return NSStringFromClass(self);
 }
 
 -(void)setTimeString:(NSString *)timeString

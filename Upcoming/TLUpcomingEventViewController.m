@@ -10,7 +10,7 @@
 #import "EKEventManager.h"
 #import "TLCalendarDotView.h"
 
-const CGFloat TLUpcomingEventViewControllerHiddenHeight = 5.0f;
+const CGFloat TLUpcomingEventViewControllerHiddenHeight = 0.0f;
 const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
 
 @interface TLUpcomingEventViewController ()
