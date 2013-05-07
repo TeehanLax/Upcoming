@@ -22,10 +22,8 @@ NSString * const EKEventManagerSourcesKeyPath = @"sources";
 
 @implementation EKEventManager
 
-- (id)init
-{
-	if (!(self = [super init]))
-	{
+- (id)init {
+	if (!(self = [super init])) {
 		return nil;
 	}
     
@@ -39,27 +37,17 @@ NSString * const EKEventManagerSourcesKeyPath = @"sources";
                                                  name:EKEventStoreChangedNotification
                                                object:_store];
 
-    if ([_store respondsToSelector:@selector(requestAccessToEntityType:completion:)]) {
-        // iOS 6+ requires explicit user approval
-        [_store requestAccessToEntityType:EKEntityTypeEvent
-                               completion:^(BOOL granted, NSError *error) {
-                                   [self willChangeValueForKey:EKEventManagerAccessibleKeyPath];
-                                   _accessible = granted;
-                                   [self didChangeValueForKey:EKEventManagerAccessibleKeyPath];
-                                   
-                                   if (_accessible) {
-                                       // load events
-                                       [self refresh];
-                                   }
-        }];
-    } else {
-        // prior to iOS 6, access is granted automatically
-        [self willChangeValueForKey:EKEventManagerAccessibleKeyPath];
-        _accessible = YES;
-        [self didChangeValueForKey:EKEventManagerAccessibleKeyPath];
-        
-        [self refresh];
-    }
+    [_store requestAccessToEntityType:EKEntityTypeEvent
+                           completion:^(BOOL granted, NSError *error) {
+                               [self willChangeValueForKey:EKEventManagerAccessibleKeyPath];
+                               _accessible = granted;
+                               [self didChangeValueForKey:EKEventManagerAccessibleKeyPath];
+                               
+                               if (_accessible) {
+                                   // load events
+                                   [self refresh];
+                               }
+                           }];
 	
 	return self;
 }
@@ -108,8 +96,7 @@ NSString * const EKEventManagerSourcesKeyPath = @"sources";
     BOOL hasCalendars = NO;
     NSUserDefaults *currentDefaults = [NSUserDefaults standardUserDefaults];
     NSData *dataRepresentingSavedArray = [currentDefaults objectForKey:@"SelectedCalendars"];
-    if (dataRepresentingSavedArray != nil)
-    {
+    if (dataRepresentingSavedArray != nil) {
         NSArray *oldSavedArray = [NSKeyedUnarchiver unarchiveObjectWithData:dataRepresentingSavedArray];
         if (oldSavedArray != nil) {
             [_selectedCalendars addObjectsFromArray:oldSavedArray];
@@ -117,14 +104,14 @@ NSString * const EKEventManagerSourcesKeyPath = @"sources";
         }
     }
     
-    for (EKSource *source in [EKEventManager sharedInstance].store.sources)
-    {
-        if ([source.calendars count] > 0) {
+    for (EKSource *source in [EKEventManager sharedInstance].store.sources) {
+        NSSet *calendars = [source calendarsForEntityType:EKEntityTypeEvent];
+        if ([calendars count] > 0) {
             [_sources addObject:source];
             if (!hasCalendars) {
                 // load defaults
-                NSArray *calendars = [source.calendars allObjects];
-                for (EKCalendar *calendar in calendars) {
+                NSArray *calendarArray = [calendars allObjects];
+                for (EKCalendar *calendar in calendarArray) {
                     if (![_selectedCalendars containsObject:calendar.calendarIdentifier]) {
                         [_selectedCalendars addObject:calendar.calendarIdentifier];
                     }
@@ -141,6 +128,9 @@ NSString * const EKEventManagerSourcesKeyPath = @"sources";
 }
 
 - (void)loadEvents {
+    [self willChangeValueForKey:EKEventManagerEventsKeyPath];
+    [self willChangeValueForKey:EKEventManagerNextEventKeyPath];
+    
     [_events removeAllObjects];
     _nextEvent = nil;
     
@@ -195,7 +185,6 @@ NSString * const EKEventManagerSourcesKeyPath = @"sources";
                                                            calendars:calendars];
     
     // get today's events
-    [self willChangeValueForKey:EKEventManagerEventsKeyPath];
     _events = [NSMutableArray arrayWithArray:[_store eventsMatchingPredicate:predicate]];
     [_events sortUsingSelector:@selector(compareStartDateWithEvent:)];
     [self didChangeValueForKey:EKEventManagerEventsKeyPath];
@@ -216,7 +205,6 @@ NSString * const EKEventManagerSourcesKeyPath = @"sources";
         [nextEvents sortUsingSelector:@selector(compareStartDateWithEvent:)];
         
         if ([nextEvents count] > 0) {
-            [self willChangeValueForKey:EKEventManagerNextEventKeyPath];
             _nextEvent = nextEvents[0];
             [self didChangeValueForKey:EKEventManagerNextEventKeyPath];
         }

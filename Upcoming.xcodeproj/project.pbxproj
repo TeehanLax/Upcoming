@@ -58,7 +58,6 @@
 		A85CD65D1730058B00B9BBC9 /* TLCollectionViewLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = A85CD65C1730058B00B9BBC9 /* TLCollectionViewLayout.m */; };
 		A85CD66317305C9600B9BBC9 /* TLEventViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A85CD66217305C9600B9BBC9 /* TLEventViewCell.m */; };
 		A85CD66517305D7400B9BBC9 /* TLEventViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A85CD66417305D7400B9BBC9 /* TLEventViewCell.xib */; };
-		A85CD6671730605E00B9BBC9 /* event-row-bg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A85CD6661730605E00B9BBC9 /* event-row-bg@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -136,7 +135,6 @@
 		A85CD66117305C9600B9BBC9 /* TLEventViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLEventViewCell.h; sourceTree = "<group>"; };
 		A85CD66217305C9600B9BBC9 /* TLEventViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLEventViewCell.m; sourceTree = "<group>"; };
 		A85CD66417305D7400B9BBC9 /* TLEventViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLEventViewCell.xib; sourceTree = "<group>"; };
-		A85CD6661730605E00B9BBC9 /* event-row-bg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "event-row-bg@2x.png"; path = "Images/event-row-bg@2x.png"; sourceTree = "<group>"; };
 		CB35EE43CD0E4DBFBCC0B9D3 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -168,7 +166,6 @@
 				5EC7DFF117381B1A00FB3C55 /* logo@2x.png */,
 				5EC7DFF317381B7300FB3C55 /* logo.png */,
 				5E18D2FE172FFF560010F8FF /* location@2x.png */,
-				A85CD6661730605E00B9BBC9 /* event-row-bg@2x.png */,
 				5E18D2FA172EEA6B0010F8FF /* upcomingEventBackground@2x.png */,
 				5E18D2B0172B03F60010F8FF /* checkmark@2x.png */,
 				5E18D2B2172B03F60010F8FF /* inner-shadow@2x.png */,
@@ -390,7 +387,6 @@
 				5E18D2FF172FFF560010F8FF /* location@2x.png in Resources */,
 				5E18D309173170970010F8FF /* soundeffect.wav in Resources */,
 				A85CD66517305D7400B9BBC9 /* TLEventViewCell.xib in Resources */,
-				A85CD6671730605E00B9BBC9 /* event-row-bg@2x.png in Resources */,
 				5EC7DFF217381B1A00FB3C55 /* logo@2x.png in Resources */,
 				5EC7DFF417381B7300FB3C55 /* logo.png in Resources */,
 				5EC7DFF717381BF400FB3C55 /* upArrow.png in Resources */,

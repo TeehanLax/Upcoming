@@ -14,10 +14,6 @@
 #import "TLRootViewController.h"
 #import "TLHourSupplementaryView.h"
 
-#define NUMBER_OF_ROWS 24
-#define EXPANDED_ROWS 4
-#define MAX_ROW_HEIGHT 38.f
-
 static NSString *kCellIdentifier = @"Cell";
 static NSString *kSupplementaryViewIdentifier = @"HourView";
 
@@ -155,7 +151,9 @@ static NSString *kSupplementaryViewIdentifier = @"HourView";
         NSLog(@"GOT %d EVENTS", [[EKEventManager sharedInstance].events count]);
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.collectionView performBatchUpdates:nil completion:nil];
+            [self.activeCells removeAllObjects];
+            [self.collectionView reloadData];
+            [self.collectionView.collectionViewLayout invalidateLayout];
         });
     }
 }
