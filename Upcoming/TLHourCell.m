@@ -11,6 +11,7 @@
 #import "TLAppDelegate.h"
 #import "TLRootViewController.h"
 #import "TLEventViewController.h"
+#import "TLCollectionViewLayoutAttributes.h"
 
 @interface TLHourCell ()
 
@@ -44,6 +45,11 @@
     [super prepareForReuse];
 
     [self reset];
+}
+
+-(void)applyLayoutAttributes:(TLCollectionViewLayoutAttributes *)layoutAttributes {
+    [super applyLayoutAttributes:layoutAttributes];
+    self.contentView.alpha = layoutAttributes.contentAlpha;
 }
 
 -(void)drawRect:(CGRect)rect {

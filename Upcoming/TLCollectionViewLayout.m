@@ -30,22 +30,29 @@
 }
 
 -(UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
-    UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
+    TLCollectionViewLayoutAttributes *attributes = (TLCollectionViewLayoutAttributes *)[super layoutAttributesForItemAtIndexPath:indexPath];
 
     attributes.zIndex = 0;
+    if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)]) {
+        attributes.contentAlpha = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView layout:self alphaForCellContentAtIndexPath:indexPath];
+    }
 
     return attributes;
 }
 
 -(NSArray *)layoutAttributesForElementsInRect:(CGRect)rect {
     NSMutableArray *array = [[super layoutAttributesForElementsInRect:rect] mutableCopy];
-
+    
+    for (TLCollectionViewLayoutAttributes *attributes in array) {
+        attributes.contentAlpha = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView layout:self alphaForCellContentAtIndexPath:attributes.indexPath];
+    }
+    
     [array addObject:[self layoutAttributesForSupplementaryViewOfKind:[TLHourSupplementaryView kind] atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]]];
 
     NSUInteger numberOfEvents;
 
     if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)]) {
-        numberOfEvents = [(id < TLCollectionViewLayoutDelegate >)(self.collectionView.delegate) collectionView : self.collectionView numberOfEventSupplementaryViewsInLayout : self];
+        numberOfEvents = [(id < TLCollectionViewLayoutDelegate >)(self.collectionView.delegate) collectionView:self.collectionView numberOfEventSupplementaryViewsInLayout:self];
 
         for (NSInteger i = 0; i < numberOfEvents; i++) {
             [array addObject:[self layoutAttributesForSupplementaryViewOfKind:[TLEventSupplementaryView kind] atIndexPath:[NSIndexPath indexPathForItem:i inSection:0]]];
@@ -61,17 +68,14 @@
 
         CGRect frame = CGRectZero;
         CGFloat alpha = 1.0f;
-        CGFloat hourLineProgression = 0.5f;
 
         if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)]) {
-            frame = [(id < TLCollectionViewLayoutDelegate >)(self.collectionView.delegate) collectionView : self.collectionView frameForHourViewInLayout : self];
-            alpha = [(id < TLCollectionViewLayoutDelegate >)(self.collectionView.delegate) collectionView : self.collectionView alphaForHourLineViewInLayout : self];
-            hourLineProgression = [(id < TLCollectionViewLayoutDelegate >)(self.collectionView.delegate) collectionView : self.collectionView hourProgressionForHourLineViewInLayout : self];
+            frame = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate)collectionView:self.collectionView frameForHourViewInLayout:self];
+            alpha = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate)collectionView:self.collectionView alphaForHourLineViewInLayout:self];
         }
 
         attributes.frame = frame;
         attributes.alpha = alpha;
-        attributes.hourLineProgressRatio = hourLineProgression;
         attributes.zIndex = 2;
 
         return attributes;
@@ -79,13 +83,16 @@
         TLCollectionViewLayoutAttributes *attributes = [TLCollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind withIndexPath:indexPath];
 
         CGRect frame = CGRectZero;
+        CGFloat alpha = 0.0f;
 
         if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)]) {
-            frame = [(id < TLCollectionViewLayoutDelegate >)(self.collectionView.delegate) collectionView : self.collectionView layout : self frameForEventSupplementaryViewAtIndexPath : indexPath];
+            frame = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView layout:self frameForEventSupplementaryViewAtIndexPath:indexPath];
+            alpha = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView layout:self alphaForSupplementaryViewAtIndexPath:indexPath];
         }
 
         attributes.frame = frame;
         attributes.alpha = 1.0f;
+        attributes.contentAlpha = alpha;
         attributes.zIndex = 1;
 
         return attributes;

@@ -10,6 +10,6 @@
 
 @interface TLCollectionViewLayoutAttributes : UICollectionViewLayoutAttributes
 
-@property (nonatomic, assign) CGFloat hourLineProgressRatio;
+@property (nonatomic, assign) CGFloat contentAlpha;
 
 @end

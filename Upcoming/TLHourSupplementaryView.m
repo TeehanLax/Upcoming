@@ -37,6 +37,8 @@
         self.timeLabel.shadowColor = [UIColor colorWithWhite:0.0f alpha:0.2f];
         self.timeLabel.shadowOffset = CGSizeMake(0, 1);
         [self addSubview:self.timeLabel];
+        
+        self.hourLineProgressionRatio = 0.5f;
     }
 
     return self;
@@ -56,7 +58,6 @@
 -(void)applyLayoutAttributes:(TLCollectionViewLayoutAttributes *)layoutAttributes {
     [super applyLayoutAttributes:layoutAttributes];
 
-    self.hourLineProgressionRatio = layoutAttributes.hourLineProgressRatio;
     [self setNeedsDisplay];
 }
 

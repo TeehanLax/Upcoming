@@ -7,6 +7,7 @@
 //
 
 #import "TLEventSupplementaryView.h"
+#import "TLCollectionViewLayoutAttributes.h"
 
 @interface TLEventSupplementaryView ()
 
@@ -25,6 +26,7 @@
     self.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.4f];
     
     self.contentView = [[UIView alloc] initWithFrame:self.bounds];
+    self.contentView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     self.contentView.backgroundColor = [UIColor clearColor];
     [self addSubview:self.contentView];
 
@@ -47,6 +49,12 @@
 
 +(NSString *)kind {
     return NSStringFromClass(self);
+}
+
+-(void)applyLayoutAttributes:(TLCollectionViewLayoutAttributes *)layoutAttributes {
+    [super applyLayoutAttributes:layoutAttributes];
+    
+    self.contentView.alpha = layoutAttributes.contentAlpha;
 }
 
 -(void)setTimeString:(NSString *)timeString {

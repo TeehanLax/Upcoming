@@ -35,10 +35,6 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 // Not completely OK to keep this around, but we can guarantee we only ever want one on screen, so it's OK.
 @property (nonatomic, strong) TLHourSupplementaryView *hourSupplementaryView;
 
-// We need to keep around a reference to hour event supplementary views. UICollectionView doesn't expose
-// these in the same way that it does cells. 
-@property (nonatomic, strong) NSMutableDictionary *eventSupplementaryViews;
-
 @end
 
 @implementation TLEventViewController
@@ -163,8 +159,6 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     self.touchDown.delaysTouchesBegan = NO;
     self.touchDown.delaysTouchesEnded = NO;
     [self.collectionView addGestureRecognizer:self.touchDown];
-    
-    self.eventSupplementaryViews = [NSMutableDictionary dictionary];
     
     @weakify(self);
     [[[RACSignal interval:60.0f] deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(id x) {
@@ -306,20 +300,10 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     
     if (!self.touch) {
         // default size
-        [UIView animateWithDuration:0.3
-                              delay:0
-                            options:UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionBeginFromCurrentState
-                         animations:^{
-                             cell.contentView.alpha = 0;
-                         }
-         
-                         completion:nil];
         return CGSizeMake(CGRectGetWidth(self.view.bounds), collectionView.frame.size.height / NUMBER_OF_ROWS);
     }
     
     CGFloat effectiveHour = indexPath.item;
-        
-    cell.contentView.alpha = [self alphaForElementInHour:effectiveHour];;
         
     return CGSizeMake(CGRectGetWidth(self.view.bounds), [self heightForHour:effectiveHour]);
 }
@@ -345,29 +329,39 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     }
 }
 
--(CGFloat)collectionView:(UICollectionView *)collectionView hourProgressionForHourLineViewInLayout:(TLCollectionViewLayout *)layout {
-    return 0.5f;
-}
-
 -(NSUInteger)collectionView:(UICollectionView *)collectionView numberOfEventSupplementaryViewsInLayout:(TLCollectionViewLayout *)layout {
     return self.viewModelArray.count;
 }
 
+-(CGFloat)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout alphaForCellContentAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.touch) {
+        return [self alphaForElementInHour:indexPath.item];
+    } else {
+        return 0.0f;
+    }
+}
+
+-(CGFloat)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout alphaForSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.touch) {
+        TLEventViewModel *model = self.viewModelArray[indexPath.item];
+        
+        NSCalendar *currentCalendar = [NSCalendar currentCalendar];
+        NSDateComponents *components = [currentCalendar components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
+        NSInteger hour = components.hour;
+        
+        return [self alphaForElementInHour:hour];
+    } else {
+        return 0.0f;
+    }
+}
+
 -(CGRect)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout frameForEventSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath {
     TLEventViewModel *model = self.viewModelArray[indexPath.item];
-    
-    TLEventSupplementaryView *supplementaryView = [self.eventSupplementaryViews objectForKey:indexPath];
-    
+        
     // Grab the date components from the startDate and use the to find the hour and minutes of the event
     NSCalendar *currentCalendar = [NSCalendar currentCalendar];
     NSDateComponents *components = [currentCalendar components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
     NSInteger hour = components.hour;
-    
-    if (!self.touch) {
-        supplementaryView.contentView.alpha = 0.0f;
-    } else {
-        supplementaryView.contentView.alpha = [self alphaForElementInHour:hour];
-    }    
     
     CGFloat startY = 0;
     CGFloat endY = 0;
@@ -472,8 +466,6 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         
         TLEventViewModel *model = self.viewModelArray[indexPath.item];
         supplementaryView.titleString = model.event.title;
-        
-        [self.eventSupplementaryViews setObject:supplementaryView forKey:indexPath];
         
         return supplementaryView;
     }
