@@ -35,6 +35,10 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 // Not completely OK to keep this around, but we can guarantee we only ever want one on screen, so it's OK.
 @property (nonatomic, strong) TLHourSupplementaryView *hourSupplementaryView;
 
+// We need to keep around a reference to hour event supplementary views. UICollectionView doesn't expose
+// these in the same way that it does cells. 
+@property (nonatomic, strong) NSMutableDictionary *eventSupplementaryViews;
+
 @end
 
 @implementation TLEventViewController
@@ -159,6 +163,8 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     self.touchDown.delaysTouchesBegan = NO;
     self.touchDown.delaysTouchesEnded = NO;
     [self.collectionView addGestureRecognizer:self.touchDown];
+    
+    self.eventSupplementaryViews = [NSMutableDictionary dictionary];
     
     @weakify(self);
     [[[RACSignal interval:60.0f] deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(id x) {
@@ -311,40 +317,11 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         return CGSizeMake(CGRectGetWidth(self.view.bounds), collectionView.frame.size.height / NUMBER_OF_ROWS);
     }
     
-    CGFloat minSize = (collectionView.frame.size.height - (MAX_ROW_HEIGHT * EXPANDED_ROWS)) / 20;
-    
-    CGFloat dayLocation = (self.location.y / self.collectionView.frame.size.height) * 24;
-    
     CGFloat effectiveHour = indexPath.item;
-    
-    CGFloat diff = dayLocation - effectiveHour;
-    
-    // prevent reducing size of min / max rows
-    if (effectiveHour < EXPANDED_ROWS) {
-        if (diff < 0) {
-            diff = 0;
-        }
-    } else if (effectiveHour > NUMBER_OF_ROWS - EXPANDED_ROWS - 1) {
-        if (diff > 0) {
-            diff = 0;
-        }
-    }
-    
-    CGFloat delta = ((EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS);
-    
-    CGFloat size = (minSize + MAX_ROW_HEIGHT) * delta;
-    
-    cell.contentView.alpha = delta;
-    
-    if (size > MAX_ROW_HEIGHT) {
-        size = MAX_ROW_HEIGHT;
-    }
-    
-    if (size < minSize) {
-        size = minSize;
-    }
-    
-    return CGSizeMake(CGRectGetWidth(self.view.bounds), size);
+        
+    cell.contentView.alpha = [self alphaForElementInHour:effectiveHour];;
+        
+    return CGSizeMake(CGRectGetWidth(self.view.bounds), [self heightForHour:effectiveHour]);
 }
 
 -(CGRect)collectionView:(UICollectionView *)collectionView frameForHourViewInLayout:(TLCollectionViewLayout *)layout {
@@ -379,15 +356,23 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 -(CGRect)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout frameForEventSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath {
     TLEventViewModel *model = self.viewModelArray[indexPath.item];
     
-    CGFloat startY = 0;
-    CGFloat endY = 0;
-    CGFloat x;
-    CGFloat width = CGRectGetWidth(self.view.bounds);
+    TLEventSupplementaryView *supplementaryView = [self.eventSupplementaryViews objectForKey:indexPath];
     
     // Grab the date components from the startDate and use the to find the hour and minutes of the event
     NSCalendar *currentCalendar = [NSCalendar currentCalendar];
     NSDateComponents *components = [currentCalendar components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
     NSInteger hour = components.hour;
+    
+    if (!self.touch) {
+        supplementaryView.contentView.alpha = 0.0f;
+    } else {
+        supplementaryView.contentView.alpha = [self alphaForElementInHour:hour];
+    }    
+    
+    CGFloat startY = 0;
+    CGFloat endY = 0;
+    CGFloat x;
+    CGFloat width = CGRectGetWidth(self.view.bounds);
     
     // Use the collection view's calculations for the hour cell representing the start hour, and adjust based on minutes if necessary
     UICollectionViewLayoutAttributes *startHourAttributes = [self.collectionView layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:hour inSection:0]];
@@ -488,11 +473,76 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         TLEventViewModel *model = self.viewModelArray[indexPath.item];
         supplementaryView.titleString = model.event.title;
         
+        [self.eventSupplementaryViews setObject:supplementaryView forKey:indexPath];
+        
         return supplementaryView;
     }
 }
 
 #pragma mark - Private Methods
+
+-(CGFloat)heightForHour:(NSInteger)hour {
+    
+    CGFloat minSize = (self.collectionView.frame.size.height - (MAX_ROW_HEIGHT * EXPANDED_ROWS)) / 20;
+    
+    CGFloat dayLocation = (self.location.y / self.collectionView.frame.size.height) * 24;
+    
+    
+    CGFloat diff = dayLocation - hour;
+    
+    // prevent reducing size of min / max rows
+    if (hour < EXPANDED_ROWS) {
+        if (diff < 0) {
+            diff = 0;
+        }
+    } else if (hour > NUMBER_OF_ROWS - EXPANDED_ROWS - 1) {
+        if (diff > 0) {
+            diff = 0;
+        }
+    }
+    
+    CGFloat delta = ((EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS);
+    
+    CGFloat size = (minSize + MAX_ROW_HEIGHT) * delta;
+    if (size > MAX_ROW_HEIGHT) {
+        size = MAX_ROW_HEIGHT;
+    }
+    
+    if (size < minSize) {
+        size = minSize;
+    }
+    
+    return size;
+}
+
+-(CGFloat)alphaForElementInHour:(NSInteger)hour {
+    CGFloat dayLocation = (self.location.y / self.collectionView.frame.size.height) * 24;
+    
+    CGFloat effectiveHour = hour;
+    
+    CGFloat diff = dayLocation - effectiveHour;
+    
+    // prevent reducing size of min / max rows
+    if (effectiveHour < EXPANDED_ROWS) {
+        if (diff < 0) {
+            diff = 0;
+        }
+    } else if (effectiveHour > NUMBER_OF_ROWS - EXPANDED_ROWS - 1) {
+        if (diff > 0) {
+            diff = 0;
+        }
+    }
+    
+    CGFloat delta = ((EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS);
+    
+    if (delta < 0) {
+        delta = 0.0f;
+    } else if (delta > 1) {
+        delta = 1.0f;
+    }
+    
+    return delta;
+}
 
 -(void)updateBackgroundGradient {
     NSArray *events = [[EKEventManager sharedInstance] events];

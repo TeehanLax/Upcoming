@@ -15,4 +15,6 @@
 @property (nonatomic, strong) NSString *timeString;
 @property (nonatomic, strong) NSString *titleString;
 
+@property (nonatomic, strong) UIView *contentView;
+
 @end

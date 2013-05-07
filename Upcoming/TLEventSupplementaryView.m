@@ -23,20 +23,24 @@
     }
 
     self.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.4f];
+    
+    self.contentView = [[UIView alloc] initWithFrame:self.bounds];
+    self.contentView.backgroundColor = [UIColor clearColor];
+    [self addSubview:self.contentView];
 
     self.timeLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.timeLabel.font = [[UIFont tl_appFont] fontWithSize:14];
     self.timeLabel.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     self.timeLabel.backgroundColor = [UIColor clearColor];
     self.timeLabel.textColor = [UIColor colorFromRGB:0x999999];
-    [self addSubview:self.timeLabel];
+    [self.contentView addSubview:self.timeLabel];
 
     self.titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.titleLabel.font = [[UIFont tl_appFont] fontWithSize:14];
     self.titleLabel.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     self.titleLabel.backgroundColor = [UIColor clearColor];
     self.titleLabel.textColor = [UIColor colorFromRGB:0x444444];
-    [self addSubview:self.titleLabel];
+    [self.contentView addSubview:self.titleLabel];
 
     return self;
 }
