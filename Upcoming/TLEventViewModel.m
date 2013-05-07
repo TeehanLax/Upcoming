@@ -10,4 +10,14 @@
 
 @implementation TLEventViewModel
 
+-(BOOL)overlapsWith:(TLEventViewModel *)otherModel {
+    BOOL overlaps =
+    ([self.event.endDate isLaterThanDate:otherModel.event.startDate] && [self.event.startDate isEarlierThanDate:otherModel.event.startDate] && ![self.event.endDate isEqualToDate:otherModel.event.startDate]) ||
+    ([self.event.startDate isEarlierThanDate:otherModel.event.endDate] && [self.event.endDate isLaterThanDate:otherModel.event.endDate] && ![self.event.startDate isEqualToDate:otherModel.event.endDate]) ||
+    ([self.event.startDate isLaterThanDate:otherModel.event.startDate] && [self.event.endDate isEarlierThanDate:otherModel.event.endDate]) ||
+    ([self.event.startDate isEarlierThanDate:otherModel.event.startDate] && [self.event.endDate isLaterThanDate:otherModel.event.endDate]);
+    
+    return overlaps;
+}
+
 @end

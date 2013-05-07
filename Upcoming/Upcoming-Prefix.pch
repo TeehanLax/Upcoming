@@ -12,6 +12,7 @@
 
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
+#import <EventKit/EventKit.h>
 
 #import <QuartzCore/QuartzCore.h>
 #import <NSDate-Utilities.h>

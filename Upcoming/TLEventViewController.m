@@ -81,9 +81,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         // Then, create an array of TLEventViewModel objects based on that array.
     }] map:^id(NSArray *sortedEventArray) {
         NSMutableArray *mutableArray = [NSMutableArray arrayWithCapacity:sortedEventArray.count];
-        
-        //TODO: Construct array based on event array.
-        
+                
         for (EKEvent *event in sortedEventArray)
         {
             // Exclude all-day events
@@ -97,11 +95,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
             // Now determine if we're overlapping an existing event.
             // Note: this isn't that efficient, but our data sets are small enough to warrant an n^2 algorithm.
             for (TLEventViewModel *otherModel in mutableArray) {
-                BOOL overlaps =
-                ([viewModel.event.endDate isLaterThanDate:otherModel.event.startDate] && [viewModel.event.startDate isEarlierThanDate:otherModel.event.startDate]) ||
-                ([viewModel.event.startDate isEarlierThanDate:otherModel.event.endDate] && [viewModel.event.endDate isLaterThanDate:otherModel.event.endDate]) ||
-                ([viewModel.event.startDate isLaterThanDate:otherModel.event.startDate] && [viewModel.event.endDate isEarlierThanDate:otherModel.event.endDate]) ||
-                ([viewModel.event.startDate isEarlierThanDate:otherModel.event.startDate] && [viewModel.event.endDate isLaterThanDate:otherModel.event.endDate]);
+                BOOL overlaps = [viewModel overlapsWith:otherModel];
                 
                 if (overlaps) {
                     if (otherModel.eventSpan == TLEventViewModelEventSpanTooManyWarning) {
@@ -109,8 +103,26 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
                         viewModel = nil;
                     }
                     else if (otherModel.eventSpan == TLEventViewModelEventSpanRight) {
-                        otherModel.eventSpan = TLEventViewModelEventSpanTooManyWarning;
-                        otherModel.extraEventsCount = 2;
+                        // Now we need to determine if the viewModel can float to the left.
+                        BOOL conflicts = NO;
+                        
+                        for (TLEventViewModel *possiblyConflictingModel in mutableArray) {
+                            if (possiblyConflictingModel == otherModel) continue;
+                            if (possiblyConflictingModel.eventSpan != TLEventViewModelEventSpanLeft) continue;
+                            
+                            if ([possiblyConflictingModel overlapsWith:viewModel]) {
+                                conflicts = YES;
+                                break;
+                            }
+                        }
+                        
+                        if (conflicts) {
+                            otherModel.eventSpan = TLEventViewModelEventSpanTooManyWarning;
+                            otherModel.extraEventsCount = 2;
+                            viewModel = nil;
+                        } else {
+                            viewModel.eventSpan = TLEventViewModelEventSpanLeft;
+                        }
                     }
                     else if (otherModel.eventSpan == TLEventViewModelEventSpanLeft) {
                         viewModel.eventSpan = TLEventViewModelEventSpanRight;
@@ -511,13 +523,17 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 {    
     EKEvent *eventUnderTouch;
     
-    //TODO: should detect "extra events" and display that text to the user. 
-    
     for (NSInteger i = 0; i < self.viewModelArray.count; i++) {
-        CGRect frame = [self collectionView:self.collectionView layout:(TLCollectionViewLayout *)self.collectionView.collectionViewLayout frameForEventSupplementaryViewAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:i inSection:0];
+        CGRect frame = [self collectionView:self.collectionView layout:(TLCollectionViewLayout *)self.collectionView.collectionViewLayout frameForEventSupplementaryViewAtIndexPath:indexPath];
         
         if (CGRectContainsPoint(frame, point)) {
-            eventUnderTouch = [self.viewModelArray[i] event];
+            
+            TLEventViewModel *model = self.viewModelArray[indexPath.item];
+            
+            if (model.eventSpan != TLEventViewModelEventSpanTooManyWarning) {
+                eventUnderTouch = [self.viewModelArray[i] event];
+            }
         }
     }
     
