@@ -28,6 +28,7 @@
 		5E2EF7BD172AC51700737A75 /* TLEventViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E2EF7BC172AC51700737A75 /* TLEventViewController.xib */; };
 		5E2EF7C0172AC53500737A75 /* TLEventViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7BF172AC53500737A75 /* TLEventViewController.m */; };
 		5E7207DF172AC3560067B19E /* EKEventManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E7207DE172AC3560067B19E /* EKEventManager.m */; };
+		5E91A6D0173895AA00CF83D5 /* TLEventViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E91A6CF173895AA00CF83D5 /* TLEventViewModel.m */; };
 		5EA3D48C1726DD4D00D9764F /* UIColor+CustomizedColors.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EA3D48B1726DD4D00D9764F /* UIColor+CustomizedColors.m */; };
 		5EA3D48F1726E00400D9764F /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EA3D48E1726E00400D9764F /* CoreImage.framework */; };
 		5EA3D4941726FCC500D9764F /* UIImage+Blur.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EA3D4931726FCC500D9764F /* UIImage+Blur.m */; };
@@ -90,6 +91,8 @@
 		5E2EF7BF172AC53500737A75 /* TLEventViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLEventViewController.m; sourceTree = "<group>"; };
 		5E7207DD172AC3560067B19E /* EKEventManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EKEventManager.h; sourceTree = "<group>"; };
 		5E7207DE172AC3560067B19E /* EKEventManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EKEventManager.m; sourceTree = "<group>"; };
+		5E91A6CE173895AA00CF83D5 /* TLEventViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLEventViewModel.h; sourceTree = "<group>"; };
+		5E91A6CF173895AA00CF83D5 /* TLEventViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLEventViewModel.m; sourceTree = "<group>"; };
 		5EA3D48A1726DD4D00D9764F /* UIColor+CustomizedColors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+CustomizedColors.h"; sourceTree = "<group>"; };
 		5EA3D48B1726DD4D00D9764F /* UIColor+CustomizedColors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+CustomizedColors.m"; sourceTree = "<group>"; };
 		5EA3D48E1726E00400D9764F /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
@@ -184,6 +187,15 @@
 			name = EventManager;
 			sourceTree = "<group>";
 		};
+		5E91A6CD1738958900CF83D5 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				5E91A6CE173895AA00CF83D5 /* TLEventViewModel.h */,
+				5E91A6CF173895AA00CF83D5 /* TLEventViewModel.m */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
 		5EA3D48D1726DD5200D9764F /* Categories */ = {
 			isa = PBXGroup;
 			children = (
@@ -239,6 +251,7 @@
 				5E18D308173170970010F8FF /* soundeffect.wav */,
 				5E18D2AD172AFA540010F8FF /* Images */,
 				5EB951AE17203DD700A5089B /* Views */,
+				5E91A6CD1738958900CF83D5 /* Models */,
 				5E21DED8171EFCED00231263 /* EventManager */,
 				5EB4E57D17187DEF00EC8E1C /* View Controllers */,
 				5EA3D48D1726DD5200D9764F /* Categories */,
@@ -441,6 +454,7 @@
 				5E18D30C1732D7000010F8FF /* TLHourSupplementaryView.m in Sources */,
 				5EC7DFF017344D8300FB3C55 /* TLCollectionViewLayoutAttributes.m in Sources */,
 				5EC7DFFB17381F5600FB3C55 /* TLLoveButton.m in Sources */,
+				5E91A6D0173895AA00CF83D5 /* TLEventViewModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -13,6 +13,7 @@
 #import "TLAppDelegate.h"
 #import "TLRootViewController.h"
 #import "TLHourSupplementaryView.h"
+#import "TLEventViewModel.h"
 
 static NSString *kCellIdentifier = @"Cell";
 static NSString *kSupplementaryViewIdentifier = @"HourView";
@@ -32,6 +33,8 @@ enum {
 @property (nonatomic, strong) NSIndexPath *indexPathUnderFinger;
 @property (nonatomic, strong) EKEvent *eventUnderFinger;
 
+@property (nonatomic, strong) NSArray *viewModelArray;
+
 // Not completely OK to keep this around, but we can guarantee we only ever want one on screen, so it's OK. 
 @property (nonatomic, strong) TLHourSupplementaryView *supplementaryView;
 
@@ -49,7 +52,58 @@ enum {
     
     RACSignal *newEventsSignal = [RACAbleWithStart(eventManager, events) deliverOn:[RACScheduler mainThreadScheduler]];
     
-    [newEventsSignal subscribeNext:^(NSArray *events) {
+    RAC(self.viewModelArray) = [[[newEventsSignal distinctUntilChanged] map:^id(NSArray *eventsArray) {
+        // First, sort the array first by size then by start time.
+        
+        NSArray *sortedArray = [eventsArray sortedArrayUsingComparator:^NSComparisonResult(EKEvent *obj1, EKEvent *obj2) {
+            NSTimeInterval interval1 = [obj1.endDate timeIntervalSinceDate:obj1.startDate];
+            NSTimeInterval interval2 = [obj2.endDate timeIntervalSinceDate:obj2.startDate];
+            
+            if (interval1 > interval2) {
+                return NSOrderedAscending;
+            }
+            else if (interval1 < interval2) {
+                return NSOrderedDescending;
+            }
+            else
+            {
+                if ([obj1.startDate isEarlierThanDate:obj2.startDate]) {
+                    return NSOrderedAscending;
+                }
+                else if ([obj1.startDate isLaterThanDate:obj2.startDate]) {
+                    return NSOrderedDescending;
+                }
+                else {
+                    return NSOrderedSame;
+                }
+            }
+        }];
+        
+        return sortedArray;
+        
+        // Then, create an array of TLEventViewModel objects based on that array.
+    }] map:^id(NSArray *sortedEventArray) {
+        NSMutableArray *mutableArray = [NSMutableArray arrayWithCapacity:sortedEventArray.count];
+        
+        //TODO: Construct array based on event array.
+        
+        for (EKEvent *event in sortedEventArray)
+        {
+            if (event.isAllDay) continue;
+            
+            TLEventViewModel *viewModel = [TLEventViewModel new];
+            viewModel.event = event;
+            viewModel.eventSpan = TLEventViewModelEventSpanFull;
+            
+            [mutableArray addObject:viewModel];
+        }
+        
+        NSLog(@"Constructed array of %d events. ", mutableArray.count);
+        
+        return mutableArray;
+    }];
+    
+    [RACAble(self.viewModelArray) subscribeNext:^(id x) {
         [self.collectionView reloadData];
         [self.collectionView.collectionViewLayout invalidateLayout];
     }];
@@ -160,53 +214,62 @@ enum {
 #pragma mark - TLCollectionViewLayoutDelegate Methods
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    TLEventViewCell *cell = (TLEventViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
-    
-    // position sampled background image
-    CGFloat yDistance = cell.maxY - cell.minY;
-    CGFloat yDelta = cell.frame.origin.y - cell.minY;
-    
-    CGRect backgroundImageFrame = cell.backgroundImage.frame;
-    backgroundImageFrame.origin.y = (cell.frame.size.height - backgroundImageFrame.size.height) * (yDelta / yDistance);
-    cell.backgroundImage.frame = backgroundImageFrame;
-    
-    //TODO: Necessary to use same cell background view? Much simpler if we use a different view. 
-    
-    if (!self.touch) {
-        // default size
-        [UIView animateWithDuration:0.3 delay:0
-                            options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState
-                         animations:^{
-                cell.contentView.alpha = 0;
-            cell.titleLabel.alpha = 0;
-        } completion:nil];
-        return CGSizeMake(320, collectionView.frame.size.height / NUMBER_OF_ROWS);
+    if (indexPath.section == kBackgroundSection)
+    {
+        TLEventViewCell *cell = (TLEventViewCell *)[collectionView cellForItemAtIndexPath:indexPath];
+        
+        // position sampled background image
+        CGFloat yDistance = cell.maxY - cell.minY;
+        CGFloat yDelta = cell.frame.origin.y - cell.minY;
+        
+        CGRect backgroundImageFrame = cell.backgroundImage.frame;
+        backgroundImageFrame.origin.y = (cell.frame.size.height - backgroundImageFrame.size.height) * (yDelta / yDistance);
+        cell.backgroundImage.frame = backgroundImageFrame;
+        
+        //TODO: Necessary to use same cell background view? Much simpler if we use a different view.
+        
+        if (!self.touch) {
+            // default size
+            [UIView animateWithDuration:0.3 delay:0
+                                options:UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState
+                             animations:^{
+                                 cell.contentView.alpha = 0;
+                                 cell.titleLabel.alpha = 0;
+                             } completion:nil];
+            return CGSizeMake(320, collectionView.frame.size.height / NUMBER_OF_ROWS);
+        }
+        
+        CGFloat minSize = (collectionView.frame.size.height - (MAX_ROW_HEIGHT * EXPANDED_ROWS)) / 20;
+        
+        CGFloat dayLocation = (self.location.y / self.collectionView.frame.size.height) * 24;
+        
+        CGFloat effectiveHour = indexPath.row;;
+        
+        CGFloat diff = dayLocation - effectiveHour;
+        
+        // prevent reducing size of min / max rows
+        if (effectiveHour < EXPANDED_ROWS) {
+            if (diff < 0) diff = 0;
+        } else if (effectiveHour > NUMBER_OF_ROWS - EXPANDED_ROWS - 1) {
+            if (diff > 0) diff = 0;
+        }
+        
+        CGFloat delta = ((EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS);
+        
+        CGFloat size = (minSize + MAX_ROW_HEIGHT) * delta;
+        
+        cell.contentView.alpha = delta;
+        cell.titleLabel.alpha = delta;
+        
+        if (size > MAX_ROW_HEIGHT) size = MAX_ROW_HEIGHT;
+        if (size < minSize) size = minSize;
+        
+        return CGSizeMake(320, size);
     }
-    
-    CGFloat minSize = (collectionView.frame.size.height - (MAX_ROW_HEIGHT * EXPANDED_ROWS)) / 20;
-    
-    CGFloat dayLocation = (self.location.y / self.collectionView.frame.size.height) * 24;
-    
-    CGFloat diff = dayLocation - (float)indexPath.row;
-    
-    // prevent reducing size of min / max rows
-    if (indexPath.row < EXPANDED_ROWS) {
-        if (diff < 0) diff = 0;
-    } else if (indexPath.row > NUMBER_OF_ROWS - EXPANDED_ROWS - 1) {
-        if (diff > 0) diff = 0;
+    else {
+        return CGSizeMake(320, 44);
     }
-    
-    CGFloat delta = ((EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS);
-    
-    CGFloat size = (minSize + MAX_ROW_HEIGHT) * delta;
-    
-    cell.contentView.alpha = delta;
-    cell.titleLabel.alpha = delta;
-    
-    if (size > MAX_ROW_HEIGHT) size = MAX_ROW_HEIGHT;
-    if (size < minSize) size = minSize;
-    
-    return CGSizeMake(320, size);
+        
 }
 
 -(CGRect)collectionView:(UICollectionView *)collectionView frameForHourViewInLayout:(TLCollectionViewLayout *)layout {
@@ -245,8 +308,7 @@ enum {
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     if (section == kEventSection)
     {
-        //TODO: No events for now
-        return 0;
+        return self.viewModelArray.count;
     }
     else
     {
@@ -393,6 +455,9 @@ enum {
             cell.titleLabel.text = event.title;
         }
     }
+    
+    //TODO: Remove (just for testing)
+    cell.backgroundColor = [UIColor blackColor];
 }
 
 -(void)configureBackgroundCell:(TLEventViewCell *)cell forIndexPath:(NSIndexPath *)indexPath{

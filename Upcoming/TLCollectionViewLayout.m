@@ -20,14 +20,39 @@
     return 0.f;
 }
 
-+(Class)layoutAttributesClass
-{
++(Class)layoutAttributesClass {
     return [TLCollectionViewLayoutAttributes class];
+}
+
+-(CGSize)collectionViewContentSize {
+    return self.collectionView.bounds.size;
+}
+
+-(UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
+    UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
+    
+    if (indexPath.section == 0) {
+        attributes.zIndex = 0;
+        return attributes;
+    } else {
+        attributes.zIndex = 1;
+        
+        UICollectionViewLayoutAttributes *backgroundAttributes = [super layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.item inSection:0]];
+        attributes.frame = backgroundAttributes.frame;
+        
+        return attributes;
+    }
 }
 
 -(NSArray *)layoutAttributesForElementsInRect:(CGRect)rect
 {
     NSMutableArray *array = [[super layoutAttributesForElementsInRect:rect] mutableCopy];
+    
+    for (UICollectionViewLayoutAttributes *attributes in array) {
+        if (attributes.indexPath.section == 0) continue;
+        
+        attributes.frame = [[self layoutAttributesForItemAtIndexPath:attributes.indexPath] frame];
+    }
     
     UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:[TLHourSupplementaryView kind] atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
     
@@ -36,8 +61,7 @@
     return array;
 }
 
--(UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
-{
+-(UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
     if (![kind isEqualToString:[TLHourSupplementaryView kind]])
         return nil;
     
