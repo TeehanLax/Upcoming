@@ -194,7 +194,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     
     NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:self.location];    
     UICollectionViewLayoutAttributes *attributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:indexPath];
-    NSInteger hour = indexPath.row;
+    NSInteger hour = indexPath.item;
     NSInteger minute = ((self.location.y - attributes.frame.origin.y) / attributes.size.height) * 60;
     
     // Convert from 24-hour format
@@ -297,7 +297,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     
     CGFloat dayLocation = (self.location.y / self.collectionView.frame.size.height) * 24;
     
-    CGFloat effectiveHour = indexPath.row;;
+    CGFloat effectiveHour = indexPath.item;
     
     CGFloat diff = dayLocation - effectiveHour;
     
@@ -353,7 +353,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 
 -(CGRect)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout frameForEventSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath
 {
-    TLEventViewModel *model = self.viewModelArray[indexPath.row];
+    TLEventViewModel *model = self.viewModelArray[indexPath.item];
     
     CGFloat startY = 0;
     CGFloat endY = 0;
@@ -463,7 +463,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     } else {
         TLEventSupplementaryView *supplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kEventSupplementaryViewIdentifier forIndexPath:indexPath];
         
-        TLEventViewModel *model = self.viewModelArray[indexPath.row];
+        TLEventViewModel *model = self.viewModelArray[indexPath.item];
         supplementaryView.titleString = model.event.title;
         
         return supplementaryView;

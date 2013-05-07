@@ -61,7 +61,7 @@
     NSIndexPath *indexPath = [collectionView indexPathForCell:self];
     
     CGFloat minSize = (collectionView.frame.size.height - (MAX_ROW_HEIGHT * EXPANDED_ROWS)) / 20;
-    self.minY = minSize * indexPath.row;
+    self.minY = minSize * indexPath.item;
     self.maxY = (collectionView.frame.size.height - (minSize * 24)) + self.minY;
     
     CGRect backgroundImageFrame = self.backgroundImage.frame;
