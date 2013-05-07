@@ -20,6 +20,6 @@ typedef enum : NSInteger {
 @interface TLEventViewModel : NSObject
 
 @property (nonatomic, strong) EKEvent *event;
-@property (nonatomic, assign) TLEventViewModelEventSpan *eventSpan;
+@property (nonatomic, assign) TLEventViewModelEventSpan eventSpan;
 
 @end

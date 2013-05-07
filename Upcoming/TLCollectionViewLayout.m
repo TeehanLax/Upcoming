@@ -8,6 +8,7 @@
 
 #import "TLCollectionViewLayout.h"
 #import "TLHourSupplementaryView.h"
+#import "TLEventSupplementaryView.h"
 #import "TLCollectionViewLayoutAttributes.h"
 
 @implementation TLCollectionViewLayout
@@ -28,62 +29,81 @@
     return self.collectionView.bounds.size;
 }
 
--(UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
+-(void)invalidateLayout {
+    [super invalidateLayout];
+    
+    NSLog(@"Invalidating layout.");
+}
+
+-(UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
+{
     UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
     
-    if (indexPath.section == 0) {
-        attributes.zIndex = 0;
-        return attributes;
-    } else {
-        attributes.zIndex = 1;
-        
-        UICollectionViewLayoutAttributes *backgroundAttributes = [super layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:indexPath.item inSection:0]];
-        attributes.frame = backgroundAttributes.frame;
-        
-        return attributes;
-    }
+    attributes.zIndex = 0;
+    
+    return attributes;
 }
 
 -(NSArray *)layoutAttributesForElementsInRect:(CGRect)rect
 {
     NSMutableArray *array = [[super layoutAttributesForElementsInRect:rect] mutableCopy];
     
-    for (UICollectionViewLayoutAttributes *attributes in array) {
-        if (attributes.indexPath.section == 0) continue;
+    [array addObject:[self layoutAttributesForSupplementaryViewOfKind:[TLHourSupplementaryView kind] atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]]];
+    
+    NSUInteger numberOfEvents;
+    
+    if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)])
+    {
+        numberOfEvents = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView numberOfEventSupplementaryViewsInLayout:self];
         
-        attributes.frame = [[self layoutAttributesForItemAtIndexPath:attributes.indexPath] frame];
+        NSLog(@"Adding %d event supplementary views to collection view.", numberOfEvents);
+        
+        for (NSInteger i = 0; i < numberOfEvents; i++)
+        {
+            [array addObject:[self layoutAttributesForSupplementaryViewOfKind:[TLEventSupplementaryView kind] atIndexPath:[NSIndexPath indexPathForItem:i inSection:0]]];
+        }
     }
-    
-    UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:[TLHourSupplementaryView kind] atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
-    
-    [array addObject:attributes];
     
     return array;
 }
 
 -(UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
-    if (![kind isEqualToString:[TLHourSupplementaryView kind]])
-        return nil;
-    
-    TLCollectionViewLayoutAttributes* attributes = [TLCollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind withIndexPath:indexPath];
-    
-    CGRect frame = CGRectZero;
-    CGFloat alpha = 1.0f;
-    CGFloat hourLineProgression = 0.5f;
-    
-    if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)])
-    {
-        frame = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView frameForHourViewInLayout:self];
-        alpha = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView alphaForHourLineViewInLayout:self];
-        hourLineProgression = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView hourProgressionForHourLineViewInLayout:self];
+    if ([kind isEqualToString:[TLHourSupplementaryView kind]]) {
+        TLCollectionViewLayoutAttributes* attributes = [TLCollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind withIndexPath:indexPath];
+        
+        CGRect frame = CGRectZero;
+        CGFloat alpha = 1.0f;
+        CGFloat hourLineProgression = 0.5f;
+        
+        if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)])
+        {
+            frame = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView frameForHourViewInLayout:self];
+            alpha = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView alphaForHourLineViewInLayout:self];
+            hourLineProgression = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView hourProgressionForHourLineViewInLayout:self];
+        }
+        
+        attributes.frame = frame;
+        attributes.alpha = alpha;
+        attributes.hourLineProgressRatio = hourLineProgression;
+        attributes.zIndex = 2;
+        
+        return attributes;
+    } else {
+        TLCollectionViewLayoutAttributes* attributes = [TLCollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind withIndexPath:indexPath];
+        
+        CGRect frame = CGRectZero;
+        
+        if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)])
+        {
+            frame = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView layout:self frameForEventSupplementaryViewAtIndexPath:indexPath];
+        }
+        
+        attributes.frame = frame;
+        attributes.alpha = 1.0f;
+        attributes.zIndex = 1;
+        
+        return attributes;
     }
-    
-    attributes.frame = frame;
-    attributes.alpha = alpha;
-    attributes.hourLineProgressRatio = hourLineProgression;
-    attributes.zIndex = 1;
-    
-    return attributes;
 }
 
 

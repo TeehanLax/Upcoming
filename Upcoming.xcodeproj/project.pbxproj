@@ -55,10 +55,14 @@
 		5EC7DFFB17381F5600FB3C55 /* TLLoveButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EC7DFFA17381F5600FB3C55 /* TLLoveButton.m */; };
 		5EC7DFFD17383DFF00FB3C55 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 5EC7DFFC17383DFF00FB3C55 /* Icon.png */; };
 		5EC7DFFF17383E0200FB3C55 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5EC7DFFE17383E0200FB3C55 /* Icon@2x.png */; };
+		5EC7E0031739427D00FB3C55 /* TLEventSupplementaryView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EC7E0021739427D00FB3C55 /* TLEventSupplementaryView.m */; };
 		5ED60CCB171C57E000F55891 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ED60CCA171C57E000F55891 /* QuartzCore.framework */; };
 		A85CD65D1730058B00B9BBC9 /* TLCollectionViewLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = A85CD65C1730058B00B9BBC9 /* TLCollectionViewLayout.m */; };
 		A85CD66317305C9600B9BBC9 /* TLEventViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A85CD66217305C9600B9BBC9 /* TLEventViewCell.m */; };
 		A85CD66517305D7400B9BBC9 /* TLEventViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A85CD66417305D7400B9BBC9 /* TLEventViewCell.xib */; };
+		A85CD66317305C9600B9BBC9 /* TLHourCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A85CD66217305C9600B9BBC9 /* TLHourCell.m */; };
+		A85CD66517305D7400B9BBC9 /* TLHourCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A85CD66417305D7400B9BBC9 /* TLHourCell.xib */; };
+		A85CD6671730605E00B9BBC9 /* event-row-bg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A85CD6661730605E00B9BBC9 /* event-row-bg@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -132,12 +136,18 @@
 		5EC7DFFA17381F5600FB3C55 /* TLLoveButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLLoveButton.m; sourceTree = "<group>"; };
 		5EC7DFFC17383DFF00FB3C55 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = ../Icon.png; sourceTree = "<group>"; };
 		5EC7DFFE17383E0200FB3C55 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "../Icon@2x.png"; sourceTree = "<group>"; };
+		5EC7E0011739427C00FB3C55 /* TLEventSupplementaryView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLEventSupplementaryView.h; sourceTree = "<group>"; };
+		5EC7E0021739427D00FB3C55 /* TLEventSupplementaryView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLEventSupplementaryView.m; sourceTree = "<group>"; };
 		5ED60CCA171C57E000F55891 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		A85CD65B1730058B00B9BBC9 /* TLCollectionViewLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLCollectionViewLayout.h; sourceTree = "<group>"; };
 		A85CD65C1730058B00B9BBC9 /* TLCollectionViewLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLCollectionViewLayout.m; sourceTree = "<group>"; };
 		A85CD66117305C9600B9BBC9 /* TLEventViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLEventViewCell.h; sourceTree = "<group>"; };
 		A85CD66217305C9600B9BBC9 /* TLEventViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLEventViewCell.m; sourceTree = "<group>"; };
 		A85CD66417305D7400B9BBC9 /* TLEventViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLEventViewCell.xib; sourceTree = "<group>"; };
+		A85CD66117305C9600B9BBC9 /* TLHourCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLHourCell.h; sourceTree = "<group>"; };
+		A85CD66217305C9600B9BBC9 /* TLHourCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLHourCell.m; sourceTree = "<group>"; };
+		A85CD66417305D7400B9BBC9 /* TLHourCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLHourCell.xib; sourceTree = "<group>"; };
+		A85CD6661730605E00B9BBC9 /* event-row-bg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "event-row-bg@2x.png"; path = "Images/event-row-bg@2x.png"; sourceTree = "<group>"; };
 		CB35EE43CD0E4DBFBCC0B9D3 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -310,11 +320,13 @@
 				5EB951B017203DE600A5089B /* TLCalendarSelectCell.m */,
 				5E18D300173019860010F8FF /* TLCalendarDotView.h */,
 				5E18D301173019860010F8FF /* TLCalendarDotView.m */,
-				A85CD66117305C9600B9BBC9 /* TLEventViewCell.h */,
-				A85CD66217305C9600B9BBC9 /* TLEventViewCell.m */,
-				A85CD66417305D7400B9BBC9 /* TLEventViewCell.xib */,
+				A85CD66117305C9600B9BBC9 /* TLHourCell.h */,
+				A85CD66217305C9600B9BBC9 /* TLHourCell.m */,
+				A85CD66417305D7400B9BBC9 /* TLHourCell.xib */,
 				5E18D30A1732D7000010F8FF /* TLHourSupplementaryView.h */,
 				5E18D30B1732D7000010F8FF /* TLHourSupplementaryView.m */,
+				5EC7E0011739427C00FB3C55 /* TLEventSupplementaryView.h */,
+				5EC7E0021739427D00FB3C55 /* TLEventSupplementaryView.m */,
 				5EC7DFF917381F5600FB3C55 /* TLLoveButton.h */,
 				5EC7DFFA17381F5600FB3C55 /* TLLoveButton.m */,
 			);
@@ -400,6 +412,8 @@
 				5E18D2FF172FFF560010F8FF /* location@2x.png in Resources */,
 				5E18D309173170970010F8FF /* soundeffect.wav in Resources */,
 				A85CD66517305D7400B9BBC9 /* TLEventViewCell.xib in Resources */,
+				A85CD66517305D7400B9BBC9 /* TLHourCell.xib in Resources */,
+				A85CD6671730605E00B9BBC9 /* event-row-bg@2x.png in Resources */,
 				5EC7DFF217381B1A00FB3C55 /* logo@2x.png in Resources */,
 				5EC7DFF417381B7300FB3C55 /* logo.png in Resources */,
 				5EC7DFF717381BF400FB3C55 /* upArrow.png in Resources */,
@@ -450,11 +464,12 @@
 				5E18D302173019860010F8FF /* TLCalendarDotView.m in Sources */,
 				A85CD65D1730058B00B9BBC9 /* TLCollectionViewLayout.m in Sources */,
 				5E18D30517316AAB0010F8FF /* TLAppDelegate+Sounds.m in Sources */,
-				A85CD66317305C9600B9BBC9 /* TLEventViewCell.m in Sources */,
+				A85CD66317305C9600B9BBC9 /* TLHourCell.m in Sources */,
 				5E18D30C1732D7000010F8FF /* TLHourSupplementaryView.m in Sources */,
 				5EC7DFF017344D8300FB3C55 /* TLCollectionViewLayoutAttributes.m in Sources */,
 				5EC7DFFB17381F5600FB3C55 /* TLLoveButton.m in Sources */,
 				5E91A6D0173895AA00CF83D5 /* TLEventViewModel.m in Sources */,
+				5EC7E0031739427D00FB3C55 /* TLEventSupplementaryView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
