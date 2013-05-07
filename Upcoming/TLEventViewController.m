@@ -511,13 +511,17 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 {    
     EKEvent *eventUnderTouch;
     
-    //TODO: should detect "extra events" and display that text to the user. 
-    
     for (NSInteger i = 0; i < self.viewModelArray.count; i++) {
-        CGRect frame = [self collectionView:self.collectionView layout:(TLCollectionViewLayout *)self.collectionView.collectionViewLayout frameForEventSupplementaryViewAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:i inSection:0];
+        CGRect frame = [self collectionView:self.collectionView layout:(TLCollectionViewLayout *)self.collectionView.collectionViewLayout frameForEventSupplementaryViewAtIndexPath:indexPath];
         
         if (CGRectContainsPoint(frame, point)) {
-            eventUnderTouch = [self.viewModelArray[i] event];
+            
+            TLEventViewModel *model = self.viewModelArray[indexPath.item];
+            
+            if (model.eventSpan != TLEventViewModelEventSpanTooManyWarning) {
+                eventUnderTouch = [self.viewModelArray[i] event];
+            }
         }
     }
     
