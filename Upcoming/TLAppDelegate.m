@@ -28,7 +28,7 @@
     return YES;
 }
 
-- (void)applicationWillEnterForeground:(UIApplication *)application {
+- (void)applicationDidBecomeActive:(UIApplication *)application {
     [[EKEventManager sharedInstance] refresh];
 }
 
