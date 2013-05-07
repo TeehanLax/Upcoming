@@ -58,8 +58,6 @@
 		5EC7E0031739427D00FB3C55 /* TLEventSupplementaryView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EC7E0021739427D00FB3C55 /* TLEventSupplementaryView.m */; };
 		5ED60CCB171C57E000F55891 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ED60CCA171C57E000F55891 /* QuartzCore.framework */; };
 		A85CD65D1730058B00B9BBC9 /* TLCollectionViewLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = A85CD65C1730058B00B9BBC9 /* TLCollectionViewLayout.m */; };
-		A85CD66317305C9600B9BBC9 /* TLEventViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A85CD66217305C9600B9BBC9 /* TLEventViewCell.m */; };
-		A85CD66517305D7400B9BBC9 /* TLEventViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A85CD66417305D7400B9BBC9 /* TLEventViewCell.xib */; };
 		A85CD66317305C9600B9BBC9 /* TLHourCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A85CD66217305C9600B9BBC9 /* TLHourCell.m */; };
 		A85CD66517305D7400B9BBC9 /* TLHourCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A85CD66417305D7400B9BBC9 /* TLHourCell.xib */; };
 /* End PBXBuildFile section */
@@ -140,9 +138,6 @@
 		5ED60CCA171C57E000F55891 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		A85CD65B1730058B00B9BBC9 /* TLCollectionViewLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLCollectionViewLayout.h; sourceTree = "<group>"; };
 		A85CD65C1730058B00B9BBC9 /* TLCollectionViewLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLCollectionViewLayout.m; sourceTree = "<group>"; };
-		A85CD66117305C9600B9BBC9 /* TLEventViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLEventViewCell.h; sourceTree = "<group>"; };
-		A85CD66217305C9600B9BBC9 /* TLEventViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLEventViewCell.m; sourceTree = "<group>"; };
-		A85CD66417305D7400B9BBC9 /* TLEventViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLEventViewCell.xib; sourceTree = "<group>"; };
 		A85CD66117305C9600B9BBC9 /* TLHourCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLHourCell.h; sourceTree = "<group>"; };
 		A85CD66217305C9600B9BBC9 /* TLHourCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLHourCell.m; sourceTree = "<group>"; };
 		A85CD66417305D7400B9BBC9 /* TLHourCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLHourCell.xib; sourceTree = "<group>"; };
@@ -409,7 +404,7 @@
 				5E18D2FD172F028F0010F8FF /* TLUpcomingEventViewController.xib in Resources */,
 				5E18D2FF172FFF560010F8FF /* location@2x.png in Resources */,
 				5E18D309173170970010F8FF /* soundeffect.wav in Resources */,
-				A85CD66517305D7400B9BBC9 /* TLEventViewCell.xib in Resources */,
+				A85CD66517305D7400B9BBC9 /* TLHourCell.xib in Resources */,
 				A85CD66517305D7400B9BBC9 /* TLHourCell.xib in Resources */,
 				5EC7DFF217381B1A00FB3C55 /* logo@2x.png in Resources */,
 				5EC7DFF417381B7300FB3C55 /* logo.png in Resources */,
@@ -557,11 +552,13 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CB35EE43CD0E4DBFBCC0B9D3 /* Pods.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Upcoming/Upcoming-Prefix.pch";
 				INFOPLIST_FILE = "Upcoming/Upcoming-Info.plist";
 				LIBRARY_SEARCH_PATHS = "$(SYMROOT)/../Pods/build/Debug$(EFFECTIVE_PLATFORM_NAME)";
 				PRODUCT_NAME = Upcoming;
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
