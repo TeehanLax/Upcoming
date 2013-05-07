@@ -23,4 +23,6 @@ typedef enum : NSInteger {
 @property (nonatomic, assign) TLEventViewModelEventSpan eventSpan;
 @property (nonatomic, assign) NSInteger extraEventsCount;
 
+-(BOOL)overlapsWith:(TLEventViewModel *)otherModel;
+
 @end

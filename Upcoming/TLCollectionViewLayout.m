@@ -29,12 +29,6 @@
     return self.collectionView.bounds.size;
 }
 
--(void)invalidateLayout {
-    [super invalidateLayout];
-    
-    NSLog(@"Invalidating layout.");
-}
-
 -(UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     UICollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
@@ -55,8 +49,6 @@
     if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)])
     {
         numberOfEvents = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView numberOfEventSupplementaryViewsInLayout:self];
-        
-        NSLog(@"Adding %d event supplementary views to collection view.", numberOfEvents);
         
         for (NSInteger i = 0; i < numberOfEvents; i++)
         {
