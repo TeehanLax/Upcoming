@@ -21,5 +21,6 @@ typedef enum : NSInteger {
 
 @property (nonatomic, strong) EKEvent *event;
 @property (nonatomic, assign) TLEventViewModelEventSpan eventSpan;
+@property (nonatomic, assign) NSInteger extraEventsCount;
 
 @end

@@ -86,13 +86,46 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         
         for (EKEvent *event in sortedEventArray)
         {
+            // Exclude all-day events
             if (event.isAllDay) continue;
             
+            // Create our view model.
             TLEventViewModel *viewModel = [TLEventViewModel new];
             viewModel.event = event;
             viewModel.eventSpan = TLEventViewModelEventSpanFull;
             
-            [mutableArray addObject:viewModel];
+            // Now determine if we're overlapping an existing event.
+            // Note: this isn't that efficient, but our data sets are small enough to warrant an n^2 algorithm.
+            for (TLEventViewModel *otherModel in mutableArray) {
+                BOOL overlaps =
+                ([viewModel.event.endDate isLaterThanDate:otherModel.event.startDate] && [viewModel.event.startDate isEarlierThanDate:otherModel.event.startDate]) ||
+                ([viewModel.event.startDate isEarlierThanDate:otherModel.event.endDate] && [viewModel.event.endDate isLaterThanDate:otherModel.event.endDate]) ||
+                ([viewModel.event.startDate isLaterThanDate:otherModel.event.startDate] && [viewModel.event.endDate isEarlierThanDate:otherModel.event.endDate]) ||
+                ([viewModel.event.startDate isEarlierThanDate:otherModel.event.startDate] && [viewModel.event.endDate isLaterThanDate:otherModel.event.endDate]);
+                
+                if (overlaps) {
+                    if (otherModel.eventSpan == TLEventViewModelEventSpanTooManyWarning) {
+                        otherModel.extraEventsCount++;
+                        viewModel = nil;
+                    }
+                    else if (otherModel.eventSpan == TLEventViewModelEventSpanRight) {
+                        otherModel.eventSpan = TLEventViewModelEventSpanTooManyWarning;
+                        otherModel.extraEventsCount = 2;
+                    }
+                    else if (otherModel.eventSpan == TLEventViewModelEventSpanLeft) {
+                        viewModel.eventSpan = TLEventViewModelEventSpanRight;
+                    }
+                    else if (otherModel.eventSpan == TLEventViewModelEventSpanFull)
+                    {
+                        otherModel.eventSpan = TLEventViewModelEventSpanLeft;
+                        viewModel.eventSpan = TLEventViewModelEventSpanRight;
+                    }
+                }
+            }
+            
+            if (viewModel) {
+                [mutableArray addObject:viewModel];
+            }
         }
         
         NSLog(@"Constructed array of %d events. ", mutableArray.count);
@@ -315,28 +348,31 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     CGFloat x;
     CGFloat width = CGRectGetWidth(self.view.bounds);
     
+    // Grab the date components from the startDate and use the to find the hour and minutes of the event
     NSCalendar *currentCalendar = [NSCalendar currentCalendar];
     NSDateComponents *components = [currentCalendar components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
     NSInteger hour = components.hour;
     
+    // Use the collection view's calculations for the hour cell representing the start hour, and adjust based on minutes if necessary
     UICollectionViewLayoutAttributes *startHourAttributes = [self.collectionView layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:hour inSection:0]];
-    
     startY = CGRectGetMinY(startHourAttributes.frame);
     if (components.minute >= 30) {
         startY += CGRectGetHeight(startHourAttributes.frame) / 2.0f;
     }
     
+    // Now grab the components of the end hour ...
     components = [currentCalendar components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.endDate];
     hour = components.hour;
     
+    // And do the same calculation for the max Y. 
     UICollectionViewLayoutAttributes *endHourAttributes = [self.collectionView layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:hour inSection:0]];
     endY = CGRectGetMinY(endHourAttributes.frame);
-    
     if (components.minute >= 30)
     {
         endY += CGRectGetHeight(endHourAttributes.frame) / 2.0f;
     }
     
+    // Finally, we need to calculate the X value and the width of the supplementary view. 
     if (model.eventSpan == TLEventViewModelEventSpanFull ||  model.eventSpan == TLEventViewModelEventSpanLeft) {
         x = 0;
     }
@@ -345,6 +381,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         x = CGRectGetMidX(self.view.bounds) + 1;
     }
     
+    // All other event spans are half the horizontal size. 
     if (model.eventSpan != TLEventViewModelEventSpanFull)
     {
         width /= 2.0f;
@@ -471,15 +508,16 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 }
 
 -(EKEvent *)eventUnderPoint:(CGPoint)point
-{
+{    
     EKEvent *eventUnderTouch;
-    NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:point];
-    for (EKEvent *event in [EKEventManager sharedInstance].events) {
-        NSCalendar *calendar = [NSCalendar currentCalendar];
-        NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:event.startDate];
-        NSInteger hour = [components hour];
-        if (hour == indexPath.row) {
-            eventUnderTouch = event;
+    
+    //TODO: should detect "extra events" and display that text to the user. 
+    
+    for (NSInteger i = 0; i < self.viewModelArray.count; i++) {
+        CGRect frame = [self collectionView:self.collectionView layout:(TLCollectionViewLayout *)self.collectionView.collectionViewLayout frameForEventSupplementaryViewAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
+        
+        if (CGRectContainsPoint(frame, point)) {
+            eventUnderTouch = [self.viewModelArray[i] event];
         }
     }
     
