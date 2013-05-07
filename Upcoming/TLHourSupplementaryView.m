@@ -21,14 +21,14 @@
 
 @implementation TLHourSupplementaryView
 
-- (id)initWithFrame:(CGRect)frame
-{
+-(id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
+
     if (self) {
         self.backgroundColor = [UIColor clearColor];
         self.userInteractionEnabled = NO;
         self.lineHeight = 1.0f;
-        
+
         self.timeLabel = [[UILabel alloc] initWithFrame:CGRectZero];
         self.timeLabel.font = [[UIFont tl_appFont] fontWithSize:14];
         self.timeLabel.autoresizingMask = UIViewAutoresizingFlexibleHeight;
@@ -38,50 +38,45 @@
         self.timeLabel.shadowOffset = CGSizeMake(0, 1);
         [self addSubview:self.timeLabel];
     }
+
     return self;
 }
 
-+(NSString *)kind
-{
++(NSString *)kind {
     return NSStringFromClass(self);
 }
 
--(void)setTimeString:(NSString *)timeString
-{
+-(void)setTimeString:(NSString *)timeString {
     _timeString = timeString;
     self.timeLabel.text = timeString;
     [self setNeedsDisplay];
     [self setNeedsLayout];
 }
 
--(void)applyLayoutAttributes:(TLCollectionViewLayoutAttributes *)layoutAttributes
-{
+-(void)applyLayoutAttributes:(TLCollectionViewLayoutAttributes *)layoutAttributes {
     [super applyLayoutAttributes:layoutAttributes];
-    
+
     self.hourLineProgressionRatio = layoutAttributes.hourLineProgressRatio;
     [self setNeedsDisplay];
 }
 
-
 static const CGFloat leftMargin = 12.0f;
 
--(void)layoutSubviews
-{
+-(void)layoutSubviews {
     [super layoutSubviews];
-    
+
     UIFont *font = [[UIFont tl_appFont] fontWithSize:14];
     CGSize textSize = [self.timeString sizeWithFont:font];
-    
+
     CGRect textRect = CGRectMake(leftMargin, CGRectGetMidY(self.bounds) - textSize.height / 2, textSize.width, textSize.height);
     self.timeLabel.frame = textRect;
 }
 
-- (void)drawRect:(CGRect)rect
-{
+-(void)drawRect:(CGRect)rect {
     CGContextRef context = UIGraphicsGetCurrentContext();
-    
+
     CGRect textRect = self.timeLabel.frame;
-    
+
     CGContextSaveGState(context);
     {
         UIBezierPath *textRectPath = [UIBezierPath bezierPathWithRect:CGRectInset(textRect, -5, -100)];
@@ -89,11 +84,11 @@ static const CGFloat leftMargin = 12.0f;
         CGPathRef path = [textRectPath CGPath];
         CGContextAddPath(context, path);
         CGContextEOClip(context);
-        
+
         CGFloat drawableHeight = CGRectGetHeight(self.bounds) - 3;
-        
+
         CGFloat y = lrint(self.hourLineProgressionRatio * drawableHeight) + 1;
-        
+
         CGContextSaveGState(context);
         {
             CGContextSetLineWidth(context, self.lineHeight);
@@ -101,11 +96,11 @@ static const CGFloat leftMargin = 12.0f;
             CGContextBeginPath(context);
             CGContextMoveToPoint(context, 0, y + 1);
             CGContextAddLineToPoint(context, CGRectGetWidth(self.bounds), y + 1);
-            
+
             CGContextStrokePath(context);
         }
         CGContextRestoreGState(context);
-        
+
         CGContextSaveGState(context);
         {
             CGContextSetLineWidth(context, self.lineHeight);
@@ -113,13 +108,12 @@ static const CGFloat leftMargin = 12.0f;
             CGContextBeginPath(context);
             CGContextMoveToPoint(context, 0, y);
             CGContextAddLineToPoint(context, CGRectGetWidth(self.bounds), y);
-            
+
             CGContextStrokePath(context);
         }
         CGContextRestoreGState(context);
     }
     CGContextRestoreGState(context);
 }
-
 
 @end

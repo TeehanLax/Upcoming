@@ -10,12 +10,11 @@
 
 @implementation TLCollectionViewLayoutAttributes
 
--(id)copyWithZone:(NSZone *)zone
-{
+-(id)copyWithZone:(NSZone *)zone {
     TLCollectionViewLayoutAttributes *otherAttributes = [super copyWithZone:zone];
-    
+
     otherAttributes.hourLineProgressRatio = self.hourLineProgressRatio;
-    
+
     return otherAttributes;
 }
 

@@ -50,9 +50,10 @@ const CGFloat kUpperHeaderHeight = 52.0f;
 
 @implementation TLHeaderViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    if (!(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) return nil;
+-(id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (!(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
+        return nil;
+    }
     
     // Reload our table view whenever the sources change on the event manager
     @weakify(self);
@@ -60,12 +61,11 @@ const CGFloat kUpperHeaderHeight = 52.0f;
         @strongify(self);
         [self.calendarTableView reloadData];
     }];
-        
+    
     return self;
 }
 
-- (void)viewDidLoad
-{
+-(void)viewDidLoad {
     [super viewDidLoad];
     
     self.view.backgroundColor = [UIColor clearColor];
@@ -75,29 +75,25 @@ const CGFloat kUpperHeaderHeight = 52.0f;
     // Update our header labels with the next event whenever it changes.
     @weakify(self);
     [[[[RACSignal combineLatest:@[RACAbleWithStart([EKEventManager sharedInstance], events), RACAbleWithStart([EKEventManager sharedInstance], nextEvent), timerSignal]
-                        reduce:^id(NSArray *eventArray, EKEvent *nextEvent, NSDate *fireDate)
-       {
-           NSArray *filteredArray = [[eventArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(EKEvent *event, NSDictionary *bindings) {
-               return [event.startDate isLaterThanDate:[NSDate date]];
-           }]] sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-               return [[obj1 startDate] compare:[obj2 startDate]];
-           }];
-           
-           if (filteredArray.count == 0)
-           {
-               return nextEvent;
-           }
-           else
-           {
-               return filteredArray[0];
-           }
-           
-       }] deliverOn:[RACScheduler mainThreadScheduler]] throttle:0.25f]
+                         reduce:^id (NSArray *eventArray, EKEvent *nextEvent, NSDate *fireDate)
+        {
+            NSArray *filteredArray = [[eventArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL (EKEvent *event, NSDictionary *bindings) {
+                return [event.startDate
+                        isLaterThanDate:[NSDate date]];
+            }]] sortedArrayUsingComparator:^NSComparisonResult (id obj1, id obj2) {
+                return [[obj1 startDate] compare:[obj2 startDate]];
+            }];
+            
+            if (filteredArray.count == 0) {
+                return nextEvent;
+            } else {
+                return filteredArray[0];
+            }
+        }] deliverOn:[RACScheduler mainThreadScheduler]] throttle:0.25f]
      subscribeNext:^(EKEvent *event) {
          @strongify(self);
          
-         if (event == nil)
-         {
+         if (event == nil) {
              self.eventTitleLabel.text = NSLocalizedString(@"No Upcoming Event", @"No upcoming event header text");
              self.eventLocationLabel.text = @"";
              self.eventTimeLabel.text = @"";
@@ -112,74 +108,57 @@ const CGFloat kUpperHeaderHeight = 52.0f;
          NSCalendar *calendar = [NSCalendar currentCalendar];
          
          unsigned int unitFlags = NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit;
-         NSDateComponents *startTimeComponents = [calendar components:unitFlags fromDate:[NSDate date] toDate:event.startDate options:0];
+         NSDateComponents *startTimeComponents = [calendar  components:unitFlags
+                                                              fromDate:[NSDate date]
+                                                                toDate:event.startDate
+                                                               options:0];
          
          // Check for descending unit lengths being greater than zero for the largest, non-zero component.
-         if (startTimeComponents.month > 0)
-         {
+         if (startTimeComponents.month > 0) {
              NSInteger numberOfMonths = startTimeComponents.month;
              
-             if (startTimeComponents.day > 15)
-             {
+             if (startTimeComponents.day > 15) {
                  numberOfMonths++;
              }
              
              self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", numberOfMonths];
              
-             if (numberOfMonths == 1)
-             {
+             if (numberOfMonths == 1) {
                  self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"MONTH", @"Month unit singular");
-             }
-             else
-             {
+             } else {
                  self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"MONTHS", @"Month unit plural");
              }
-         }
-         else if (startTimeComponents.day > 0)
-         {
+         } else if (startTimeComponents.day > 0) {
              self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", startTimeComponents.day];
              
-             if (startTimeComponents.day == 1)
-             {
+             if (startTimeComponents.day == 1) {
                  self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"DAY", @"Day unit singular");
-             }
-             else
-             {
+             } else {
                  self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"DAYS", @"Day unit plural");
              }
-         }
-         else if (startTimeComponents.hour > 0 && !(startTimeComponents.hour == 1 && startTimeComponents.minute < 30))
-         {
+         } else if (startTimeComponents.hour > 0 && !(startTimeComponents.hour == 1 && startTimeComponents.minute < 30)) {
              NSInteger numberOfHours = startTimeComponents.hour;
              
-             if (startTimeComponents.minute > 30)
-             {
+             if (startTimeComponents.minute > 30) {
                  numberOfHours++;
              }
              
              self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", numberOfHours];
              
-             if (numberOfHours == 1)
-             {
+             if (numberOfHours == 1) {
                  self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"HOUR", @"Hour unit singular");
-             }
-             else
-             {
+             } else {
                  self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"HOURS", @"Hour unit plural");
              }
-         }
-         else 
-         {
-             NSInteger numberOfMinutes = [event.startDate minutesAfterDate:[NSDate date]];
+         } else {
+             NSInteger numberOfMinutes = [event.startDate
+                                          minutesAfterDate:[NSDate date]];
              
              self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", numberOfMinutes];
              
-             if (numberOfMinutes == 1)
-             {
+             if (numberOfMinutes == 1) {
                  self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"MIN", @"Minute unit singular");
-             }
-             else
-             {
+             } else {
                  self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"MINS", @"Minute unit plural");
              }
          }
@@ -187,15 +166,16 @@ const CGFloat kUpperHeaderHeight = 52.0f;
          self.eventTitleLabel.text = event.title;
          self.eventLocationLabel.text = event.location;
          self.eventTimeLabel.text = [NSString stringWithFormat:@"%@ – %@",
-                                       [NSDateFormatter localizedStringFromDate:event.startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle],
-                                       [NSDateFormatter localizedStringFromDate:event.endDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle]];
+                                     [NSDateFormatter localizedStringFromDate:event.startDate
+                                                                    dateStyle:NSDateFormatterNoStyle
+                                                                    timeStyle:NSDateFormatterShortStyle],
+                                     [NSDateFormatter localizedStringFromDate:event.endDate
+                                                                    dateStyle:NSDateFormatterNoStyle
+                                                                    timeStyle:NSDateFormatterShortStyle]];
          
-         if ([self.eventLocationLabel.text length] > 0)
-         {
+         if ([self.eventLocationLabel.text length] > 0) {
              self.eventLocationImageView.alpha = 1.0f;
-         }
-         else
-         {
+         } else {
              self.eventLocationImageView.alpha = 0.0f;
          }
          
@@ -205,29 +185,26 @@ const CGFloat kUpperHeaderHeight = 52.0f;
     
     self.alternateEventSubject = [RACSubject subject];
     [[self.alternateEventSubject distinctUntilChanged] subscribeNext:^(EKEvent *event) {
-        
-        if (event == nil)
-        {
+        if (event == nil) {
             self.alternateEventTitleLabel.text = @"";
             self.alternateEventLocationLabel.text = @"";
             self.alternateEventTimeLabel.text = @"";
             self.alternateCalendarView.alpha = 0.0f;
             self.alternateEventLocationImageView.alpha = 0.0f;
-        }
-        else
-        {
+        } else {
             self.alternateEventTitleLabel.text = event.title;
             self.alternateEventLocationLabel.text = event.location;
             self.alternateEventTimeLabel.text = [NSString stringWithFormat:@"%@ – %@",
-                                                 [NSDateFormatter localizedStringFromDate:event.startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle],
-                                                 [NSDateFormatter localizedStringFromDate:event.endDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle]];
+                                                 [NSDateFormatter           localizedStringFromDate:event.startDate
+                                                                                          dateStyle:NSDateFormatterNoStyle
+                                                                                          timeStyle:NSDateFormatterShortStyle],
+                                                 [NSDateFormatter           localizedStringFromDate:event.endDate
+                                                                                          dateStyle:NSDateFormatterNoStyle
+                                                                                          timeStyle:NSDateFormatterShortStyle]];
             
-            if ([self.alternateEventLocationLabel.text length] > 0)
-            {
+            if ([self.alternateEventLocationLabel.text length] > 0) {
                 self.alternateEventLocationImageView.alpha = 1.0f;
-            }
-            else
-            {
+            } else {
                 self.alternateEventLocationImageView.alpha = 0.0f;
             }
             
@@ -235,29 +212,30 @@ const CGFloat kUpperHeaderHeight = 52.0f;
             self.alternateCalendarView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
         }
         
-        [self.headerAlernateDetailView crossfadeWithDuration:0.1f];
+        [self.headerAlernateDetailView
+         crossfadeWithDuration:0.1f];
     }];
-        
+    
     // Remove the default table view background
     UIView *backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
     backgroundView.backgroundColor = [UIColor clearColor];
     self.calendarTableView.backgroundView = backgroundView;
 }
 
--(void)viewWillAppear:(BOOL)animated
-{
+-(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     // Set up the table view mask
     [self setupTableViewMask];
 }
 
--(void)setupTableViewMask
-{
+-(void)setupTableViewMask {
     // This method sets up the mask for the view which contains the table view,
     // making it appear to "fade out" as it reaches the bottom.
     
-    if (self.tableMaskingView.layer.mask) return;
+    if (self.tableMaskingView.layer.mask) {
+        return;
+    }
     
     CALayer *maskLayer = [CALayer layer];
     maskLayer.frame = self.tableMaskingView.bounds;
@@ -283,25 +261,21 @@ const CGFloat kUpperHeaderHeight = 52.0f;
     self.tableMaskingView.layer.mask = maskLayer;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
+-(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     EKSource *source = [EKEventManager sharedInstance].sources[section];
     
     return source.title;
 }
 
--(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return 46;
 }
 
--(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
-{
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     return 37;
 }
 
--(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
-{
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(tableView.bounds), [self tableView:tableView heightForHeaderInSection:section])];
     
     header.backgroundColor = [UIColor clearColor];
@@ -318,25 +292,21 @@ const CGFloat kUpperHeaderHeight = 52.0f;
     return header;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     EKSource *source = [EKEventManager sharedInstance].sources[section];
     
     return [[source calendarsForEntityType:EKEntityTypeEvent] count];
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return [[EKEventManager sharedInstance].sources count];
 }
 
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *CellIdentifier = @"Cell";
     TLCalendarSelectCell *cell = (TLCalendarSelectCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
-    if (!cell)
-    {
+    if (!cell) {
         cell = [[TLCalendarSelectCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     
@@ -346,22 +316,19 @@ const CGFloat kUpperHeaderHeight = 52.0f;
     EKCalendar *calendar = calendars[indexPath.row];
     
     cell.textLabel.text = calendar.title;
-    if ([eventManager.selectedCalendars containsObject:calendar.calendarIdentifier])
-    {
+    
+    if ([eventManager.selectedCalendars containsObject:calendar.calendarIdentifier]) {
         cell.accessoryView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"checkmark"]];
-    }
-    else
-    {
+    } else {
         cell.accessoryView = nil;
     }
     
     cell.dotColor = [UIColor colorWithCGColor:calendar.CGColor];
-
+    
     return cell;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     EKEventManager *eventManager = [EKEventManager sharedInstance];
     EKSource *source = eventManager.sources[indexPath.section];
     NSArray *calendars = [[source calendarsForEntityType:EKEntityTypeEvent] allObjects];
@@ -372,21 +339,19 @@ const CGFloat kUpperHeaderHeight = 52.0f;
 
 #pragma mark - Public Methods
 
--(void)flashScrollBars
-{
+-(void)flashScrollBars {
     [self.calendarTableView flashScrollIndicators];
 }
 
--(void)scrollTableViewToTop
-{
+-(void)scrollTableViewToTop {
     [self.calendarTableView scrollRectToVisible:CGRectMake(1, 1, 1, 1) animated:NO];
 }
 
 /*
- Each of the following two animations is actually made up of four discrete animations. 
- First, we pull down by some distange, then pull back up to hide the view completely. 
+ Each of the following two animations is actually made up of four discrete animations.
+ First, we pull down by some distange, then pull back up to hide the view completely.
  A delay occurs, then another view falls back down to the pulled-down distance
- then returns to its resting state. 
+ then returns to its resting state.
  */
 
 static CGFloat pullDownDistance = 7.0f;
@@ -396,59 +361,85 @@ static CGFloat pullUpAnimationDuration = 0.1f;
 static CGFloat fallDownAnimationDuration = 0.1f;
 static CGFloat interAnimationDelay = 0.05f;
 
--(void)hideHeaderView
-{
-    [UIView animateWithDuration:pullDownAnimationDuration animations:^{
-        self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
-    } completion:^(BOOL finished) {
-        [UIView animateWithDuration:pullUpAnimationDuration delay:0.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-            self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
-        } completion:^(BOOL finished) {
-            self.headerAlernateDetailView.alpha = 1.0f;
-            self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerAlernateDetailView.frame));
-            [UIView animateWithDuration:fallDownAnimationDuration delay:interAnimationDelay options:UIViewAnimationOptionCurveEaseOut animations:^{
-                self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
-            } completion:^(BOOL finished) {
-                [UIView animateWithDuration:pullDownAnimationDuration animations:^{
-                    self.headerAlernateDetailView.transform = CGAffineTransformIdentity;
-                }];
-            }];
-        }];
-    }];
+-(void)hideHeaderView {
+    [UIView animateWithDuration:pullDownAnimationDuration
+                     animations:^{
+                         self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
+                     }
+     
+                     completion:^(BOOL finished) {
+                         [UIView  animateWithDuration:pullUpAnimationDuration
+                                                delay:0.0f
+                                              options:UIViewAnimationOptionCurveEaseIn
+                                           animations:^{
+                                               self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
+                                           }
+                          
+                                           completion:^(BOOL finished) {
+                                               self.headerAlernateDetailView.alpha = 1.0f;
+                                               self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerAlernateDetailView.frame));
+                                               [UIView               animateWithDuration:fallDownAnimationDuration
+                                                                                   delay:interAnimationDelay
+                                                                                 options:UIViewAnimationOptionCurveEaseOut
+                                                                              animations:^{
+                                                                                  self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
+                                                                              }
+                                                
+                                                                              completion:^(BOOL finished) {
+                                                                                  [UIView            animateWithDuration:pullDownAnimationDuration
+                                                                                                              animations:^{
+                                                                                                                  self.headerAlernateDetailView.transform = CGAffineTransformIdentity;
+                                                                                                              }];
+                                                                              }];
+                                           }];
+                     }];
 }
 
--(void)showHeaderView
-{
+-(void)showHeaderView {
     //[[UIApplication sharedApplication] beginIgnoringInteractionEvents];
-    [UIView animateWithDuration:pullDownAnimationDuration animations:^{
-        self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
-    } completion:^(BOOL finished) {
-        [UIView animateWithDuration:pullUpAnimationDuration delay:0.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-            self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
-        } completion:^(BOOL finished) {
-            self.headerAlernateDetailView.alpha = 0.0f;
-            [UIView animateWithDuration:fallDownAnimationDuration delay:interAnimationDelay options:UIViewAnimationOptionCurveEaseOut animations:^{
-                self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
-            } completion:^(BOOL finished) {
-                [UIView animateWithDuration:pullDownAnimationDuration animations:^{
-                    self.headerDetailView.transform = CGAffineTransformIdentity;
-                } completion:^(BOOL finished) {
-                    //[[UIApplication sharedApplication] endIgnoringInteractionEvents];
-                }];
-            }];
-        }];
-    }];
+    [UIView animateWithDuration:pullDownAnimationDuration
+                     animations:^{
+                         self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
+                     }
+     
+                     completion:^(BOOL finished) {
+                         [UIView  animateWithDuration:pullUpAnimationDuration
+                                                delay:0.0f
+                                              options:UIViewAnimationOptionCurveEaseIn
+                                           animations:^{
+                                               self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
+                                           }
+                          
+                                           completion:^(BOOL finished) {
+                                               self.headerAlernateDetailView.alpha = 0.0f;
+                                               [UIView               animateWithDuration:fallDownAnimationDuration
+                                                                                   delay:interAnimationDelay
+                                                                                 options:UIViewAnimationOptionCurveEaseOut
+                                                                              animations:^{
+                                                                                  self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
+                                                                              }
+                                                
+                                                                              completion:^(BOOL finished) {
+                                                                                  [UIView            animateWithDuration:pullDownAnimationDuration
+                                                                                                              animations:^{
+                                                                                                                  self.headerDetailView.transform = CGAffineTransformIdentity;
+                                                                                                              }
+                                                                                   
+                                                                                                              completion:^(BOOL finished) {
+                                                                                                                  //[[UIApplication sharedApplication] endIgnoringInteractionEvents];
+                                                                                                              }];
+                                                                              }];
+                                           }];
+                     }];
 }
 
--(void)updateHour:(NSInteger)hours minute:(NSInteger)minutes event:(EKEvent *)event
-{
+-(void)updateHour:(NSInteger)hours minute:(NSInteger)minutes event:(EKEvent *)event {
     self.alternateAbsoluteTimeLabel.text = [NSString stringWithFormat:@"%d:%02d", hours, minutes];
     
     [self.alternateEventSubject sendNext:event];
 }
 
--(void)setArrowRotationRatio:(CGFloat)arrowRotationRatio
-{
+-(void)setArrowRotationRatio:(CGFloat)arrowRotationRatio {
     _arrowRotationRatio = arrowRotationRatio;
     
     self.arrowButton.transform = CGAffineTransformMakeRotation(M_PI * arrowRotationRatio + M_PI);
@@ -456,13 +447,11 @@ static CGFloat interAnimationDelay = 0.05f;
 
 #pragma mark - IBAction Methods
 
--(IBAction)userDidPressDismissButton
-{
+-(IBAction)userDidPressDismissButton {
     [self.delegate userDidTapDismissHeaderButton];
 }
 
--(IBAction)userDidPressTLButton:(id)sender
-{
+-(IBAction)userDidPressTLButton:(id)sender {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://www.teehanlax.com/"]];
 }
 

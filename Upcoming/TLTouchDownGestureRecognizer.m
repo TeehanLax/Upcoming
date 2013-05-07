@@ -11,13 +11,13 @@
 
 @implementation TLTouchDownGestureRecognizer
 
--(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     if (self.state == UIGestureRecognizerStatePossible) {
         self.state = UIGestureRecognizerStateBegan;
     }
 }
 
--(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
+-(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     self.state = UIGestureRecognizerStateEnded;
 }
 

@@ -13,4 +13,3 @@
 @property (nonatomic, assign) CGFloat hourLineProgressRatio;
 
 @end
-

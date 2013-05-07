@@ -11,7 +11,7 @@
 #import "TLCollectionViewLayout.h"
 
 #define NUMBER_OF_ROWS 24
-#define EXPANDED_ROWS 4
+#define EXPANDED_ROWS  4
 #define MAX_ROW_HEIGHT 38.f
 
 @class TLEventViewController;

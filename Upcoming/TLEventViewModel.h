@@ -15,7 +15,7 @@ typedef enum : NSInteger {
     TLEventViewModelEventSpanLeft,
     TLEventViewModelEventSpanRight,
     TLEventViewModelEventSpanTooManyWarning
-}TLEventViewModelEventSpan;
+} TLEventViewModelEventSpan;
 
 @interface TLEventViewModel : NSObject
 

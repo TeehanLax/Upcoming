@@ -10,6 +10,6 @@
 
 @interface UIImage (Blur)
 
-+ (UIImage *)darkenedAndBlurredImageForImage:(UIImage *)image;
++(UIImage *)darkenedAndBlurredImageForImage:(UIImage *)image;
 
 @end

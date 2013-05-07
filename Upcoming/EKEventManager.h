@@ -9,10 +9,10 @@
 #import <Foundation/Foundation.h>
 #import <EventKit/EventKit.h>
 
-extern NSString * const EKEventManagerAccessibleKeyPath;
-extern NSString * const EKEventManagerEventsKeyPath;
-extern NSString * const EKEventManagerNextEventKeyPath;
-extern NSString * const EKEventManagerSourcesKeyPath;
+extern NSString *const EKEventManagerAccessibleKeyPath;
+extern NSString *const EKEventManagerEventsKeyPath;
+extern NSString *const EKEventManagerNextEventKeyPath;
+extern NSString *const EKEventManagerSourcesKeyPath;
 
 @interface EKEventManager : NSObject
 
@@ -25,8 +25,8 @@ extern NSString * const EKEventManagerSourcesKeyPath;
 @property (nonatomic, strong) NSMutableArray *sources;
 @property (nonatomic, strong) NSMutableArray *selectedCalendars;
 
-+ (EKEventManager *)sharedInstance;
-- (void)refresh;
-- (void)toggleCalendarWithIdentifier:(NSString *)calendarIdentifier;
++(EKEventManager *)sharedInstance;
+-(void)refresh;
+-(void)toggleCalendarWithIdentifier:(NSString *)calendarIdentifier;
 
 @end

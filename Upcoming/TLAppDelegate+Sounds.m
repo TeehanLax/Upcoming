@@ -19,67 +19,61 @@ static SystemSoundID pushMenuInSoundID;
 
 @implementation TLAppDelegate (Sounds)
 
--(void)playTouchDownSound
-{
+-(void)playTouchDownSound {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         NSString *path  = [[NSBundle mainBundle] pathForResource:@"soundeffect" ofType:@"wav"];
-        NSURL *pathURL = [NSURL fileURLWithPath : path];
+        NSURL *pathURL = [NSURL fileURLWithPath:path];
         AudioServicesCreateSystemSoundID((__bridge CFURLRef)pathURL, &touchDownSoundID);
     });
     AudioServicesPlaySystemSound(touchDownSoundID);
 }
 
--(void)playTouchUpSound
-{
+-(void)playTouchUpSound {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         NSString *path  = [[NSBundle mainBundle] pathForResource:@"soundeffect" ofType:@"wav"];
-        NSURL *pathURL = [NSURL fileURLWithPath : path];
+        NSURL *pathURL = [NSURL fileURLWithPath:path];
         AudioServicesCreateSystemSoundID((__bridge CFURLRef)pathURL, &touchUpSoundID);
     });
     AudioServicesPlaySystemSound(touchUpSoundID);
 }
 
--(void)playTouchNewHourSound
-{
+-(void)playTouchNewHourSound {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         NSString *path  = [[NSBundle mainBundle] pathForResource:@"soundeffect" ofType:@"wav"];
-        NSURL *pathURL = [NSURL fileURLWithPath : path];
+        NSURL *pathURL = [NSURL fileURLWithPath:path];
         AudioServicesCreateSystemSoundID((__bridge CFURLRef)pathURL, &touchNewHourSoundID);
     });
     AudioServicesPlaySystemSound(touchNewHourSoundID);
 }
 
--(void)playTouchNewEventSound
-{
+-(void)playTouchNewEventSound {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         NSString *path  = [[NSBundle mainBundle] pathForResource:@"soundeffect" ofType:@"wav"];
-        NSURL *pathURL = [NSURL fileURLWithPath : path];
+        NSURL *pathURL = [NSURL fileURLWithPath:path];
         AudioServicesCreateSystemSoundID((__bridge CFURLRef)pathURL, &touchNewEventSoundID);
     });
     AudioServicesPlaySystemSound(touchNewEventSoundID);
 }
 
--(void)playPullMenuOutSound
-{
+-(void)playPullMenuOutSound {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         NSString *path  = [[NSBundle mainBundle] pathForResource:@"soundeffect" ofType:@"wav"];
-        NSURL *pathURL = [NSURL fileURLWithPath : path];
+        NSURL *pathURL = [NSURL fileURLWithPath:path];
         AudioServicesCreateSystemSoundID((__bridge CFURLRef)pathURL, &pullMenuOutSoundID);
     });
     AudioServicesPlaySystemSound(pullMenuOutSoundID);
 }
 
--(void)playPushMenuInSound
-{
+-(void)playPushMenuInSound {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         NSString *path  = [[NSBundle mainBundle] pathForResource:@"soundeffect" ofType:@"wav"];
-        NSURL *pathURL = [NSURL fileURLWithPath : path];
+        NSURL *pathURL = [NSURL fileURLWithPath:path];
         AudioServicesCreateSystemSoundID((__bridge CFURLRef)pathURL, &pushMenuInSoundID);
     });
     AudioServicesPlaySystemSound(pushMenuInSoundID);

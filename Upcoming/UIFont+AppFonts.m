@@ -10,13 +10,11 @@
 
 @implementation UIFont (AppFonts)
 
-+(UIFont *)tl_appFont
-{
++(UIFont *)tl_appFont {
     return [UIFont fontWithName:@"AvenirNext-Regular" size:[UIFont systemFontSize]];
 }
 
-+(UIFont *)tl_mediumAppFont
-{
++(UIFont *)tl_mediumAppFont {
     return [UIFont fontWithName:@"AvenirNext-Medium" size:[UIFont systemFontSize]];
 }
 

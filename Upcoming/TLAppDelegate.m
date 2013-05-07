@@ -15,25 +15,23 @@
 
 @implementation TLAppDelegate
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
+-(BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     self.viewController = [[TLRootViewController alloc] init];
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
-    
+
     [self setupDevice];
-        
+
     return YES;
 }
 
-- (void)applicationDidBecomeActive:(UIApplication *)application {
+-(void)applicationDidBecomeActive:(UIApplication *)application {
     [[EKEventManager sharedInstance] refresh];
 }
 
--(void)setupDevice
-{
+-(void)setupDevice {
     // Gets a string with the device model
     size_t size;
     sysctlbyname("hw.machine", NULL, &size, NULL, 0);
@@ -41,27 +39,18 @@
     sysctlbyname("hw.machine", machine, &size, NULL, 0);
     NSString *platform = [NSString stringWithCString:machine encoding:NSUTF8StringEncoding];
     free(machine);
-    
-    if ([platform hasPrefix:@"iPhone2"] || [platform hasPrefix:@"iPod2"] || [platform hasPrefix:@"iPod3"])
-    {
+
+    if ([platform hasPrefix:@"iPhone2"] || [platform hasPrefix:@"iPod2"] || [platform hasPrefix:@"iPod3"]) {
         _device = TLAppDelegateDeviceIPhone3GS;
-    }
-    else if ([platform hasPrefix:@"iPhone3"] || [platform hasPrefix:@"iPod4"])
-    {
+    } else if ([platform hasPrefix:@"iPhone3"] || [platform hasPrefix:@"iPod4"]) {
         _device = TLAppDelegateDeviceIPhone4;
-    }
-    else if ([platform hasPrefix:@"iPhone4"] || [platform hasPrefix:@"iPod5"])
-    {
+    } else if ([platform hasPrefix:@"iPhone4"] || [platform hasPrefix:@"iPod5"]) {
         _device = TLAppDelegateDeviceIPhone4S;
-    }
-    else if ([platform hasPrefix:@"iPhone5"])
-    {
+    } else if ([platform hasPrefix:@"iPhone5"]) {
         _device = TLAppDelegateDeviceIPhone5;
-    }
-    else
-    {
+    } else {
         // We're going to assume it's the iPhone 5 if none of the other comparisons worked.
-        // Likely, this is new hardware that's at least as capable as the iPhone 5. 
+        // Likely, this is new hardware that's at least as capable as the iPhone 5.
         _device = TLAppDelegateDeviceIPhone5;
     }
 }

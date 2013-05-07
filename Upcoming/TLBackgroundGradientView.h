@@ -11,7 +11,7 @@
 @interface TLBackgroundGradientView : UIView
 
 /*
- Change the ratio between normal colours and alerted colours.
+   Change the ratio between normal colours and alerted colours.
  */
 -(void)setAlertRatio:(CGFloat)ratio animated:(BOOL)animated;
 

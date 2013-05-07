@@ -10,7 +10,7 @@
 
 @class TLRootViewController;
 
-typedef enum{
+typedef enum {
     TLAppDelegateDeviceIPhone3GS,
     TLAppDelegateDeviceIPhone4,
     TLAppDelegateDeviceIPhone4S,

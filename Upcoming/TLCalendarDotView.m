@@ -10,17 +10,15 @@
 
 @implementation TLCalendarDotView
 
--(void)setDotColor:(UIColor *)dotColor
-{
+-(void)setDotColor:(UIColor *)dotColor {
     _dotColor = dotColor;
     [self setNeedsDisplay];
 }
 
-- (void)drawRect:(CGRect)rect
-{
+-(void)drawRect:(CGRect)rect {
     CGContextRef ctx = UIGraphicsGetCurrentContext();
     CGContextAddEllipseInRect(ctx, self.bounds);
-    CGContextSetFillColor(ctx, CGColorGetComponents([self.dotColor CGColor] ?: [[UIColor clearColor] CGColor]));
+    CGContextSetFillColor(ctx, CGColorGetComponents([self.dotColor CGColor] ? : [[UIColor clearColor] CGColor]));
     CGContextFillPath(ctx);
 }
 
