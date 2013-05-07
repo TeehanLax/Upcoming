@@ -44,8 +44,9 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
                                [self didChangeValueForKey:EKEventManagerAccessibleKeyPath];
 
                                if (_accessible) {
-                               // load events
-                               [self refresh];
+                                   // load events
+                                   [_store reset];
+                                   [self refresh];
                                }
                            }];
 
