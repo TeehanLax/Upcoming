@@ -461,7 +461,10 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         
         return self.hourSupplementaryView;
     } else {
-        TLHourCell *supplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kEventSupplementaryViewIdentifier forIndexPath:indexPath];
+        TLEventSupplementaryView *supplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kEventSupplementaryViewIdentifier forIndexPath:indexPath];
+        
+        TLEventViewModel *model = self.viewModelArray[indexPath.row];
+        supplementaryView.titleString = model.event.title;
         
         return supplementaryView;
     }
