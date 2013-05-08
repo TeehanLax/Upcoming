@@ -16,7 +16,7 @@ static CGFloat lerp(CGFloat amount, CGFloat a, CGFloat b) {
 @implementation UIColor (CustomizedColors)
 
 
-+(UIColor *)interpolatedColorWithRatio:(CGFloat)ratio color:(UIColor *)color color:(UIColor *)otherColor {
++(UIColor *)tl_interpolatedColorWithRatio:(CGFloat)ratio color:(UIColor *)color color:(UIColor *)otherColor {
     CGFloat red1, red2, green1, green2, blue1, blue2, alpha1, alpha2;
 
     [color getRed:&red1 green:&green1 blue:&blue1 alpha:&alpha1];
@@ -25,7 +25,7 @@ static CGFloat lerp(CGFloat amount, CGFloat a, CGFloat b) {
     return [UIColor colorWithRed:lerp(ratio, red1, red2) green:lerp(ratio, green1, green2) blue:lerp(ratio, blue1, blue2) alpha:lerp(ratio, alpha1, alpha2)];
 }
 
-+(UIColor *)colorFromRGB:(int)rgbValue {
++(UIColor *)tl_colorFromRGB:(int)rgbValue {
     return [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16)) / 255.0 green:((float)((rgbValue & 0xFF00) >> 8)) / 255.0 blue:((float)(rgbValue & 0xFF)) / 255.0 alpha:1.0];
 }
 

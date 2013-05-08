@@ -262,17 +262,15 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
     } else if (recognizer.state == UIGestureRecognizerStateChanged) {
         [self.collectionView.collectionViewLayout invalidateLayout];
         
-        if ([self.eventUnderFinger compareStartDateWithEvent:event] != NSOrderedSame ||
-            (self.eventUnderFinger == nil && event != nil) ||
-            (self.eventUnderFinger != nil && event == nil)) {
+        if (event != nil) {
             [AppDelegate playTouchNewEventSound];
-            self.eventUnderFinger = event;
         } else {
             if ([indexPath compare:self.indexPathUnderFinger] != NSOrderedSame) {
                 [AppDelegate playTouchNewHourSound];
                 self.indexPathUnderFinger = indexPath;
             }
         }
+        self.eventUnderFinger = event;
         
         if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
             [self.delegate userDidInteractWithDayListView:self updateTimeHour:hour minute:minute event:event];
@@ -392,7 +390,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
     CGFloat width = CGRectGetWidth(self.view.bounds);
     
     // Use the collection view's calculations for the hour cell representing the start hour, and adjust based on minutes if necessary
-    UICollectionViewLayoutAttributes *startHourAttributes = [self.collectionView layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:hour inSection:0]];
+    UICollectionViewLayoutAttributes *startHourAttributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:hour inSection:0]];
     startY = CGRectGetMinY(startHourAttributes.frame);
     
     if (components.minute >= 30) {
@@ -404,7 +402,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
     hour = components.hour;
     
     // And do the same calculation for the max Y.
-    UICollectionViewLayoutAttributes *endHourAttributes = [self.collectionView layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:hour inSection:0]];
+    UICollectionViewLayoutAttributes *endHourAttributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:hour inSection:0]];
     endY = CGRectGetMinY(endHourAttributes.frame);
     
     if (components.minute >= 30) {
@@ -427,7 +425,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
 }
 
 -(CGRect)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout frameForHourGutterSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath {
-    UICollectionViewLayoutAttributes *hourAttributes = [self.collectionView layoutAttributesForItemAtIndexPath:indexPath];
+    UICollectionViewLayoutAttributes *hourAttributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:indexPath];
     
     return CGRectMake(5, hourAttributes.frame.origin.y, 20, hourAttributes.frame.size.height);
 }
@@ -669,13 +667,8 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:i inSection:0];
         CGRect frame = [self collectionView:self.collectionView layout:(TLCollectionViewLayout *)self.collectionView.collectionViewLayout frameForEventSupplementaryViewAtIndexPath:indexPath];
         
-        if (CGRectContainsPoint(frame, point)) {
-            TLEventViewModel *model = self.viewModelArray[indexPath.item];
-            
-            // If the model represents a warning that there are too many events, we don't want to return it. 
-            if (model.eventSpan != TLEventViewModelEventSpanTooManyWarning) {
-                eventUnderTouch = [self.viewModelArray[i] event];
-            }
+        if (CGRectContainsPoint(frame, point)) {            
+            eventUnderTouch = [self.viewModelArray[i] event];
         }
     }
     

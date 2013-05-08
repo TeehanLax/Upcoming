@@ -22,10 +22,10 @@
     
     self.backgroundColor = [UIColor clearColor];
     
-    self.label = [[UILabel alloc] initWithFrame:self.bounds];
+    self.label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
     self.label.backgroundColor = [UIColor clearColor];
     self.label.font = [[UIFont tl_appFont] fontWithSize:11];
-    self.label.textColor = [UIColor colorFromRGB:0x999999];
+    self.label.textColor = [UIColor blackColor];
     self.label.textAlignment = NSTextAlignmentCenter;
 
     [self addSubview:self.label];
@@ -44,7 +44,7 @@
 -(void)layoutSubviews {
     [super layoutSubviews];
     
-    self.label.frame = self.bounds;
+    self.label.center = CGPointMake(self.label.center.x, lrint(CGRectGetMidY(self.bounds)));
 }
 
 @end

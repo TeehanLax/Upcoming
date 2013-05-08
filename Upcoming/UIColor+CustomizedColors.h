@@ -10,8 +10,8 @@
 
 @interface UIColor (CustomizedColors)
 
-+(UIColor *)interpolatedColorWithRatio:(CGFloat)ratio color:(UIColor *)color color:(UIColor *)otherColor;
++(UIColor *)tl_interpolatedColorWithRatio:(CGFloat)ratio color:(UIColor *)color color:(UIColor *)otherColor;
 
-+(UIColor *)colorFromRGB:(int)rgbValue;
++(UIColor *)tl_colorFromRGB:(int)rgbValue;
 
 @end

@@ -77,7 +77,7 @@
         UIColor *alertColor = [UIColor colorWithCGColor:(CGColorRef)(alertColorsArray[i])];
         UIColor *normalColor = [UIColor colorWithCGColor:(CGColorRef)(normalColorsArray[i])];
 
-        UIColor *newColor = [UIColor interpolatedColorWithRatio:ratio color:normalColor color:alertColor];
+        UIColor *newColor = [UIColor tl_interpolatedColorWithRatio:ratio color:normalColor color:alertColor];
         [toColors insertObject:(id)[newColor CGColor] atIndex:i];
     }
 

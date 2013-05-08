@@ -37,7 +37,7 @@
     self.titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.titleLabel.font = [[UIFont tl_appFont] fontWithSize:14];
     self.titleLabel.backgroundColor = [UIColor clearColor];
-    self.titleLabel.textColor = [UIColor colorFromRGB:0x444444];
+    self.titleLabel.textColor = [UIColor tl_colorFromRGB:0x444444];
     [self.contentView addSubview:self.titleLabel];
     
     // Require this because UICollectionView will leave random supplementary views floating around, but give them a bounds of CGRect Zero. 

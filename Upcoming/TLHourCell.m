@@ -24,7 +24,7 @@
 -(void)awakeFromNib {
     self.titleLabel.clipsToBounds = NO;
     self.titleLabel.font = [[UIFont tl_mediumAppFont] fontWithSize:14];
-    self.titleLabel.textColor = [UIColor colorFromRGB:0x444444];
+    self.titleLabel.textColor = [UIColor tl_colorFromRGB:0x444444];
 
     [self.background.layer setCornerRadius:3.0f];
     [self.background.layer setMasksToBounds:YES];
