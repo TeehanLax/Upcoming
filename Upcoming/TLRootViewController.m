@@ -11,7 +11,6 @@
 #import "TLUpcomingEventViewController.h"
 
 #import "UIImage+Blur.h"
-#import "TLProfiling.h"
 #import "EKEventManager.h"
 
 #import <BlocksKit.h>
