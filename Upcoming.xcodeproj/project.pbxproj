@@ -64,6 +64,7 @@
 
 /* Begin PBXFileReference section */
 		0DF8D172A92B477D8A55BFE7 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		5E08B6DD173A910B00FBCBBB /* TLDefines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TLDefines.h; sourceTree = "<group>"; };
 		5E18D2AA172AF5A50010F8FF /* UIFont+AppFonts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIFont+AppFonts.h"; sourceTree = "<group>"; };
 		5E18D2AB172AF5A50010F8FF /* UIFont+AppFonts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIFont+AppFonts.m"; sourceTree = "<group>"; };
 		5E18D2B0172B03F60010F8FF /* checkmark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "checkmark@2x.png"; path = "Images/checkmark@2x.png"; sourceTree = "<group>"; };
@@ -263,6 +264,7 @@
 				5E2EF7B4172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m */,
 				5EB4E5601717374E00EC8E1C /* TLAppDelegate.h */,
 				5EB4E5611717374E00EC8E1C /* TLAppDelegate.m */,
+				5E08B6DD173A910B00FBCBBB /* TLDefines.h */,
 				5EB4E5581717374E00EC8E1C /* Supporting Files */,
 			);
 			path = Upcoming;
@@ -542,7 +544,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Upcoming/Upcoming-Prefix.pch";
 				INFOPLIST_FILE = "Upcoming/Upcoming-Info.plist";
-				LIBRARY_SEARCH_PATHS = "$(SYMROOT)/../Pods/build/Debug$(EFFECTIVE_PLATFORM_NAME)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SYMROOT)/../Pods/build/Debug$(EFFECTIVE_PLATFORM_NAME)",
+					"$(PODS_ROOT)/TestFlightSDK",
+				);
 				PRODUCT_NAME = Upcoming;
 				WRAPPER_EXTENSION = app;
 			};
@@ -556,7 +561,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Upcoming/Upcoming-Prefix.pch";
 				INFOPLIST_FILE = "Upcoming/Upcoming-Info.plist";
-				LIBRARY_SEARCH_PATHS = "$(SYMROOT)/../Pods/build/Debug$(EFFECTIVE_PLATFORM_NAME)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SYMROOT)/../Pods/build/Debug$(EFFECTIVE_PLATFORM_NAME)",
+					"$(PODS_ROOT)/TestFlightSDK",
+				);
 				PRODUCT_NAME = Upcoming;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;

@@ -9,6 +9,9 @@
 #import "TLAppDelegate.h"
 #import "TLRootViewController.h"
 #import "EKEventManager.h"
+#import "TLDefines.h"
+
+#import <TestFlight.h>
 
 #include <sys/types.h>
 #include <sys/sysctl.h>
@@ -16,6 +19,10 @@
 @implementation TLAppDelegate
 
 -(BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    if ([TEST_FLIGHT_TOKEN length] > 0) {
+        [TestFlight takeOff:TEST_FLIGHT_TOKEN];
+    }
+    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     self.viewController = [[TLRootViewController alloc] init];

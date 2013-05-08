@@ -1,5 +1,6 @@
 platform :ios, '6.0'
 
+pod 'TestFlightSDK', '1.2.4'
 pod 'UIViewDrawRectBlock', '0.0.1'
 pod 'ViewUtils', '1.1'
 pod 'ReactiveCocoa', '1.4.0'
