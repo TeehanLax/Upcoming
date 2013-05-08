@@ -18,4 +18,8 @@
     return [UIFont fontWithName:@"AvenirNext-Medium" size:[UIFont systemFontSize]];
 }
 
++(UIFont  *)tl_boldAppFont {
+    return [UIFont fontWithName:@"AvenirNext-Bold" size:[UIFont systemFontSize]];
+}
+
 @end

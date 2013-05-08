@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+#import "TLSplashViewController.h"
+
 @class TLRootViewController;
 
 typedef enum {
@@ -17,7 +19,7 @@ typedef enum {
     TLAppDelegateDeviceIPhone5
 }TLAppDelegateDevice;
 
-@interface TLAppDelegate : UIResponder <UIApplicationDelegate>
+@interface TLAppDelegate : UIResponder <UIApplicationDelegate, TLSplashViewControllerDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 

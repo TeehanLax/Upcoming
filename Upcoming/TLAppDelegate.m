@@ -16,6 +16,12 @@
 #include <sys/types.h>
 #include <sys/sysctl.h>
 
+@interface TLAppDelegate ()
+
+@property (nonatomic, strong) TLSplashViewController *splashViewController;
+
+@end
+
 @implementation TLAppDelegate
 
 -(BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -28,6 +34,10 @@
     self.viewController = [[TLRootViewController alloc] init];
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
+    
+    self.splashViewController = [[TLSplashViewController alloc] init];
+    self.splashViewController.view.frame = self.viewController.view.bounds;
+    [self.viewController.view addSubview:self.splashViewController.view];
 
     [self setupDevice];
 
@@ -61,6 +71,11 @@
         // Likely, this is new hardware that's at least as capable as the iPhone 5.
         _device = TLAppDelegateDeviceIPhone5;
     }
+}
+
+-(void)splashScreenControllerFinishedTransition:(TLSplashViewController *)controller {
+    [self.splashViewController.view removeFromSuperview];
+    self.splashViewController = nil;
 }
 
 @end

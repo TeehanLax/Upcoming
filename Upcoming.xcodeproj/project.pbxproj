@@ -19,6 +19,13 @@
 		5E08B6F4173AAD7300FBCBBB /* background-unhighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B6EF173AAD7300FBCBBB /* background-unhighlighted.png */; };
 		5E08B6F5173AAD7300FBCBBB /* background-highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B6F0173AAD7300FBCBBB /* background-highlighted.png */; };
 		5E08B6F9173AC09D00FBCBBB /* TLHourGutterSupplementaryView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E08B6F8173AC09D00FBCBBB /* TLHourGutterSupplementaryView.m */; };
+		5E08B700173AD78F00FBCBBB /* splash-1.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B6FA173AD78F00FBCBBB /* splash-1.png */; };
+		5E08B701173AD78F00FBCBBB /* splash-2.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B6FB173AD78F00FBCBBB /* splash-2.png */; };
+		5E08B702173AD78F00FBCBBB /* splash-3.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B6FC173AD78F00FBCBBB /* splash-3.png */; };
+		5E08B703173AD78F00FBCBBB /* splash-4.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B6FD173AD78F00FBCBBB /* splash-4.png */; };
+		5E08B704173AD78F00FBCBBB /* splash-5.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B6FE173AD78F00FBCBBB /* splash-5.png */; };
+		5E08B705173AD78F00FBCBBB /* splash-6.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B6FF173AD78F00FBCBBB /* splash-6.png */; };
+		5E08B709173AD7B600FBCBBB /* TLSplashViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E08B708173AD7B600FBCBBB /* TLSplashViewController.m */; };
 		5E18D2AC172AF5A50010F8FF /* UIFont+AppFonts.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E18D2AB172AF5A50010F8FF /* UIFont+AppFonts.m */; };
 		5E18D2B4172B03F60010F8FF /* checkmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2B0172B03F60010F8FF /* checkmark@2x.png */; };
 		5E18D2B6172B03F60010F8FF /* inner-shadow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2B2172B03F60010F8FF /* inner-shadow@2x.png */; };
@@ -88,6 +95,14 @@
 		5E08B6F0173AAD7300FBCBBB /* background-highlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "background-highlighted.png"; path = "Images/background-highlighted.png"; sourceTree = "<group>"; };
 		5E08B6F7173AC09D00FBCBBB /* TLHourGutterSupplementaryView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLHourGutterSupplementaryView.h; sourceTree = "<group>"; };
 		5E08B6F8173AC09D00FBCBBB /* TLHourGutterSupplementaryView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLHourGutterSupplementaryView.m; sourceTree = "<group>"; };
+		5E08B6FA173AD78F00FBCBBB /* splash-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "splash-1.png"; path = "Images/SplashImages/splash-1.png"; sourceTree = "<group>"; };
+		5E08B6FB173AD78F00FBCBBB /* splash-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "splash-2.png"; path = "Images/SplashImages/splash-2.png"; sourceTree = "<group>"; };
+		5E08B6FC173AD78F00FBCBBB /* splash-3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "splash-3.png"; path = "Images/SplashImages/splash-3.png"; sourceTree = "<group>"; };
+		5E08B6FD173AD78F00FBCBBB /* splash-4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "splash-4.png"; path = "Images/SplashImages/splash-4.png"; sourceTree = "<group>"; };
+		5E08B6FE173AD78F00FBCBBB /* splash-5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "splash-5.png"; path = "Images/SplashImages/splash-5.png"; sourceTree = "<group>"; };
+		5E08B6FF173AD78F00FBCBBB /* splash-6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "splash-6.png"; path = "Images/SplashImages/splash-6.png"; sourceTree = "<group>"; };
+		5E08B707173AD7B600FBCBBB /* TLSplashViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLSplashViewController.h; sourceTree = "<group>"; };
+		5E08B708173AD7B600FBCBBB /* TLSplashViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLSplashViewController.m; sourceTree = "<group>"; };
 		5E18D2AA172AF5A50010F8FF /* UIFont+AppFonts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIFont+AppFonts.h"; sourceTree = "<group>"; };
 		5E18D2AB172AF5A50010F8FF /* UIFont+AppFonts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIFont+AppFonts.m"; sourceTree = "<group>"; };
 		5E18D2B0172B03F60010F8FF /* checkmark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "checkmark@2x.png"; path = "Images/checkmark@2x.png"; sourceTree = "<group>"; };
@@ -204,9 +219,23 @@
 			name = "UICollectionView Views";
 			sourceTree = "<group>";
 		};
+		5E08B706173AD79300FBCBBB /* Splash Images */ = {
+			isa = PBXGroup;
+			children = (
+				5E08B6FA173AD78F00FBCBBB /* splash-1.png */,
+				5E08B6FB173AD78F00FBCBBB /* splash-2.png */,
+				5E08B6FC173AD78F00FBCBBB /* splash-3.png */,
+				5E08B6FD173AD78F00FBCBBB /* splash-4.png */,
+				5E08B6FE173AD78F00FBCBBB /* splash-5.png */,
+				5E08B6FF173AD78F00FBCBBB /* splash-6.png */,
+			);
+			name = "Splash Images";
+			sourceTree = "<group>";
+		};
 		5E18D2AD172AFA540010F8FF /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				5E08B706173AD79300FBCBBB /* Splash Images */,
 				5E08B6E2173AA84300FBCBBB /* background-highlighted@2x.png */,
 				5E08B6E3173AA84300FBCBBB /* background-unhighlighted@2x.png */,
 				5E08B6E6173AAC2900FBCBBB /* background-future@2x.png */,
@@ -351,6 +380,8 @@
 				5E18D2F7172EE7880010F8FF /* TLUpcomingEventViewController.h */,
 				5E18D2F8172EE7880010F8FF /* TLUpcomingEventViewController.m */,
 				5E18D2FC172F028F0010F8FF /* TLUpcomingEventViewController.xib */,
+				5E08B707173AD7B600FBCBBB /* TLSplashViewController.h */,
+				5E08B708173AD7B600FBCBBB /* TLSplashViewController.m */,
 			);
 			name = "View Controllers";
 			sourceTree = "<group>";
@@ -467,6 +498,12 @@
 				5E08B6F3173AAD7300FBCBBB /* background-past.png in Resources */,
 				5E08B6F4173AAD7300FBCBBB /* background-unhighlighted.png in Resources */,
 				5E08B6F5173AAD7300FBCBBB /* background-highlighted.png in Resources */,
+				5E08B700173AD78F00FBCBBB /* splash-1.png in Resources */,
+				5E08B701173AD78F00FBCBBB /* splash-2.png in Resources */,
+				5E08B702173AD78F00FBCBBB /* splash-3.png in Resources */,
+				5E08B703173AD78F00FBCBBB /* splash-4.png in Resources */,
+				5E08B704173AD78F00FBCBBB /* splash-5.png in Resources */,
+				5E08B705173AD78F00FBCBBB /* splash-6.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -518,6 +555,7 @@
 				5E91A6D0173895AA00CF83D5 /* TLEventViewModel.m in Sources */,
 				5EC7E0031739427D00FB3C55 /* TLEventSupplementaryView.m in Sources */,
 				5E08B6F9173AC09D00FBCBBB /* TLHourGutterSupplementaryView.m in Sources */,
+				5E08B709173AD7B600FBCBBB /* TLSplashViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

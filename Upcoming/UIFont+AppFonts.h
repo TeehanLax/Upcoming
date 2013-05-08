@@ -12,5 +12,6 @@
 
 +(UIFont *)tl_appFont;
 +(UIFont *)tl_mediumAppFont;
++(UIFont  *)tl_boldAppFont;
 
 @end
