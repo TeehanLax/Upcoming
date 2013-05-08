@@ -75,23 +75,27 @@
     
     CGFloat x = 0.0f;
     CGFloat width = CGRectGetWidth(self.bounds);
+    CGFloat xOffset = 0.0f;
     switch (layoutAttributes.alignment) {
         case TLCollectionViewLayoutAttributesAlignmentFull:
             x = 5.0f;
             width = 310.0f;
+            xOffset = 25.0f;
             break;
         case TLCollectionViewLayoutAttributesAlignmentLeft:
             x = 5.0f;
             width = 154.0f;
+            xOffset = 25.0f;
             break;
         case TLCollectionViewLayoutAttributesAlignmentRight:
             x = 2.0;
             width = 154.0f;
+            xOffset = 5.0f;
             break;
     }
     
     CGRect frame = CGRectMake(x, 2, width, self.frame.size.height - 4);
-    self.titleLabel.frame = CGRectInset(frame, 5, 0);
+    self.titleLabel.frame = CGRectInset(frame, xOffset, 0);
     self.backgroundImageView.frame = frame;
 }
 

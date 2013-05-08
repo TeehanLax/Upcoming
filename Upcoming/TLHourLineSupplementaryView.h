@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TLHourSupplementaryView : UICollectionReusableView
+@interface TLHourLineSupplementaryView : UICollectionReusableView
 
 +(NSString *)kind;
 

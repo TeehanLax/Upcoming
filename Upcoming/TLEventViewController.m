@@ -12,7 +12,8 @@
 #import "TLHourCell.h"
 #import "TLAppDelegate.h"
 #import "TLRootViewController.h"
-#import "TLHourSupplementaryView.h"
+#import "TLHourLineSupplementaryView.h"
+#import "TLHourGutterSupplementaryView.h"
 #import "TLEventSupplementaryView.h"
 #import "TLEventViewModel.h"
 
@@ -20,6 +21,7 @@
 static NSString *kCellIdentifier = @"Cell";
 static NSString *kHourSupplementaryViewIdentifier = @"HourView";
 static NSString *kEventSupplementaryViewIdentifier = @"EventView";
+static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
 
 @interface TLEventViewController ()
 
@@ -38,7 +40,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 @property (nonatomic, strong) NSArray *viewModelArray;
 
 // Not completely OK to keep this around, but we can guarantee we only ever want one on screen, so it's OK.
-@property (nonatomic, strong) TLHourSupplementaryView *hourSupplementaryView;
+@property (nonatomic, strong) TLHourLineSupplementaryView *hourSupplementaryView;
 
 @end
 
@@ -164,7 +166,8 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     // Register our reusable views for the collection view
     [self.collectionView registerNib:[UINib nibWithNibName:@"TLHourCell" bundle:nil] forCellWithReuseIdentifier:kCellIdentifier];
     [self.collectionView registerClass:[TLEventSupplementaryView class] forSupplementaryViewOfKind:[TLEventSupplementaryView kind] withReuseIdentifier:kEventSupplementaryViewIdentifier];
-    [self.collectionView registerClass:[TLHourSupplementaryView class] forSupplementaryViewOfKind:[TLHourSupplementaryView kind] withReuseIdentifier:kHourSupplementaryViewIdentifier];
+    [self.collectionView registerClass:[TLHourLineSupplementaryView class] forSupplementaryViewOfKind:[TLHourLineSupplementaryView kind] withReuseIdentifier:kHourSupplementaryViewIdentifier];
+    [self.collectionView registerClass:[TLHourGutterSupplementaryView class] forSupplementaryViewOfKind:[TLHourGutterSupplementaryView kind] withReuseIdentifier:kHourGutterSupplementaryViewIdentifier];
     
     // Create our gesture recognizer. 
     self.touchDown = [[TLTouchDownGestureRecognizer alloc] initWithTarget:self action:@selector(touchDownHandler:)];
@@ -324,7 +327,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     return CGSizeMake(CGRectGetWidth(self.view.bounds), [self heightForHour:effectiveHour]);
 }
 
--(CGRect)collectionView:(UICollectionView *)collectionView frameForHourViewInLayout:(TLCollectionViewLayout *)layout {
+-(CGRect)collectionView:(UICollectionView *)collectionView frameForHourLineViewInLayout:(TLCollectionViewLayout *)layout {
     NSCalendar *calendar = [NSCalendar currentCalendar];
     NSDateComponents *components = [calendar components:NSHourCalendarUnit fromDate:[NSDate date]];
     
@@ -423,6 +426,12 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     return CGRectMake(x, startY, width, endY - startY);
 }
 
+-(CGRect)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout frameForHourGutterSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath {
+    UICollectionViewLayoutAttributes *hourAttributes = [self.collectionView layoutAttributesForItemAtIndexPath:indexPath];
+    
+    return CGRectMake(5, hourAttributes.frame.origin.y, 20, hourAttributes.frame.size.height);
+}
+
 -(TLCollectionViewLayoutAttributesBackgroundState)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout backgroundStateForSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath {
     TLEventViewModel *model = self.viewModelArray[indexPath.item];
     
@@ -478,7 +487,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 }
 
 -(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
-    if ([kind isEqualToString:[TLHourSupplementaryView kind]]) {
+    if ([kind isEqualToString:[TLHourLineSupplementaryView kind]]) {
         // We only ever have one hour supplementary view for the hour. 
         if (!self.hourSupplementaryView) {
             self.hourSupplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kHourSupplementaryViewIdentifier forIndexPath:indexPath];
@@ -524,11 +533,23 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         }
         
         return self.hourSupplementaryView;
-    } else {
+    } else if ([kind isEqualToString:[TLEventSupplementaryView kind]]) {
         TLEventSupplementaryView *supplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kEventSupplementaryViewIdentifier forIndexPath:indexPath];
         
         TLEventViewModel *model = self.viewModelArray[indexPath.item];
         supplementaryView.titleString = model.event.title;
+        
+        return supplementaryView;
+    } else {
+        TLHourGutterSupplementaryView *supplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kHourGutterSupplementaryViewIdentifier forIndexPath:indexPath];
+        
+        NSInteger number = indexPath.item % 12;
+        
+        if (number == 0) {
+            number = 12;
+        }
+        
+        [supplementaryView setString:[NSString stringWithFormat:@"%d", number]];
         
         return supplementaryView;
     }

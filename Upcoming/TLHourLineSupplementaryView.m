@@ -6,12 +6,12 @@
 //  Copyright (c) 2013 Teehan+Lax. All rights reserved.
 //
 
-#import "TLHourSupplementaryView.h"
+#import "TLHourLineSupplementaryView.h"
 #import "UIFont+AppFonts.h"
 #import "TLCollectionViewLayoutAttributes.h"
 #import <ViewUtils.h>
 
-@interface TLHourSupplementaryView ()
+@interface TLHourLineSupplementaryView ()
 
 @property (nonatomic, assign) CGFloat lineHeight;
 @property (nonatomic, assign) CGFloat hourLineProgressionRatio;
@@ -19,7 +19,7 @@
 
 @end
 
-@implementation TLHourSupplementaryView
+@implementation TLHourLineSupplementaryView
 
 -(id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];

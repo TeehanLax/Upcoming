@@ -7,7 +7,8 @@
 //
 
 #import "TLCollectionViewLayout.h"
-#import "TLHourSupplementaryView.h"
+#import "TLHourLineSupplementaryView.h"
+#import "TLHourGutterSupplementaryView.h"
 #import "TLEventSupplementaryView.h"
 
 @implementation TLCollectionViewLayout
@@ -47,7 +48,7 @@
         attributes.contentAlpha = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView layout:self alphaForCellContentAtIndexPath:attributes.indexPath];
     }
     
-    [array addObject:[self layoutAttributesForSupplementaryViewOfKind:[TLHourSupplementaryView kind] atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]]];
+    [array addObject:[self layoutAttributesForSupplementaryViewOfKind:[TLHourLineSupplementaryView kind] atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]]];
 
     NSUInteger numberOfEvents;
     if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)]) {
@@ -57,20 +58,24 @@
             [array addObject:[self layoutAttributesForSupplementaryViewOfKind:[TLEventSupplementaryView kind] atIndexPath:[NSIndexPath indexPathForItem:i inSection:0]]];
         }
     }
+    
+    for (NSInteger i = 0; i < NUMBER_OF_ROWS; i++) {
+        [array addObject:[self layoutAttributesForSupplementaryViewOfKind:[TLHourGutterSupplementaryView kind] atIndexPath:[NSIndexPath indexPathForItem:i inSection:0]]];
+    }
 
     return array;
 }
 
 -(UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
-    if ([kind isEqualToString:[TLHourSupplementaryView kind]]) {
-        TLCollectionViewLayoutAttributes *attributes = [TLCollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind withIndexPath:indexPath];
-
+    TLCollectionViewLayoutAttributes *attributes = [TLCollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind withIndexPath:indexPath];
+    
+    if ([kind isEqualToString:[TLHourLineSupplementaryView kind]]) {
         CGRect frame = CGRectZero;
         CGFloat alpha = 1.0f;
 
         if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)]) {
             id<TLCollectionViewLayoutDelegate> delegate = (id<TLCollectionViewLayoutDelegate>)self.collectionView.delegate;
-            frame = [delegate collectionView:self.collectionView frameForHourViewInLayout:self];
+            frame = [delegate collectionView:self.collectionView frameForHourLineViewInLayout:self];
             alpha = [delegate collectionView:self.collectionView alphaForHourLineViewInLayout:self];
         }
 
@@ -79,9 +84,7 @@
         attributes.zIndex = 2;
 
         return attributes;
-    } else {
-        TLCollectionViewLayoutAttributes *attributes = [TLCollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind withIndexPath:indexPath];
-
+    } else if ([kind isEqualToString:[TLEventSupplementaryView kind]]) {
         CGRect frame = CGRectZero;
         CGFloat alpha = 0.0f;
         TLCollectionViewLayoutAttributesBackgroundState backgroundState;
@@ -103,8 +106,22 @@
         attributes.alignment = alignment;
         attributes.zIndex = 1;
 
-        return attributes;
+    } else {
+        CGRect frame = CGRectZero;
+        CGFloat alpha = 0.0f;
+        
+        if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)]) {
+            id<TLCollectionViewLayoutDelegate> delegate = (id<TLCollectionViewLayoutDelegate>)self.collectionView.delegate;
+            
+            frame = [delegate collectionView:self.collectionView layout:self frameForHourGutterSupplementaryViewAtIndexPath:indexPath];
+            alpha = [delegate collectionView:self.collectionView layout:self alphaForCellContentAtIndexPath:indexPath];
+        }
+        
+        attributes.frame = frame;
+        attributes.alpha = alpha;
+        attributes.zIndex = 4;
     }
+    return attributes;
 }
 
 @end

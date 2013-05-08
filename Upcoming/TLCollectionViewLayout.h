@@ -9,6 +9,10 @@
 #import <UIKit/UIKit.h>
 #import "TLCollectionViewLayoutAttributes.h"
 
+#define NUMBER_OF_ROWS 24
+#define EXPANDED_ROWS  4
+#define MAX_ROW_HEIGHT 38.f
+
 @class TLCollectionViewLayout;
 
 @protocol TLCollectionViewLayoutDelegate <UICollectionViewDelegateFlowLayout>
@@ -17,7 +21,7 @@
 -(CGFloat)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout alphaForCellContentAtIndexPath:(NSIndexPath *)indexPath;
 
 // Methods for hour line supplementary views.
--(CGRect)collectionView:(UICollectionView *)collectionView frameForHourViewInLayout:(TLCollectionViewLayout *)layout;
+-(CGRect)collectionView:(UICollectionView *)collectionView frameForHourLineViewInLayout:(TLCollectionViewLayout *)layout;
 -(CGFloat)collectionView:(UICollectionView *)collectionView alphaForHourLineViewInLayout:(TLCollectionViewLayout *)layout;
 
 // Methods for event supplementary views. 
@@ -26,6 +30,9 @@
 -(CGFloat)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout alphaForSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath;
 -(TLCollectionViewLayoutAttributesBackgroundState)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout backgroundStateForSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath;
 -(TLCollectionViewLayoutAttributesAlignment)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout alignmentForSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath;
+
+// Methods for hour gutter supplementary views.
+-(CGRect)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout frameForHourGutterSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath;
 
 @end
 
