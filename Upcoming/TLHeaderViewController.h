@@ -18,7 +18,9 @@
 
 @end
 
+// Height of the visible header (while menu is hidden).
 extern const CGFloat kHeaderHeight;
+// Height of the visible header (while menu is open).
 extern const CGFloat kUpperHeaderHeight;
 
 @interface TLHeaderViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
@@ -27,6 +29,8 @@ extern const CGFloat kUpperHeaderHeight;
 -(void)scrollTableViewToTop;
 -(void)hideHeaderView;
 -(void)showHeaderView;
+
+// Used when user is interacting with collection view.
 -(void)updateHour:(NSInteger)hours minute:(NSInteger)minutes event:(EKEvent *)event;
 
 @property (nonatomic, weak) id<TLHeaderViewControllerDelegate> delegate;

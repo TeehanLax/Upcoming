@@ -11,6 +11,7 @@
 @implementation TLEventViewModel
 
 -(BOOL)overlapsWith:(TLEventViewModel *)otherModel {
+    // There are four cases that events can overlap.
     BOOL overlaps =
         ([self.event.endDate isLaterThanDate:otherModel.event.startDate] && [self.event.startDate isEarlierThanDate:otherModel.event.startDate] && ![self.event.endDate isEqualToDate:otherModel.event.startDate]) ||
         ([self.event.startDate isEarlierThanDate:otherModel.event.endDate] && [self.event.endDate isLaterThanDate:otherModel.event.endDate] && ![self.event.startDate isEqualToDate:otherModel.event.endDate]) ||

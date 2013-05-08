@@ -28,6 +28,7 @@
 }
 
 -(void)applicationDidBecomeActive:(UIApplication *)application {
+    // Update the content of the event manager, and thus the collection view. 
     [[EKEventManager sharedInstance] refresh];
 }
 

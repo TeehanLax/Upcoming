@@ -24,8 +24,6 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
 @property (nonatomic, weak) IBOutlet UILabel *eventRelativeTimeLabel;
 @property (nonatomic, weak) IBOutlet UILabel *eventRelativeTimeUnitLabel;
 
-@property (nonatomic, strong) RACSubject *nextEventSubject;
-
 @end
 
 @implementation TLUpcomingEventViewController
@@ -39,42 +37,29 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     self.backgroundImageView.layer.shadowPath = [[UIBezierPath bezierPathWithRect:self.backgroundImageView.bounds] CGPath];
     self.backgroundImageView.layer.shadowRadius = 22.0f;
     
-    // Reload our table view whenever the sources change on the event manager
+    // Reload our table view whenever the sources change on the event manager, or every 60 seconds.
+    // Throttle the nextEvent so it doesn't go all flashy. 
+    RACSignal *nextEventSignal = [[RACAbleWithStart([EKEventManager sharedInstance], nextEvent) deliverOn:[RACScheduler mainThreadScheduler]] throttle:0.25f];
+    
     @weakify(self);
-    [[RACAble([EKEventManager sharedInstance], nextEvent) deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(EKEvent *event) {
-        @strongify(self);
-        [self.nextEventSubject
-         sendNext:event];
-    }];
-    
-    // Update the data once per minute
-    [[[[RACSignal interval:60] map:^id (id value) {
-        return [[EKEventManager sharedInstance] nextEvent];
-    }] deliverOn:[RACScheduler mainThreadScheduler] ] subscribeNext:^(EKEvent *event) {
-        @strongify(self);
-        [self.nextEventSubject
-         sendNext:event];
-    }];
-    
-    self.nextEventSubject = [RACSubject subject];
-    [self.nextEventSubject
-     subscribeNext:^(EKEvent *event) {
-         @strongify(self);
-         
-         if (event == nil) {
-             self.eventNameLabel.text = NSLocalizedString(@"No upcoming event", @"Empty upcoming event message");
-             self.eventLocationLabel.text = @"";
-             self.eventTimeLabel.text = @"";
-             self.eventRelativeTimeLabel.text = @"";
-             self.eventRelativeTimeUnitLabel.text = @"";
-             self.eventLocationImageView.alpha = 0.0f;
-             self.calendarView.alpha = 0.0f;
-         } else {
-             [self reloadData:event];
-         }
-     }];
-    
-    [self.nextEventSubject sendNext:[[EKEventManager sharedInstance] nextEvent]];
+    [[RACSignal combineLatest:@[[[RACSignal interval:60] startWith:[NSDate date]], nextEventSignal]
+                      reduce:^id(NSDate *now, EKEvent *nextEvent){
+                          return nextEvent;
+                      }] subscribeNext:^(EKEvent *event) {
+                          @strongify(self);
+                          
+                          if (event == nil) {
+                              self.eventNameLabel.text = NSLocalizedString(@"No upcoming event", @"Empty upcoming event message");
+                              self.eventLocationLabel.text = @"";
+                              self.eventTimeLabel.text = @"";
+                              self.eventRelativeTimeLabel.text = @"";
+                              self.eventRelativeTimeUnitLabel.text = @"";
+                              self.eventLocationImageView.alpha = 0.0f;
+                              self.calendarView.alpha = 0.0f;
+                          } else {
+                              [self reloadData:event];
+                          }
+                      }];
 }
 
 -(void)reloadData:(EKEvent *)event {

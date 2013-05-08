@@ -77,9 +77,8 @@
     // day tomorrow (ie: before noon), then move it up.
     RACSignal *filteredUpdateSignal = [[[RACSignal interval:60.0f] startWith:[NSDate date]] map:^id (NSDate *now) {
         NSArray *upcomingEvents = [[[EKEventManager sharedInstance] events] filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL (EKEvent *event, NSDictionary *bindings) {
-                    return [event.startDate
-                            isLaterThanDate:now];
-                }]];
+            return [event.startDate isLaterThanDate:now];
+        }]];
         return @(upcomingEvents.count == 0);
     }];
 
@@ -90,21 +89,19 @@
             return [[EKEventManager sharedInstance] nextEvent];
         }] deliverOn:[RACScheduler mainThreadScheduler]];
 
-    RACSignal *nextApplicableEventSignal = [[RACSignal
-                                             combineLatest:@[filteredUpdateSignal, nextEventSignal]
-                                             reduce:^id (NSNumber *noFurtherEventsToday, EKEvent *nextEvent) {
-                                                 if (noFurtherEventsToday.boolValue) {
-                                                     NSCalendar *calendar = [NSCalendar currentCalendar];
-                                                     NSDateComponents *components = [calendar components:NSHourCalendarUnit
-                                                                                                fromDate:nextEvent.startDate];
-                                                     
-                                                     if (components.hour < 12 && !nextEvent.isAllDay && [nextEvent.startDate isTomorrow]) {
-                                                         return nextEvent;
-                                                     }
-                                                 }
-                                                 
-                                                 return nil;
-                                             }] distinctUntilChanged];
+    RACSignal *nextApplicableEventSignal = [[RACSignal combineLatest:@[filteredUpdateSignal, nextEventSignal] reduce:^id (NSNumber *noFurtherEventsToday, EKEvent *nextEvent) {
+        if (noFurtherEventsToday.boolValue) {
+            NSCalendar *calendar = [NSCalendar currentCalendar];
+            NSDateComponents *components = [calendar components:NSHourCalendarUnit
+                                                       fromDate:nextEvent.startDate];
+            
+            if (components.hour < 12 && !nextEvent.isAllDay && [nextEvent.startDate isTomorrow]) {
+                return nextEvent;
+            }
+        }
+        
+        return nil;
+    }] distinctUntilChanged];
 
     // These subjects are responsible for adding/removing the overlay view to our hierarchy.
     // We're using an explicit subject here because it maintains state (whether or not the overlay view is in the hierarchy).
@@ -186,24 +183,23 @@
     //These subjects are responsible for calculating the frame of the header and footer
     self.headerPanSubject = [RACSubject subject];
     
-    RACSignal *headerOpenRatioSubject = [self.headerPanSubject
-                                         map:^id (NSNumber *translation) {
-                                             CGFloat verticalTranslation = [translation floatValue];
-                                             
-                                             CGFloat effectiveRatio = 0.0f;
-                                             
-                                             if (verticalTranslation <= 0) {
-                                                 effectiveRatio = 0.0f;
-                                             } else if (verticalTranslation <= kMaximumHeaderTranslationThreshold) {
-                                                 effectiveRatio = fabsf(verticalTranslation / kMaximumHeaderTranslationThreshold);
-                                             } else {
-                                                 CGFloat overshoot = verticalTranslation - kMaximumHeaderTranslationThreshold;
-                                                 CGFloat y = 2 * sqrtf(overshoot + 1) - 2;
-                                                 effectiveRatio = 1.0f + (y / kMaximumHeaderTranslationThreshold);
-                                             }
-                                             
-                                             return @(effectiveRatio);
-                                         }];
+    RACSignal *headerOpenRatioSubject = [self.headerPanSubject map:^id (NSNumber *translation) {
+        CGFloat verticalTranslation = [translation floatValue];
+        
+        CGFloat effectiveRatio = 0.0f;
+        
+        if (verticalTranslation <= 0) {
+            effectiveRatio = 0.0f;
+        } else if (verticalTranslation <= kMaximumHeaderTranslationThreshold) {
+            effectiveRatio = fabsf(verticalTranslation / kMaximumHeaderTranslationThreshold);
+        } else {
+            CGFloat overshoot = verticalTranslation - kMaximumHeaderTranslationThreshold;
+            CGFloat y = 2 * sqrtf(overshoot + 1) - 2;
+            effectiveRatio = 1.0f + (y / kMaximumHeaderTranslationThreshold);
+        }
+        
+        return @(effectiveRatio);
+    }];
     
     RAC(self.headerViewController.arrowRotationRatio) = headerOpenRatioSubject;
     
@@ -226,77 +222,73 @@
     
     self.footerPanSubject = [RACSubject subject];
     
-    RACSignal *footerOpenRatioSubject = [self.footerPanSubject
-                                         map:^id (id translation) {
-                                             @strongify(self);
-                                             
-                                             CGFloat verticalTranslation = [translation floatValue];
-                                             
-                                             CGFloat targetTranslation = kMaximumFooterTranslationThreshold;
-                                             CGFloat effectiveRatio = 0.0f;
-                                             
-                                             if (verticalTranslation < targetTranslation) {
-                                                 CGFloat overshoot = fabsf(verticalTranslation) - fabsf(targetTranslation);
-                                                 CGFloat y = 2 * sqrtf(overshoot + 1) - 2;
-                                                 effectiveRatio = 1.0f + (y / fabsf(targetTranslation));
-                                             } else {
-                                                 effectiveRatio = verticalTranslation / targetTranslation;
-                                             }
-                                             
-                                             return @(effectiveRatio);
-                                         }];
+    RACSignal *footerOpenRatioSubject = [self.footerPanSubject map:^id (id translation) {
+        @strongify(self);
+        
+        CGFloat verticalTranslation = [translation floatValue];
+        
+        CGFloat targetTranslation = kMaximumFooterTranslationThreshold;
+        CGFloat effectiveRatio = 0.0f;
+        
+        if (verticalTranslation < targetTranslation) {
+            CGFloat overshoot = fabsf(verticalTranslation) - fabsf(targetTranslation);
+            CGFloat y = 2 * sqrtf(overshoot + 1) - 2;
+            effectiveRatio = 1.0f + (y / fabsf(targetTranslation));
+        } else {
+            effectiveRatio = verticalTranslation / targetTranslation;
+        }
+        
+        return @(effectiveRatio);
+    }];
     
     // Need to combine latest on the two signals since the footer moves with both
-    RACSignal *footerFrameSignal = [[[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)], [nextApplicableEventSignal startWith:nil]]
-                                                       reduce:^id (NSNumber *headerRatio, NSNumber *footerRatio, EKEvent *nextEvent) {
-                                                           if (headerRatio.floatValue > 0) {
-                                                               return @(-headerRatio.floatValue);
-                                                           }
-                                                           
-                                                           if (footerRatio.floatValue > 0) {
-                                                               return footerRatio;
-                                                           }
-                                                           
-                                                           if (nextEvent) {
-                                                               return @(0.25f);                                                      // We have an event tomorrow we'd like to highlight.
-                                                           }
-                                                           
-                                                           return @(0);
-                                                       }]
-                                     map:^id (id value) {
-                                         @strongify(self);
-                                         
-                                         // This is the ratio of the movement. 0 is closed and 1 is open.
-                                         // Values less than zero are treated as zero.
-                                         // Values greater than one are valid and will be extrapolated beyond the fully open menu.
-                                         CGFloat ratio = [value floatValue];
-                                         
-                                         CGFloat targetTranslation = kMaximumFooterTranslationThreshold;
-                                         CGRect footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight + ratio * targetTranslation, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);
-                                         
-                                         return [NSValue valueWithCGRect:footerFrame];
-                                     }] animateWithDuration:0.1f];
+    RACSignal *footerFrameSignal =
+    [[[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)], [nextApplicableEventSignal startWith:nil]] reduce:^id (NSNumber *headerRatio, NSNumber *footerRatio, EKEvent *nextEvent) {
+        if (headerRatio.floatValue > 0) {
+            return @(-headerRatio.floatValue);
+        }
+        
+        if (footerRatio.floatValue > 0) {
+            return footerRatio;
+        }
+        
+        if (nextEvent) {
+            return @(0.25f);    // We have an event tomorrow we'd like to highlight. 0.25 seems reasonable. 
+        }
+        
+        return @(0);
+    }] map:^id (id value) {
+        @strongify(self);
+        
+        // This is the ratio of the movement. 0 is closed and 1 is open.
+        // Values less than zero are treated as zero.
+        // Values greater than one are valid and will be extrapolated beyond the fully open menu.
+        CGFloat ratio = [value floatValue];
+        
+        CGFloat targetTranslation = kMaximumFooterTranslationThreshold;
+        CGRect footerFrame = CGRectMake(0, CGRectGetHeight(self.view.bounds) - TLUpcomingEventViewControllerHiddenHeight + ratio * targetTranslation, CGRectGetWidth(self.view.bounds), TLUpcomingEventViewControllerTotalHeight);
+        
+        return [NSValue valueWithCGRect:footerFrame];
+    }] animateWithDuration:0.1f];
     
     RAC(self.footerViewController.view.frame) = footerFrameSignal;
     
     
     // This subject is responsible for calculating the alpha value of the overlay view
-    RACSignal *dayListBlurSubject = [[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)]]
-                                                       reduce:^id (NSNumber *headerRatio, NSNumber *footerRatio) {
-                                                           return @(MAX(headerRatio.floatValue, footerRatio.floatValue));
-                                                       }]
-                                     map:^id (id value) {
-                                         // This is the ratio of the movement. 0 is full sized and 1 is fully shrunk.
-                                         CGFloat ratio = [value floatValue];
-                                         
-                                         if (ratio > 1.0f) {
-                                             ratio = 1.0f;
-                                         } else if (ratio < 0.0f) {
-                                             ratio = 0.0f;
-                                         }
-                                         
-                                         return @(ratio);
-                                     }];
+    RACSignal *dayListBlurSubject = [[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)]] reduce:^id (NSNumber *headerRatio, NSNumber *footerRatio) {
+        return @(MAX(headerRatio.floatValue, footerRatio.floatValue));
+    }] map:^id (id value) {
+        // This is the ratio of the movement. 0 is full sized and 1 is fully shrunk.
+        CGFloat ratio = [value floatValue];
+        
+        if (ratio > 1.0f) {
+            ratio = 1.0f;
+        } else if (ratio < 0.0f) {
+            ratio = 0.0f;
+        }
+        
+        return @(ratio);
+    }];
     
     RAC(self.dayListOverlayView.alpha) = dayListBlurSubject;
     
@@ -332,12 +324,9 @@
          }
      }];
     
-    RACSignal *canOpenMenuSignal = [RACSignal combineLatest:@[[self.headerFinishedTransitionSubject
-                                                               startWith:@(NO)], [self.footerFinishedTransitionSubject
-                                                                                  startWith:@(NO)]]
-                                                     reduce:^(NSNumber *headerIsOpen, NSNumber *footerIsOpen) {
-                                                         return @(!headerIsOpen.boolValue && !footerIsOpen.boolValue);
-                                                     }];
+    RACSignal *canOpenMenuSignal = [RACSignal combineLatest:@[[self.headerFinishedTransitionSubject startWith:@(NO)], [self.footerFinishedTransitionSubject startWith:@(NO)]] reduce:^(NSNumber *headerIsOpen, NSNumber *footerIsOpen) {
+        return @(!headerIsOpen.boolValue && !footerIsOpen.boolValue);
+    }];
     
     RAC(self.panHeaderDownGestureRecognizer.enabled) = canOpenMenuSignal;
     RAC(self.panFooterUpGestureRecognizer.enabled) = canOpenMenuSignal;
@@ -394,21 +383,18 @@
             BOOL movingDown = ([recognizer velocityInView:self.view].y > 0 && translation.y > kMoveDownThreshold);
             
             // Animate the change
-            [UIView                                                                   animateWithDuration:0.25f
-                                                                                               animations:^{
-                                                                                                   if (movingDown) {
-                                                                                                       [self.headerPanSubject
-                                                                                                        sendNext:@(kMaximumHeaderTranslationThreshold)];
-                                                                                                   } else {
-                                                                                                       [self.headerPanSubject
-                                                                                                        sendNext:@(0)];
-                                                                                                   }
-                                                                                               }
-             
-                                                                                               completion:^(BOOL finished) {
-                                                                                                   [self.headerFinishedTransitionSubject
-                                                                                                    sendNext:@(movingDown)];
-                                                                                               }];
+            [UIView animateWithDuration:0.25f animations:^{
+                if (movingDown) {
+                    [self.headerPanSubject
+                     sendNext:@(kMaximumHeaderTranslationThreshold)];
+                } else {
+                    [self.headerPanSubject
+                     sendNext:@(0)];
+                }
+            } completion:^(BOOL finished) {
+                [self.headerFinishedTransitionSubject
+                 sendNext:@(movingDown)];
+            }];
         }
     }];
     self.panHeaderDownGestureRecognizer.delegate = self;
@@ -427,21 +413,18 @@
             BOOL movingDown = ([recognizer velocityInView:self.view].y > 0);
             
             // Animate the change
-            [UIView                                                                 animateWithDuration:0.25f
-                                                                                             animations:^{
-                                                                                                 if (movingDown) {
-                                                                                                     [self.headerPanSubject
-                                                                                                      sendNext:@(kMaximumHeaderTranslationThreshold)];
-                                                                                                 } else {
-                                                                                                     [self.headerPanSubject
-                                                                                                      sendNext:@(0)];
-                                                                                                 }
-                                                                                             }
-             
-                                                                                             completion:^(BOOL finished) {
-                                                                                                 [self.headerFinishedTransitionSubject
-                                                                                                  sendNext:@(movingDown)];
-                                                                                             }];
+            [UIView animateWithDuration:0.25f animations:^{
+                if (movingDown) {
+                    [self.headerPanSubject
+                     sendNext:@(kMaximumHeaderTranslationThreshold)];
+                } else {
+                    [self.headerPanSubject
+                     sendNext:@(0)];
+                }
+            } completion:^(BOOL finished) {
+                [self.headerFinishedTransitionSubject
+                 sendNext:@(movingDown)];
+            }];
         }
     }];
     self.panHeaderUpGestureRecognizer.delegate = self;
@@ -463,21 +446,18 @@
             BOOL movingUp = NO; //[recognizer velocityInView:self.view].y < 0;
             
             // Animate the change
-            [UIView                                                                 animateWithDuration:0.25f
-                                                                                             animations:^{
-                                                                                                 if (movingUp) {
-                                                                                                     [self.footerPanSubject
-                                                                                                      sendNext:@(kMaximumFooterTranslationThreshold)];
-                                                                                                 } else {
-                                                                                                     [self.footerPanSubject
-                                                                                                      sendNext:@(0)];
-                                                                                                 }
-                                                                                             }
-             
-                                                                                             completion:^(BOOL finished) {
-                                                                                                 [self.footerFinishedTransitionSubject
-                                                                                                  sendNext:@(movingUp)];
-                                                                                             }];
+            [UIView animateWithDuration:0.25f animations:^{
+                if (movingUp) {
+                    [self.footerPanSubject
+                     sendNext:@(kMaximumFooterTranslationThreshold)];
+                } else {
+                    [self.footerPanSubject
+                     sendNext:@(0)];
+                }
+            } completion:^(BOOL finished) {
+                [self.footerFinishedTransitionSubject
+                 sendNext:@(movingUp)];
+            }];
         }
     }];
     self.panFooterUpGestureRecognizer.delegate = self;
@@ -515,16 +495,13 @@
 #pragma mark -TLHeaderViewControllerDelegate Methods
 
 -(void)userDidTapDismissHeaderButton {
-    [UIView animateWithDuration:0.5f
-                     animations:^{
-                         [self.headerPanSubject
-                          sendNext:@(0)];
-                     }
-     
-                     completion:^(BOOL finished) {
-                         [self.headerFinishedTransitionSubject
-                          sendNext:@(NO)];
-                     }];
+    [UIView animateWithDuration:0.5f animations:^{
+        [self.headerPanSubject
+         sendNext:@(0)];
+    } completion:^(BOOL finished) {
+        [self.headerFinishedTransitionSubject
+         sendNext:@(NO)];
+    }];
 }
 
 @end

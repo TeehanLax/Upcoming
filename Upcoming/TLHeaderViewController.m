@@ -361,76 +361,46 @@ static CGFloat pullUpAnimationDuration = 0.1f;
 static CGFloat fallDownAnimationDuration = 0.1f;
 static CGFloat interAnimationDelay = 0.05f;
 
+// Obviously these two methods aren't ideal. However, they work great so there's no
+// real point in moving over to a CAKeyFrameAnimation. 
+
 -(void)hideHeaderView {
-    [UIView animateWithDuration:pullDownAnimationDuration
-                     animations:^{
-                         self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
-                     }
-     
-                     completion:^(BOOL finished) {
-                         [UIView  animateWithDuration:pullUpAnimationDuration
-                                                delay:0.0f
-                                              options:UIViewAnimationOptionCurveEaseIn
-                                           animations:^{
-                                               self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
-                                           }
-                          
-                                           completion:^(BOOL finished) {
-                                               self.headerAlernateDetailView.alpha = 1.0f;
-                                               self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerAlernateDetailView.frame));
-                                               [UIView               animateWithDuration:fallDownAnimationDuration
-                                                                                   delay:interAnimationDelay
-                                                                                 options:UIViewAnimationOptionCurveEaseOut
-                                                                              animations:^{
-                                                                                  self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
-                                                                              }
-                                                
-                                                                              completion:^(BOOL finished) {
-                                                                                  [UIView            animateWithDuration:pullDownAnimationDuration
-                                                                                                              animations:^{
-                                                                                                                  self.headerAlernateDetailView.transform = CGAffineTransformIdentity;
-                                                                                                              }];
-                                                                              }];
-                                           }];
-                     }];
+    [UIView animateWithDuration:pullDownAnimationDuration animations:^{
+        self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:pullUpAnimationDuration delay:0.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+            self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
+        } completion:^(BOOL finished) {
+            self.headerAlernateDetailView.alpha = 1.0f;
+            self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerAlernateDetailView.frame));
+            [UIView animateWithDuration:fallDownAnimationDuration delay:interAnimationDelay options:UIViewAnimationOptionCurveEaseOut animations:^{
+                self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
+            } completion:^(BOOL finished) {
+                [UIView animateWithDuration:pullDownAnimationDuration animations:^{
+                    self.headerAlernateDetailView.transform = CGAffineTransformIdentity;
+                }];
+            }];
+        }];
+    }];
 }
 
 -(void)showHeaderView {
-    //[[UIApplication sharedApplication] beginIgnoringInteractionEvents];
-    [UIView animateWithDuration:pullDownAnimationDuration
-                     animations:^{
-                         self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
-                     }
-     
-                     completion:^(BOOL finished) {
-                         [UIView  animateWithDuration:pullUpAnimationDuration
-                                                delay:0.0f
-                                              options:UIViewAnimationOptionCurveEaseIn
-                                           animations:^{
-                                               self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
-                                           }
-                          
-                                           completion:^(BOOL finished) {
-                                               self.headerAlernateDetailView.alpha = 0.0f;
-                                               [UIView               animateWithDuration:fallDownAnimationDuration
-                                                                                   delay:interAnimationDelay
-                                                                                 options:UIViewAnimationOptionCurveEaseOut
-                                                                              animations:^{
-                                                                                  self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
-                                                                              }
-                                                
-                                                                              completion:^(BOOL finished) {
-                                                                                  [UIView            animateWithDuration:pullDownAnimationDuration
-                                                                                                              animations:^{
-                                                                                                                  self.headerDetailView.transform = CGAffineTransformIdentity;
-                                                                                                              }
-                                                                                   
-                                                                                                              completion:^(BOOL finished) {
-                                                                                                                  //[[UIApplication sharedApplication] endIgnoringInteractionEvents];
-                                                                                                              }];
-                                                                              }];
-                                           }];
-                     }];
+    [UIView animateWithDuration:pullDownAnimationDuration animations:^{
+        self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:pullUpAnimationDuration delay:0.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+            self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
+        } completion:^(BOOL finished) {
+            self.headerAlernateDetailView.alpha = 0.0f;
+            [UIView animateWithDuration:fallDownAnimationDuration delay:interAnimationDelay options:UIViewAnimationOptionCurveEaseOut animations:^{
+                self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
+            } completion:^(BOOL finished) {
+                [UIView animateWithDuration:pullDownAnimationDuration animations:^{
+                    self.headerDetailView.transform = CGAffineTransformIdentity;
+                } completion:nil];
+            }];
+        }];
+    }];
 }
 
 -(void)updateHour:(NSInteger)hours minute:(NSInteger)minutes event:(EKEvent *)event {

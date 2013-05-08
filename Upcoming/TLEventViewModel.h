@@ -17,12 +17,15 @@ typedef enum : NSInteger {
     TLEventViewModelEventSpanTooManyWarning
 } TLEventViewModelEventSpan;
 
+
+// Wraps an event, a horizontal placement, and possibly an "extra events" count. 
 @interface TLEventViewModel : NSObject
 
 @property (nonatomic, strong) EKEvent *event;
 @property (nonatomic, assign) TLEventViewModelEventSpan eventSpan;
-@property (nonatomic, assign) NSInteger extraEventsCount;
+@property (nonatomic, assign) NSInteger extraEventsCount; // Ignored unless eventSpan is TLEventViewModelEventSpanTooManyWarning
 
+// Determine if the event overlaps with another. "Touching" events don't count as overlapping. 
 -(BOOL)overlapsWith:(TLEventViewModel *)otherModel;
 
 @end

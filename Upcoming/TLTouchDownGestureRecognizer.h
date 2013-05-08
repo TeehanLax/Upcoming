@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
+// Let's use start recognizing touches immediately. 
 @interface TLTouchDownGestureRecognizer : UIGestureRecognizer
 
 @end

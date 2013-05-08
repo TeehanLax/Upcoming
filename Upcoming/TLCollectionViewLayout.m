@@ -14,11 +14,11 @@
 @implementation TLCollectionViewLayout
 
 -(CGFloat)minimumInteritemSpacing {
-    return 0.f;
+    return 0.0f;
 }
 
 -(CGFloat)minimumLineSpacing {
-    return 0.f;
+    return 0.0f;
 }
 
 +(Class)layoutAttributesClass {
@@ -32,6 +32,7 @@
 -(UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
     TLCollectionViewLayoutAttributes *attributes = (TLCollectionViewLayoutAttributes *)[super layoutAttributesForItemAtIndexPath:indexPath];
 
+    // hours are in the "background" – 0 zIndex. 
     attributes.zIndex = 0;
     if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)]) {
         attributes.contentAlpha = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView layout:self alphaForCellContentAtIndexPath:indexPath];
@@ -50,9 +51,8 @@
     [array addObject:[self layoutAttributesForSupplementaryViewOfKind:[TLHourSupplementaryView kind] atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]]];
 
     NSUInteger numberOfEvents;
-
     if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)]) {
-        numberOfEvents = [(id < TLCollectionViewLayoutDelegate >)(self.collectionView.delegate) collectionView:self.collectionView numberOfEventSupplementaryViewsInLayout:self];
+        numberOfEvents = [(id <TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView numberOfEventSupplementaryViewsInLayout:self];
 
         for (NSInteger i = 0; i < numberOfEvents; i++) {
             [array addObject:[self layoutAttributesForSupplementaryViewOfKind:[TLEventSupplementaryView kind] atIndexPath:[NSIndexPath indexPathForItem:i inSection:0]]];

@@ -10,18 +10,10 @@
 
 @implementation TLLoveButton
 
--(id)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-
-    if (self) {
-        // Initialization code
-    }
-
-    return self;
-}
-
 -(void)layoutSubviews {
     [super layoutSubviews];
+    
+    // Float the text left, then the image to the right of the text. 
 
     CGRect frame = self.titleLabel.frame;
     frame.origin.x = 10.0f;

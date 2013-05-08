@@ -16,20 +16,25 @@
 #import "TLEventSupplementaryView.h"
 #import "TLEventViewModel.h"
 
+// Collection View reusable views' identifiers
 static NSString *kCellIdentifier = @"Cell";
 static NSString *kHourSupplementaryViewIdentifier = @"HourView";
 static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 
-
 @interface TLEventViewController ()
 
+// Latest updated location under finder.
 @property (nonatomic, assign) CGPoint location;
-@property (nonatomic, assign) BOOL touch;
-@property (nonatomic, strong) TLBackgroundGradientView *backgroundGradientView;
-
+// Determines whether finger is touching or not.
+@property (nonatomic, assign, getter = isTouching) BOOL touching;
+// Latest hour cell index path under user's finger.
 @property (nonatomic, strong) NSIndexPath *indexPathUnderFinger;
+// Latest event under finger (used to play "new event" sound).
 @property (nonatomic, strong) EKEvent *eventUnderFinger;
 
+// Background gradient view for self.view (*not* the collection view's backgroundView).
+@property (nonatomic, strong) TLBackgroundGradientView *backgroundGradientView;
+// View model currently being displayed *as supplementary views* by the collection view. 
 @property (nonatomic, strong) NSArray *viewModelArray;
 
 // Not completely OK to keep this around, but we can guarantee we only ever want one on screen, so it's OK.
@@ -37,6 +42,8 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 
 @end
 
+// This collection view displays *hours* as cells – the events themselves are supplementary views.
+// Which kind of makes sense, since events are kind of like metadata about a day. Neat. 
 @implementation TLEventViewController
 
 #pragma mark - View Lifecycle Methods
@@ -46,8 +53,10 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     
     EKEventManager *eventManager = [EKEventManager sharedInstance];
     
+    // Wrap our eventManager events property as a RACSignal so we can react to changes.
     RACSignal *newEventsSignal = [RACAbleWithStart(eventManager, events) deliverOn:[RACScheduler mainThreadScheduler]];
     
+    // Bind our viewModelArray to a mapped newEventSignal
     RAC(self.viewModelArray) = [[[newEventsSignal distinctUntilChanged] map:^id (NSArray *eventsArray) {
         // First, sort the array first by size then by start time.
         
@@ -75,9 +84,8 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         }];
         
         return sortedArray;
-        
-        // Then, create an array of TLEventViewModel objects based on that array.
     }] map:^id (NSArray *sortedEventArray) {
+        // Then, create an array of TLEventViewModel objects based on that array.
         NSMutableArray *mutableArray = [NSMutableArray arrayWithCapacity:sortedEventArray.count];
         
         for (EKEvent * event in sortedEventArray) {
@@ -102,9 +110,11 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
                         viewModel = nil;
                     } else if (otherModel.eventSpan == TLEventViewModelEventSpanRight) {
                         // Now we need to determine if the viewModel can float to the left.
+                        // Assume no conflicts until we find one. 
                         BOOL conflicts = NO;
                         
                         for (TLEventViewModel * possiblyConflictingModel in mutableArray) {
+                            // Ignore this model – we already know it overlaps
                             if (possiblyConflictingModel == otherModel) {
                                 continue;
                             }
@@ -145,21 +155,25 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         return mutableArray;
     }];
     
+    // Whenever our viewModelArray changes, reload our data and invalidate the layout. 
     [RACAble(self.viewModelArray) subscribeNext:^(id x) {
         [self.collectionView reloadData];
         [self.collectionView.collectionViewLayout invalidateLayout];
     }];
     
+    // Register our reusable views for the collection view
     [self.collectionView registerNib:[UINib nibWithNibName:@"TLHourCell" bundle:nil] forCellWithReuseIdentifier:kCellIdentifier];
     [self.collectionView registerClass:[TLEventSupplementaryView class] forSupplementaryViewOfKind:[TLEventSupplementaryView kind] withReuseIdentifier:kEventSupplementaryViewIdentifier];
     [self.collectionView registerClass:[TLHourSupplementaryView class] forSupplementaryViewOfKind:[TLHourSupplementaryView kind] withReuseIdentifier:kHourSupplementaryViewIdentifier];
     
+    // Create our gesture recognizer. 
     self.touchDown = [[TLTouchDownGestureRecognizer alloc] initWithTarget:self action:@selector(touchDownHandler:)];
     self.touchDown.cancelsTouchesInView = NO;
     self.touchDown.delaysTouchesBegan = NO;
     self.touchDown.delaysTouchesEnded = NO;
     [self.collectionView addGestureRecognizer:self.touchDown];
     
+    // Updat eour background gradient every minute. 
     @weakify(self);
     [[[RACSignal interval:60.0f] deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(id x) {
         @strongify(self);
@@ -177,6 +191,9 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     
     [self.collectionView setCollectionViewLayout:layout animated:animated];
     
+    // We need to insert our background gradient here since we can't rely on self.view's
+    // geometry in viewDidLoad and the background gradient view doesn't resize well, so
+    // autoresizing won't work easily. 
     if (!self.backgroundGradientView) {
         self.backgroundGradientView = [[TLBackgroundGradientView alloc] initWithFrame:self.view.bounds];
         [self.view insertSubview:self.backgroundGradientView atIndex:0];
@@ -199,13 +216,12 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     if (hour > 12) {
         hour -= 12;
     }
-    
     if (hour == 0) {
         hour += 12;
     }
-    
     if (minute < 0) {
-        minute = 0;             // Weird rounding error
+        // Weird rounding error sometimes results in a negative number
+        minute = 0;
     }
     
     if (recognizer.state == UIGestureRecognizerStateBegan) {
@@ -215,7 +231,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
               setDarkened:YES];
              self.eventUnderFinger = nil;
              self.indexPathUnderFinger = indexPath;
-             self.touch = YES;
+             self.touching = YES;
              [self.delegate
               userDidBeginInteractingWithDayListViewController:self];
              
@@ -265,7 +281,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
               setDarkened:NO];
              self.eventUnderFinger = nil;
              self.indexPathUnderFinger = nil;
-             self.touch = NO;
+             self.touching = NO;
              [self.delegate
               userDidEndInteractingWithDayListViewController:self];
              [AppDelegate playTouchUpSound];
@@ -290,7 +306,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     TLHourCell *cell = (TLHourCell *)[collectionView cellForItemAtIndexPath:indexPath];
     
-    // position sampled background image
+    // Position sampled background image
     CGFloat yDistance = cell.maxY - cell.minY;
     CGFloat yDelta = cell.frame.origin.y - cell.minY;
     
@@ -298,7 +314,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     backgroundImageFrame.origin.y = (cell.frame.size.height - backgroundImageFrame.size.height) * (yDelta / yDistance);
     cell.backgroundImage.frame = backgroundImageFrame;
     
-    if (!self.touch) {
+    if (!self.touching) {
         // default size
         return CGSizeMake(CGRectGetWidth(self.view.bounds), collectionView.frame.size.height / NUMBER_OF_ROWS);
     }
@@ -314,6 +330,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     
     NSInteger currentHour = components.hour;
     
+    // Instead of re-calculating geometry for events, rely on the calculations for hour views. 
     UICollectionViewLayoutAttributes *attributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:currentHour inSection:0]];
     
     CGFloat viewHeight = attributes.size.height;
@@ -322,7 +339,8 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 }
 
 -(CGFloat)collectionView:(UICollectionView *)collectionView alphaForHourLineViewInLayout:(TLCollectionViewLayout *)layout {
-    if (self.touch) {
+    // Don't show the hour line while touching
+    if (self.touching) {
         return 0.0f;
     } else {
         return 1.0f;
@@ -334,7 +352,8 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 }
 
 -(CGFloat)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout alphaForCellContentAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.touch) {
+    // Cells are invisible while not touching. 
+    if (self.touching) {
         return [self alphaForElementInHour:indexPath.item];
     } else {
         return 0.0f;
@@ -342,7 +361,8 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 }
 
 -(CGFloat)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout alphaForSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.touch) {
+    // Supplementary views' contentViews are visible only while touching. 
+    if (self.touching) {
         TLEventViewModel *model = self.viewModelArray[indexPath.item];
         
         NSCalendar *currentCalendar = [NSCalendar currentCalendar];
@@ -419,7 +439,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 
 -(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
     if ([kind isEqualToString:[TLHourSupplementaryView kind]]) {
-        // We only ever have one hour supplementary view.
+        // We only ever have one hour supplementary view for the hour. 
         if (!self.hourSupplementaryView) {
             self.hourSupplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kHourSupplementaryViewIdentifier forIndexPath:indexPath];
             
@@ -428,6 +448,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
             NSCalendar *calendar = [NSCalendar currentCalendar];
             NSDateComponents *components = [calendar components:NSSecondCalendarUnit fromDate:[NSDate date]];
             
+            // Find out when the next minute change is and start a recurring RACSignal when that happens. 
             NSInteger delay = 60 - components.second;
             
             NSLog(@"Scheduling subscription every minute for supplementary view in %d seconds", delay);
@@ -444,12 +465,14 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
                 }];
             });
             
+            // Finally, bind the value of the supplementary view's timeString property to a mapped signal.
             RAC(self.hourSupplementaryView.timeString) = [updateSubject map:^id (NSDate *date) {
                 NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit)
                                                            fromDate:date];
                 
                 NSInteger hours = components.hour % 12;
                 
+                // Convert to 12-hour time.
                 if (hours == 0) {
                     hours = 12;
                 }
@@ -537,6 +560,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 }
 
 -(void)updateBackgroundGradient {
+    // Determine if the soonest event is within a half hour to change the colour of the background gradient.
     NSArray *events = [[EKEventManager sharedInstance] events];
     
     CGFloat soonestEvent = NSIntegerMax;
@@ -567,7 +591,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         [self.backgroundGradientView setAlertRatio:ratio animated:YES];
     }
     
-    // save copy of gradient as image
+    // Save copy of gradient as image.
     TLAppDelegate *appDelegate = (TLAppDelegate *)[UIApplication sharedApplication].delegate;
     TLRootViewController *rootViewController = appDelegate.viewController;
     UIGraphicsBeginImageContext(self.backgroundGradientView.bounds.size);
@@ -577,6 +601,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 }
 
 -(EKEvent *)eventUnderPoint:(CGPoint)point {
+    //Find the event under a specific point
     EKEvent *eventUnderTouch;
     
     for (NSInteger i = 0; i < self.viewModelArray.count; i++) {
@@ -586,6 +611,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         if (CGRectContainsPoint(frame, point)) {
             TLEventViewModel *model = self.viewModelArray[indexPath.item];
             
+            // If the model represents a warning that there are too many events, we don't want to return it. 
             if (model.eventSpan != TLEventViewModelEventSpanTooManyWarning) {
                 eventUnderTouch = [self.viewModelArray[i] event];
             }
@@ -598,6 +624,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 #pragma mark - Private Methods
 
 -(void)configureBackgroundCell:(TLHourCell *)cell forIndexPath:(NSIndexPath *)indexPath {
+    // nop for now. 
 }
 
 @end
