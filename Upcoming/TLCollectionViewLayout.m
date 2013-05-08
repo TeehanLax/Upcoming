@@ -81,7 +81,7 @@
 
         attributes.frame = frame;
         attributes.alpha = alpha;
-        attributes.zIndex = 2;
+        attributes.zIndex = 4;
 
         return attributes;
     } else if ([kind isEqualToString:[TLEventSupplementaryView kind]]) {
@@ -104,7 +104,7 @@
         attributes.contentAlpha = alpha;
         attributes.backgroundState = backgroundState;
         attributes.alignment = alignment;
-        attributes.zIndex = 1;
+        attributes.zIndex = 3;
 
     } else {
         CGRect frame = CGRectZero;
@@ -119,7 +119,7 @@
         
         attributes.frame = frame;
         attributes.alpha = alpha;
-        attributes.zIndex = 4;
+        attributes.zIndex = 2;
     }
     return attributes;
 }

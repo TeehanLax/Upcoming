@@ -80,12 +80,12 @@
         case TLCollectionViewLayoutAttributesAlignmentFull:
             x = 5.0f;
             width = 310.0f;
-            xOffset = 25.0f;
+            xOffset = 5.0f;
             break;
         case TLCollectionViewLayoutAttributesAlignmentLeft:
             x = 5.0f;
             width = 154.0f;
-            xOffset = 25.0f;
+            xOffset = 5.0f;
             break;
         case TLCollectionViewLayoutAttributesAlignmentRight:
             x = 2.0;

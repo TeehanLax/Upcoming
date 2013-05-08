@@ -26,7 +26,6 @@
 		5E08B704173AD78F00FBCBBB /* splash-5.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B6FE173AD78F00FBCBBB /* splash-5.png */; };
 		5E08B705173AD78F00FBCBBB /* splash-6.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B6FF173AD78F00FBCBBB /* splash-6.png */; };
 		5E08B709173AD7B600FBCBBB /* TLSplashViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E08B708173AD7B600FBCBBB /* TLSplashViewController.m */; };
-		5E08B70B173AE5E000FBCBBB /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B70A173AE5E000FBCBBB /* Default-568h@2x.png */; };
 		5E18D2AC172AF5A50010F8FF /* UIFont+AppFonts.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E18D2AB172AF5A50010F8FF /* UIFont+AppFonts.m */; };
 		5E18D2B4172B03F60010F8FF /* checkmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2B0172B03F60010F8FF /* checkmark@2x.png */; };
 		5E18D2B6172B03F60010F8FF /* inner-shadow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E18D2B2172B03F60010F8FF /* inner-shadow@2x.png */; };
@@ -43,8 +42,9 @@
 		5E18D30C1732D7000010F8FF /* TLHourLineSupplementaryView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E18D30B1732D7000010F8FF /* TLHourLineSupplementaryView.m */; };
 		5E21DEDB171F19C000231263 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DED9171F19C000231263 /* EventKit.framework */; };
 		5E21DEDC171F19C000231263 /* EventKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E21DEDA171F19C000231263 /* EventKitUI.framework */; };
-		5E23B2D8173AE6D20074734D /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E23B2D7173AE6D20074734D /* Default@2x.png */; };
-		5E23B2DC173AE7150074734D /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E23B2DB173AE7150074734D /* Default.png */; };
+		5E23B2E0173AEF6B0074734D /* Default-568@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E23B2DF173AEF6B0074734D /* Default-568@2x.png */; };
+		5E23B2E2173AEF850074734D /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E23B2E1173AEF850074734D /* Default@2x.png */; };
+		5E23B2E4173AEF9E0074734D /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E23B2E3173AEF9E0074734D /* Default.png */; };
 		5E2EF7B5172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7B4172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m */; };
 		5E2EF7BD172AC51700737A75 /* TLEventViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E2EF7BC172AC51700737A75 /* TLEventViewController.xib */; };
 		5E2EF7C0172AC53500737A75 /* TLEventViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E2EF7BF172AC53500737A75 /* TLEventViewController.m */; };
@@ -105,7 +105,6 @@
 		5E08B6FF173AD78F00FBCBBB /* splash-6.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "splash-6.png"; path = "Images/SplashImages/splash-6.png"; sourceTree = "<group>"; };
 		5E08B707173AD7B600FBCBBB /* TLSplashViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLSplashViewController.h; sourceTree = "<group>"; };
 		5E08B708173AD7B600FBCBBB /* TLSplashViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLSplashViewController.m; sourceTree = "<group>"; };
-		5E08B70A173AE5E000FBCBBB /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "../Default-568h@2x.png"; sourceTree = "<group>"; };
 		5E18D2AA172AF5A50010F8FF /* UIFont+AppFonts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIFont+AppFonts.h"; sourceTree = "<group>"; };
 		5E18D2AB172AF5A50010F8FF /* UIFont+AppFonts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIFont+AppFonts.m"; sourceTree = "<group>"; };
 		5E18D2B0172B03F60010F8FF /* checkmark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "checkmark@2x.png"; path = "Images/checkmark@2x.png"; sourceTree = "<group>"; };
@@ -127,8 +126,9 @@
 		5E18D30B1732D7000010F8FF /* TLHourLineSupplementaryView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLHourLineSupplementaryView.m; sourceTree = "<group>"; };
 		5E21DED9171F19C000231263 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 		5E21DEDA171F19C000231263 /* EventKitUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKitUI.framework; path = System/Library/Frameworks/EventKitUI.framework; sourceTree = SDKROOT; };
-		5E23B2D7173AE6D20074734D /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "../Default@2x.png"; sourceTree = "<group>"; };
-		5E23B2DB173AE7150074734D /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = SOURCE_ROOT; };
+		5E23B2DF173AEF6B0074734D /* Default-568@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568@2x.png"; path = "../Default-568@2x.png"; sourceTree = "<group>"; };
+		5E23B2E1173AEF850074734D /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "../Default@2x.png"; sourceTree = "<group>"; };
+		5E23B2E3173AEF9E0074734D /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = SOURCE_ROOT; };
 		5E2EF7B3172AC4FF00737A75 /* TLTouchDownGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLTouchDownGestureRecognizer.h; sourceTree = "<group>"; };
 		5E2EF7B4172AC4FF00737A75 /* TLTouchDownGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLTouchDownGestureRecognizer.m; sourceTree = "<group>"; };
 		5E2EF7BC172AC51700737A75 /* TLEventViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TLEventViewController.xib; sourceTree = "<group>"; };
@@ -354,9 +354,9 @@
 		5EB4E5581717374E00EC8E1C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				5E08B70A173AE5E000FBCBBB /* Default-568h@2x.png */,
-				5E23B2D7173AE6D20074734D /* Default@2x.png */,
-				5E23B2DB173AE7150074734D /* Default.png */,
+				5E23B2DF173AEF6B0074734D /* Default-568@2x.png */,
+				5E23B2E1173AEF850074734D /* Default@2x.png */,
+				5E23B2E3173AEF9E0074734D /* Default.png */,
 				5EB4E5591717374E00EC8E1C /* Upcoming-Info.plist */,
 				5EB4E55A1717374E00EC8E1C /* InfoPlist.strings */,
 				5EB4E55D1717374E00EC8E1C /* main.m */,
@@ -508,9 +508,9 @@
 				5E08B703173AD78F00FBCBBB /* splash-4.png in Resources */,
 				5E08B704173AD78F00FBCBBB /* splash-5.png in Resources */,
 				5E08B705173AD78F00FBCBBB /* splash-6.png in Resources */,
-				5E08B70B173AE5E000FBCBBB /* Default-568h@2x.png in Resources */,
-				5E23B2D8173AE6D20074734D /* Default@2x.png in Resources */,
-				5E23B2DC173AE7150074734D /* Default.png in Resources */,
+				5E23B2E0173AEF6B0074734D /* Default-568@2x.png in Resources */,
+				5E23B2E2173AEF850074734D /* Default@2x.png in Resources */,
+				5E23B2E4173AEF9E0074734D /* Default.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

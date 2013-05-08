@@ -12,6 +12,7 @@
 @interface TLSplashViewController ()
 
 @property (nonatomic, strong) NSArray *splashImageViews;
+@property (nonatomic, strong) UIImageView *shadowImageView;
 
 @end
 
@@ -19,6 +20,7 @@
 
 -(void)viewDidLoad {
     [super viewDidLoad];
+    
     
     NSMutableArray *mutableArray = [NSMutableArray arrayWithCapacity:5];
     
@@ -61,22 +63,26 @@
         [mutableArray addObject:imageView];
     }
     
+    self.shadowImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"inner-shadow"]];
+    self.shadowImageView.frame = self.view.bounds;
+    self.shadowImageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [self.view addSubview:self.shadowImageView];
+    
     self.splashImageViews = [NSArray arrayWithArray:mutableArray];
     
-    [self.view addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
-        [self removeImageViews];
-    }]];
-    
     NSString *appearedBeforeString = @"Appeared";
-    
     if ([[NSUserDefaults standardUserDefaults] boolForKey:appearedBeforeString]) {
-        double delayInSeconds = 0.1;
+        double delayInSeconds = 1.0;
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
         dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
             [self removeImageViews];
         });
     } else {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:appearedBeforeString];
+        
+        [self.view addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
+            [self removeImageViews];
+        }]];
     }
 }
 
@@ -84,7 +90,13 @@
     for (NSInteger i = 0; i < self.splashImageViews.count; i++) {
         UIImageView *imageView = self.splashImageViews[i];
         
-        [UIView animateWithDuration:0.2f delay:(i * 0.1f) options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        [UIView animateWithDuration:0.8f animations:^{
+            [UIView animateWithDuration:0.2f animations:^{
+                self.shadowImageView.alpha = 0.0f;
+            }];
+        }];
+        
+        [UIView animateWithDuration:0.1f delay:(i * 0.1f) options:UIViewAnimationOptionCurveEaseInOut animations:^{
             imageView.transform = CGAffineTransformMakeTranslation(-10, 0);
         } completion:^(BOOL finished) {
             [UIView animateWithDuration:0.4f delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
