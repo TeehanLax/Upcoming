@@ -475,9 +475,9 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 
 -(CGFloat)heightForHour:(NSInteger)hour {
     
-    CGFloat minSize = (self.collectionView.frame.size.height - (MAX_ROW_HEIGHT * EXPANDED_ROWS)) / 20;
+    CGFloat minSize = (self.collectionView.frame.size.height - (MAX_ROW_HEIGHT * EXPANDED_ROWS)) / (NUMBER_OF_ROWS - EXPANDED_ROWS);
     
-    CGFloat dayLocation = (self.location.y / self.collectionView.frame.size.height) * 24;
+    CGFloat dayLocation = (self.location.y / self.collectionView.frame.size.height) * NUMBER_OF_ROWS;
     
     
     CGFloat diff = dayLocation - hour;
