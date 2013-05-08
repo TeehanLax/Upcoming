@@ -208,6 +208,10 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
 -(void)touchDownHandler:(TLTouchDownGestureRecognizer *)recognizer {
     self.location = [recognizer locationInView:recognizer.view];
     
+    if (self.location.y < 0) {
+        self.location = CGPointMake(self.location.x, 0);
+    }
+    
     EKEvent *event = [self eventUnderPoint:self.location];
     
     NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:self.location];
