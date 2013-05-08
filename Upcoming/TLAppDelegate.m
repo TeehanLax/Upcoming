@@ -36,6 +36,7 @@
     [self.window makeKeyAndVisible];
     
     self.splashViewController = [[TLSplashViewController alloc] init];
+    self.splashViewController.delegate = self;
     self.splashViewController.view.frame = self.viewController.view.bounds;
     [self.viewController.view addSubview:self.splashViewController.view];
 
@@ -76,6 +77,8 @@
 -(void)splashScreenControllerFinishedTransition:(TLSplashViewController *)controller {
     [self.splashViewController.view removeFromSuperview];
     self.splashViewController = nil;
+    
+    [[EKEventManager sharedInstance] promptForAccess];
 }
 
 @end

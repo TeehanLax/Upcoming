@@ -37,18 +37,6 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
                                                  name:EKEventStoreChangedNotification
                                                object:_store];
 
-    [_store requestAccessToEntityType:EKEntityTypeEvent
-                           completion:^(BOOL granted, NSError *error) {
-                               [self willChangeValueForKey:EKEventManagerAccessibleKeyPath];
-                               _accessible = granted;
-                               [self didChangeValueForKey:EKEventManagerAccessibleKeyPath];
-
-                               if (_accessible) {
-                                   // load events
-                                   [_store reset];
-                                   [self refresh];
-                               }
-                           }];
 
     return self;
 }
@@ -61,6 +49,21 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
 
     dispatch_once(&pred, ^{ _sharedInstance = [[self alloc] init]; });
     return _sharedInstance;
+}
+
+-(void)promptForAccess {
+    [_store requestAccessToEntityType:EKEntityTypeEvent
+                           completion:^(BOOL granted, NSError *error) {
+                               [self willChangeValueForKey:EKEventManagerAccessibleKeyPath];
+                               _accessible = granted;
+                               [self didChangeValueForKey:EKEventManagerAccessibleKeyPath];
+                               
+                               if (_accessible) {
+                                   // load events
+                                   [_store reset];
+                                   [self refresh];
+                               }
+                           }];
 }
 
 -(void)refresh {

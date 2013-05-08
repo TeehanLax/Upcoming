@@ -29,4 +29,6 @@ extern NSString *const EKEventManagerSourcesKeyPath;
 -(void)refresh;
 -(void)toggleCalendarWithIdentifier:(NSString *)calendarIdentifier;
 
+-(void)promptForAccess;
+
 @end
