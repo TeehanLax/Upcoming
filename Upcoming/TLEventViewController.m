@@ -423,6 +423,46 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     return CGRectMake(x, startY, width, endY - startY);
 }
 
+-(TLCollectionViewLayoutAttributesBackgroundState)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout backgroundStateForSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath {
+    TLEventViewModel *model = self.viewModelArray[indexPath.item];
+    
+    if (self.isTouching) {
+        // The user is touching. Either represented by the index path is under the finger (highlighted) or not (unhighlited)
+        if (model.event == self.eventUnderFinger) {
+            return TLCollectionViewLayoutAttributesBackgroundStateHighlighted;
+        } else {
+            return TLCollectionViewLayoutAttributesBackgroundStateUnhighlighted;
+        }
+    } else {
+        
+        // TODO: test overlapping events (only one should appear as immediate).
+        NSDate *now = [NSDate date];
+        if ([model.event.startDate isEarlierThanDate:now] && [model.event.endDate isLaterThanDate:now]) {
+            return TLCollectionViewLayoutAttributesBackgroundStateImmediate;
+        }
+        else if ([model.event.endDate isEarlierThanDate:now]) {
+            return TLCollectionViewLayoutAttributesBackgroundStatePast;
+        }
+        else { // implicitly, ([model.event.startDate isLaterThanDate:now]) 
+            return TLCollectionViewLayoutAttributesBackgroundStateFuture;
+        }
+    }
+}
+
+-(TLCollectionViewLayoutAttributesAlignment)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout alignmentForSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath {
+    TLEventViewModel *model = self.viewModelArray[indexPath.item];
+    
+    if (model.eventSpan == TLEventViewModelEventSpanFull) {
+        return TLCollectionViewLayoutAttributesAlignmentFull;
+    }
+    else if (model.eventSpan == TLEventViewModelEventSpanLeft) {
+        return TLCollectionViewLayoutAttributesAlignmentLeft;
+    }
+    else {
+        return TLCollectionViewLayoutAttributesAlignmentRight;
+    }
+}
+
 #pragma mark - UICollectionViewDataSource Methods
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {

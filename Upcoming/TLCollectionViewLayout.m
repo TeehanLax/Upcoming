@@ -9,7 +9,6 @@
 #import "TLCollectionViewLayout.h"
 #import "TLHourSupplementaryView.h"
 #import "TLEventSupplementaryView.h"
-#import "TLCollectionViewLayoutAttributes.h"
 
 @implementation TLCollectionViewLayout
 
@@ -70,8 +69,9 @@
         CGFloat alpha = 1.0f;
 
         if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)]) {
-            frame = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate)collectionView:self.collectionView frameForHourViewInLayout:self];
-            alpha = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate)collectionView:self.collectionView alphaForHourLineViewInLayout:self];
+            id<TLCollectionViewLayoutDelegate> delegate = (id<TLCollectionViewLayoutDelegate>)self.collectionView.delegate;
+            frame = [delegate collectionView:self.collectionView frameForHourViewInLayout:self];
+            alpha = [delegate collectionView:self.collectionView alphaForHourLineViewInLayout:self];
         }
 
         attributes.frame = frame;
@@ -84,15 +84,23 @@
 
         CGRect frame = CGRectZero;
         CGFloat alpha = 0.0f;
+        TLCollectionViewLayoutAttributesBackgroundState backgroundState;
+        TLCollectionViewLayoutAttributesAlignment alignment;
 
         if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)]) {
-            frame = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView layout:self frameForEventSupplementaryViewAtIndexPath:indexPath];
-            alpha = [(id<TLCollectionViewLayoutDelegate>)(self.collectionView.delegate) collectionView:self.collectionView layout:self alphaForSupplementaryViewAtIndexPath:indexPath];
+            id<TLCollectionViewLayoutDelegate> delegate = (id<TLCollectionViewLayoutDelegate>)self.collectionView.delegate;
+            
+            frame = [delegate collectionView:self.collectionView layout:self frameForEventSupplementaryViewAtIndexPath:indexPath];
+            alpha = [delegate collectionView:self.collectionView layout:self alphaForSupplementaryViewAtIndexPath:indexPath];
+            backgroundState = [delegate collectionView:self.collectionView layout:self backgroundStateForSupplementaryViewAtIndexPath:indexPath];
+            alignment = [delegate collectionView:self.collectionView layout:self alignmentForSupplementaryViewAtIndexPath:indexPath];
         }
 
         attributes.frame = frame;
         attributes.alpha = 1.0f;
         attributes.contentAlpha = alpha;
+        attributes.backgroundState = backgroundState;
+        attributes.alignment = alignment;
         attributes.zIndex = 1;
 
         return attributes;

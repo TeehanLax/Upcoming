@@ -14,6 +14,8 @@
     TLCollectionViewLayoutAttributes *otherAttributes = [super copyWithZone:zone];
 
     otherAttributes.contentAlpha = self.contentAlpha;
+    otherAttributes.backgroundState = self.backgroundState;
+    otherAttributes.alignment = self.alignment;
 
     return otherAttributes;
 }

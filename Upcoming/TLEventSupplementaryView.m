@@ -11,8 +11,9 @@
 
 @interface TLEventSupplementaryView ()
 
-@property (nonatomic, strong) UILabel *timeLabel;
 @property (nonatomic, strong) UILabel *titleLabel;
+
+@property (nonatomic, strong) UIImageView *backgroundImageView;
 
 @end
 
@@ -23,26 +24,24 @@
         return nil;
     }
 
-    self.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.4f];
+    self.backgroundColor = [UIColor clearColor];
+    
+    self.backgroundImageView = [[UIImageView alloc] initWithFrame:self.bounds];
+    self.backgroundImageView.backgroundColor = [UIColor clearColor];
+    [self addSubview:self.backgroundImageView];
     
     self.contentView = [[UIView alloc] initWithFrame:self.bounds];
-    self.contentView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     self.contentView.backgroundColor = [UIColor clearColor];
     [self addSubview:self.contentView];
-
-    self.timeLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.timeLabel.font = [[UIFont tl_appFont] fontWithSize:14];
-    self.timeLabel.autoresizingMask = UIViewAutoresizingFlexibleHeight;
-    self.timeLabel.backgroundColor = [UIColor clearColor];
-    self.timeLabel.textColor = [UIColor colorFromRGB:0x999999];
-    [self.contentView addSubview:self.timeLabel];
-
+    
     self.titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.titleLabel.font = [[UIFont tl_appFont] fontWithSize:14];
-    self.titleLabel.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     self.titleLabel.backgroundColor = [UIColor clearColor];
     self.titleLabel.textColor = [UIColor colorFromRGB:0x444444];
     [self.contentView addSubview:self.titleLabel];
+    
+    // Require this because UICollectionView will leave random supplementary views floating around, but give them a bounds of CGRect Zero. 
+    self.clipsToBounds = YES;
 
     return self;
 }
@@ -55,30 +54,58 @@
     [super applyLayoutAttributes:layoutAttributes];
     
     self.contentView.alpha = layoutAttributes.contentAlpha;
-}
-
--(void)setTimeString:(NSString *)timeString {
-    _timeString = timeString;
-    self.timeLabel.text = timeString;
-    [self setNeedsDisplay];
-    [self setNeedsLayout];
+        
+    switch (layoutAttributes.backgroundState) {
+        case TLCollectionViewLayoutAttributesBackgroundStateFuture:
+            self.backgroundImageView.image = [[UIImage imageNamed:@"background-future"] resizableImageWithCapInsets:UIEdgeInsetsMake(3, 3, 3, 3)];
+            break;
+        case TLCollectionViewLayoutAttributesBackgroundStateUnhighlighted:
+            self.backgroundImageView.image = [[UIImage imageNamed:@"background-unhighlighted"] resizableImageWithCapInsets:UIEdgeInsetsMake(3, 3, 3, 3)];
+            break;
+        case TLCollectionViewLayoutAttributesBackgroundStateHighlighted:
+            self.backgroundImageView.image = [[UIImage imageNamed:@"background-highlighted"] resizableImageWithCapInsets:UIEdgeInsetsMake(3, 3, 3, 3)];
+            break;
+        case TLCollectionViewLayoutAttributesBackgroundStatePast:
+            self.backgroundImageView.image = [[UIImage imageNamed:@"background-past"] resizableImageWithCapInsets:UIEdgeInsetsMake(3, 3, 3, 3)];
+            break;
+        case TLCollectionViewLayoutAttributesBackgroundStateImmediate:
+            self.backgroundImageView.image = [[UIImage imageNamed:@"background-immediate"] resizableImageWithCapInsets:UIEdgeInsetsMake(3, 3, 3, 3)];
+            break;
+    }
+    
+    CGFloat x = 0.0f;
+    CGFloat width = CGRectGetWidth(self.bounds);
+    switch (layoutAttributes.alignment) {
+        case TLCollectionViewLayoutAttributesAlignmentFull:
+            x = 5.0f;
+            width = 310.0f;
+            break;
+        case TLCollectionViewLayoutAttributesAlignmentLeft:
+            x = 5.0f;
+            width = 154.0f;
+            break;
+        case TLCollectionViewLayoutAttributesAlignmentRight:
+            x = 2.0;
+            width = 154.0f;
+            break;
+    }
+    
+    CGRect frame = CGRectMake(x, 2, width, self.frame.size.height - 4);
+    self.titleLabel.frame = CGRectInset(frame, 5, 0);
+    self.backgroundImageView.frame = frame;
 }
 
 -(void)setTitleString:(NSString *)titleString {
     _titleString = titleString;
     self.titleLabel.text = titleString;
-    [self setNeedsDisplay];
-    [self setNeedsLayout];
 }
 
 -(void)layoutSubviews {
     [super layoutSubviews];
-
-    self.timeLabel.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
-    self.titleLabel.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
 }
 
--(void)drawRect:(CGRect)rect {
+-(void)prepareForReuse {
+    [super prepareForReuse];
 }
 
 @end
