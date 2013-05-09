@@ -49,16 +49,9 @@
 }
 
 -(void)setTimeString:(NSString *)timeString {
+    timeString = @"10:00";
     _timeString = timeString;
     self.timeLabel.text = timeString;
-    [self setNeedsDisplay];
-    [self setNeedsLayout];
-}
-
--(void)applyLayoutAttributes:(TLCollectionViewLayoutAttributes *)layoutAttributes {
-    [super applyLayoutAttributes:layoutAttributes];
-
-    [self setNeedsDisplay];
 }
 
 static const CGFloat leftMargin = 12.0f;
@@ -67,13 +60,15 @@ static const CGFloat leftMargin = 12.0f;
     [super layoutSubviews];
 
     UIFont *font = [[UIFont tl_appFont] fontWithSize:14];
-    CGSize textSize = [self.timeString sizeWithFont:font];
+    CGSize textSize = [self.timeLabel.text sizeWithFont:font];
 
     CGRect textRect = CGRectMake(leftMargin, CGRectGetMidY(self.bounds) - textSize.height / 2, textSize.width, textSize.height);
     self.timeLabel.frame = textRect;
 }
 
 -(void)drawRect:(CGRect)rect {
+    [super drawRect:rect];
+    
     CGContextRef context = UIGraphicsGetCurrentContext();
 
     CGRect textRect = self.timeLabel.frame;

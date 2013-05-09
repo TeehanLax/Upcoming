@@ -40,6 +40,9 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
 // Not completely OK to keep this around, but we can guarantee we only ever want one on screen, so it's OK.
 @property (nonatomic, strong) TLHourLineSupplementaryView *hourSupplementaryView;
 
+@property (nonatomic, strong) NSCalendar *calendar;
+@property (nonatomic, strong) NSDateComponents *currentDateComponents;
+
 @end
 
 // This collection view displays *hours* as cells – the events themselves are supplementary views.
@@ -51,10 +54,19 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
 -(void)viewDidLoad {
     [super viewDidLoad];
     
+    //TODO: Audo-updating?
+    self.calendar = [NSCalendar currentCalendar];
+    
     EKEventManager *eventManager = [EKEventManager sharedInstance];
     
     // Wrap our eventManager events property as a RACSignal so we can react to changes.
     RACSignal *newEventsSignal = [RACAbleWithStart(eventManager, events) deliverOn:[RACScheduler mainThreadScheduler]];
+    
+    @weakify(self);
+    RAC(self.currentDateComponents) = [[[RACSignal interval:60] startWith:[NSDate date]] map:^id(id value) {
+        @strongify(self);
+        return [self.calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
+    }];
     
     // Bind our viewModelArray to a mapped newEventSignal
     RAC(self.viewModelArray) = [[[newEventsSignal distinctUntilChanged] map:^id (NSArray *eventsArray) {
@@ -175,7 +187,6 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
     [self.collectionView addGestureRecognizer:self.touchDown];
     
     // Updat eour background gradient every minute. 
-    @weakify(self);
     [[[RACSignal interval:60.0f] deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(id x) {
         @strongify(self);
         [self updateBackgroundGradient];
@@ -328,8 +339,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
 }
 
 -(CGRect)collectionView:(UICollectionView *)collectionView frameForHourLineViewInLayout:(TLCollectionViewLayout *)layout {
-    NSCalendar *calendar = [NSCalendar currentCalendar];
-    NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
+    NSDateComponents *components = self.currentDateComponents;
     
     NSInteger currentHour = components.hour;
     NSInteger currentMinute = components.minute;
@@ -372,8 +382,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
     if (self.touching) {
         TLEventViewModel *model = self.viewModelArray[indexPath.item];
         
-        NSCalendar *currentCalendar = [NSCalendar currentCalendar];
-        NSDateComponents *components = [currentCalendar components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
+        NSDateComponents *components = [self.calendar components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
         NSInteger hour = components.hour;
         
         return [self alphaForElementInHour:hour];
@@ -386,8 +395,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
     TLEventViewModel *model = self.viewModelArray[indexPath.item];
         
     // Grab the date components from the startDate and use the to find the hour and minutes of the event
-    NSCalendar *currentCalendar = [NSCalendar currentCalendar];
-    NSDateComponents *components = [currentCalendar components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
+    NSDateComponents *components = [self.calendar components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
     NSInteger hour = components.hour;
     
     CGFloat startY = 0;
@@ -404,7 +412,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
     }
     
     // Now grab the components of the end hour ...
-    components = [currentCalendar components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.endDate];
+    components = [self.calendar components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.endDate];
     hour = components.hour;
     
     // And do the same calculation for the max Y.
@@ -497,8 +505,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
             
             RACSubject *updateSubject = [RACSubject subject];
             
-            NSCalendar *calendar = [NSCalendar currentCalendar];
-            NSDateComponents *components = [calendar components:NSSecondCalendarUnit fromDate:[NSDate date]];
+            NSDateComponents *components = self.currentDateComponents;
             
             // Find out when the next minute change is and start a recurring RACSignal when that happens. 
             NSInteger delay = 60 - components.second;
@@ -517,9 +524,11 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
                 }];
             });
             
+            @weakify(self);
             // Finally, bind the value of the supplementary view's timeString property to a mapped signal.
             RAC(self.hourSupplementaryView.timeString) = [updateSubject map:^id (NSDate *date) {
-                NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit)
+                @strongify(self);
+                NSDateComponents *components = [self.calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit)
                                                            fromDate:date];
                 
                 NSInteger hours = components.hour % 12;

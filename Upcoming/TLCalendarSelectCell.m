@@ -31,7 +31,6 @@
     [self setupCustomColors];
 
     self.dotView = [[TLCalendarDotView alloc] initWithFrame:CGRectMake(0, 0, 10, 10)];
-    self.dotView.backgroundColor = [UIColor clearColor];
     [self.contentView addSubview:self.dotView];
 
     return self;
@@ -55,8 +54,6 @@
     _dotColor = dotColor;
 
     self.dotView.dotColor = dotColor;
-
-    [self.dotView setNeedsDisplay];
 }
 
 #pragma mark - Private Methods

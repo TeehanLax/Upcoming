@@ -158,7 +158,6 @@ const CGFloat kUpperHeaderHeight = 52.0f;
             
             TLCalendarDotView *dotView = [[TLCalendarDotView alloc] initWithFrame:CGRectMake(0, 0, 10, 10)];
             dotView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
-            dotView.backgroundColor = [UIColor clearColor];
             dotView.center = CGPointMake(CGRectGetMinX(allDayLabel.frame) - 10, allDayLabel.center.y);
             [view addSubview:dotView];
             

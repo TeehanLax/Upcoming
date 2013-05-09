@@ -10,16 +10,27 @@
 
 @implementation TLCalendarDotView
 
--(void)setDotColor:(UIColor *)dotColor {
-    _dotColor = dotColor;
-    [self setNeedsDisplay];
+-(void)awakeFromNib {
+    [super awakeFromNib];
+    
+    self.layer.masksToBounds = YES;
+    self.layer.cornerRadius = lrint(CGRectGetWidth(self.bounds) / 2.0f);
 }
 
--(void)drawRect:(CGRect)rect {
-    CGContextRef ctx = UIGraphicsGetCurrentContext();
-    CGContextAddEllipseInRect(ctx, self.bounds);
-    CGContextSetFillColor(ctx, CGColorGetComponents([self.dotColor CGColor] ? : [[UIColor clearColor] CGColor]));
-    CGContextFillPath(ctx);
+-(id)initWithFrame:(CGRect)frame {
+    if (!(self = [super initWithFrame:frame])) return nil;
+    
+    
+    self.layer.masksToBounds = YES;
+    self.layer.cornerRadius = lrint(CGRectGetWidth(self.bounds) / 2.0f);
+    
+    return self;
+}
+
+-(void)setDotColor:(UIColor *)dotColor {
+    _dotColor = dotColor;
+    
+    self.backgroundColor = dotColor;
 }
 
 @end

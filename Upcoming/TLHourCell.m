@@ -53,7 +53,7 @@
 }
 
 -(void)drawRect:(CGRect)rect {
-    float alpha = 0.3;
+    CGFloat alpha = 0.3;
 
     if (self.titleLabel.text.length > 0) {
         alpha = 1;
@@ -80,10 +80,10 @@
     UIImage *aImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
 
-    CGPoint p = self.frame.origin;
-    CGSize s = self.frame.size;
+    CGPoint point = self.frame.origin;
+    CGSize size = self.frame.size;
 
-    CGImageRef imageRef = CGImageCreateWithImageInRect([rootViewController.gradientImage CGImage], CGRectMake(p.x, self.minY + self.superview.frame.origin.y, s.width, self.maxY - self.minY));
+    CGImageRef imageRef = CGImageCreateWithImageInRect([rootViewController.gradientImage CGImage], CGRectMake(point.x, self.minY + self.superview.frame.origin.y, size.width, self.maxY - self.minY));
     UIImage *img = [UIImage imageWithCGImage:imageRef];
     CGImageRelease(imageRef);
 
