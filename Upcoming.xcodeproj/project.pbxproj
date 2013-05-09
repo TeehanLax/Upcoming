@@ -59,9 +59,6 @@
 		5EB4E55C1717374E00EC8E1C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5EB4E55A1717374E00EC8E1C /* InfoPlist.strings */; };
 		5EB4E55E1717374E00EC8E1C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EB4E55D1717374E00EC8E1C /* main.m */; };
 		5EB4E5621717374E00EC8E1C /* TLAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EB4E5611717374E00EC8E1C /* TLAppDelegate.m */; };
-		5EB4E5641717374E00EC8E1C /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 5EB4E5631717374E00EC8E1C /* Default.png */; };
-		5EB4E5661717374E00EC8E1C /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5EB4E5651717374E00EC8E1C /* Default@2x.png */; };
-		5EB4E5681717374E00EC8E1C /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5EB4E5671717374E00EC8E1C /* Default-568h@2x.png */; };
 		5EB4E57C17187CF700EC8E1C /* TLRootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EB4E57B17187CF700EC8E1C /* TLRootViewController.m */; };
 		5EB4E58417187E1500EC8E1C /* TLHeaderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EB4E58217187E1500EC8E1C /* TLHeaderViewController.m */; };
 		5EB4E58517187E1500EC8E1C /* TLHeaderViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5EB4E58317187E1500EC8E1C /* TLHeaderViewController.xib */; };
@@ -466,9 +463,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5EB4E55C1717374E00EC8E1C /* InfoPlist.strings in Resources */,
-				5EB4E5641717374E00EC8E1C /* Default.png in Resources */,
-				5EB4E5661717374E00EC8E1C /* Default@2x.png in Resources */,
-				5EB4E5681717374E00EC8E1C /* Default-568h@2x.png in Resources */,
 				5EB4E58517187E1500EC8E1C /* TLHeaderViewController.xib in Resources */,
 				5E2EF7BD172AC51700737A75 /* TLEventViewController.xib in Resources */,
 				5E18D2B4172B03F60010F8FF /* checkmark@2x.png in Resources */,
