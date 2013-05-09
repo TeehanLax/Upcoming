@@ -15,14 +15,13 @@
 
 @interface TLHourCell ()
 
+@property (nonatomic, weak) IBOutlet UILabel *hourLabel;
+
 @end
 
 @implementation TLHourCell
 
 -(void)awakeFromNib {
-//    [self.background.layer setCornerRadius:3.0f];
-//    [self.background.layer setMasksToBounds:YES];
-
     [self reset];
 }
 
@@ -42,11 +41,16 @@
 
 -(void)applyLayoutAttributes:(TLCollectionViewLayoutAttributes *)layoutAttributes {
     [super applyLayoutAttributes:layoutAttributes];
+    
     self.contentView.alpha = layoutAttributes.contentAlpha;
 }
 
+-(void)setHour:(NSInteger)hour {
+    self.hourLabel.text = [NSString stringWithFormat:@"%d", hour];
+}
+
 -(void)drawRect:(CGRect)rect {
-    CGFloat alpha = 0.3;
+    CGFloat alpha = 0.1;
     TLAppDelegate *appDelegate = (TLAppDelegate *)[UIApplication sharedApplication].delegate;
     TLRootViewController *rootViewController = appDelegate.viewController;
 

@@ -16,4 +16,6 @@
 @property (nonatomic, assign) float minY;
 @property (nonatomic, assign) float maxY;
 
+-(void)setHour:(NSInteger)hour;
+
 @end

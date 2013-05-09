@@ -12,6 +12,7 @@
 @interface TLEventSupplementaryView ()
 
 @property (nonatomic, strong) UILabel *titleLabel;
+@property (nonatomic, strong) UILabel *timeLabel;
 
 @property (nonatomic, strong) UIImageView *backgroundImageView;
 
@@ -39,6 +40,12 @@
     self.titleLabel.backgroundColor = [UIColor clearColor];
     self.titleLabel.textColor = [UIColor tl_colorFromRGB:0x444444];
     [self.contentView addSubview:self.titleLabel];
+    
+    self.timeLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    self.timeLabel.font = [[UIFont tl_appFont] fontWithSize:14];
+    self.timeLabel.backgroundColor = [UIColor clearColor];
+    self.timeLabel.textColor = [UIColor colorWithWhite:0.0f alpha:0.4f];
+    [self.contentView addSubview:self.timeLabel];
     
     // Require this because UICollectionView will leave random supplementary views floating around, but give them a bounds of CGRect Zero. 
     self.clipsToBounds = YES;
@@ -80,28 +87,40 @@
         case TLCollectionViewLayoutAttributesAlignmentFull:
             x = 5.0f;
             width = 310.0f;
-            xOffset = 5.0f;
+            xOffset = 35.0f;
             break;
         case TLCollectionViewLayoutAttributesAlignmentLeft:
             x = 5.0f;
             width = 154.0f;
-            xOffset = 5.0f;
+            xOffset = 35.0f;
             break;
         case TLCollectionViewLayoutAttributesAlignmentRight:
             x = 2.0;
             width = 152.0f;
+            xOffset = 35.0f;
+            break;
+        case TLCollectionViewLayoutAttributesAlignmentNoTime:
+            x = 5.0f;
+            width = 154.0f;
             xOffset = 5.0f;
             break;
     }
     
     CGRect frame = CGRectMake(x, 2, width, self.frame.size.height - 4);
-    self.titleLabel.frame = CGRectInset(frame, xOffset, 0);
+    [self.timeLabel sizeToFit];
+    self.timeLabel.frame = CGRectMake(x + 4, 2, CGRectGetWidth(self.timeLabel.frame), CGRectGetHeight(frame));
+    self.titleLabel.frame = CGRectMake(CGRectGetMaxX(self.timeLabel.frame) + 3, 2, CGRectGetWidth(frame) - 3 - CGRectGetMaxX(self.timeLabel.frame), frame.size.height);
     self.backgroundImageView.frame = frame;
 }
 
 -(void)setTitleString:(NSString *)titleString {
     _titleString = titleString;
     self.titleLabel.text = titleString;
+}
+
+-(void) setTimeString:(NSString *)timeString {
+    _timeString = timeString;
+    self.timeLabel.text = timeString;
 }
 
 -(void)layoutSubviews {

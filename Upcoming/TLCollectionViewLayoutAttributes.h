@@ -19,7 +19,8 @@ typedef enum {
 typedef enum {
     TLCollectionViewLayoutAttributesAlignmentLeft = 0,
     TLCollectionViewLayoutAttributesAlignmentFull,
-    TLCollectionViewLayoutAttributesAlignmentRight
+    TLCollectionViewLayoutAttributesAlignmentRight,
+    TLCollectionViewLayoutAttributesAlignmentNoTime
 }TLCollectionViewLayoutAttributesAlignment;
 
 @interface TLCollectionViewLayoutAttributes : UICollectionViewLayoutAttributes
