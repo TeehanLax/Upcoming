@@ -27,6 +27,7 @@ const CGFloat kUpperHeaderHeight = 52.0f;
 @property (nonatomic, weak) IBOutlet UILabel *eventTitleLabel;
 @property (nonatomic, weak) IBOutlet UILabel *eventLocationLabel;
 @property (nonatomic, weak) IBOutlet UILabel *eventTimeLabel;
+@property (nonatomic, weak) IBOutlet UILabel *eventNowLabel;
 @property (nonatomic, weak) IBOutlet UILabel *eventRelativeTimeLabel;
 @property (nonatomic, weak) IBOutlet UILabel *eventRelativeTimeUnitLabel;
 @property (nonatomic, weak) IBOutlet UIImageView *eventLocationImageView;
@@ -78,8 +79,7 @@ const CGFloat kUpperHeaderHeight = 52.0f;
                          reduce:^id (NSArray *eventArray, EKEvent *nextEvent, NSDate *fireDate)
         {
             NSArray *filteredArray = [[eventArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL (EKEvent *event, NSDictionary *bindings) {
-                return [event.startDate
-                        isLaterThanDate:[NSDate date]];
+                return [event.endDate isLaterThanDate:[NSDate date]] && !event.isAllDay;
             }]] sortedArrayUsingComparator:^NSComparisonResult (id obj1, id obj2) {
                 return [[obj1 startDate] compare:[obj2 startDate]];
             }];
@@ -113,8 +113,15 @@ const CGFloat kUpperHeaderHeight = 52.0f;
                                                                 toDate:event.startDate
                                                                options:0];
          
+         self.eventNowLabel.hidden = YES;
+         
+         if (startTimeComponents.minute < 0) {
+             self.eventNowLabel.hidden = NO;
+             self.eventRelativeTimeLabel.text = @"";
+             self.eventRelativeTimeUnitLabel.text = @"";
+         }
          // Check for descending unit lengths being greater than zero for the largest, non-zero component.
-         if (startTimeComponents.month > 0) {
+         else if (startTimeComponents.month > 0) {
              NSInteger numberOfMonths = startTimeComponents.month;
              
              if (startTimeComponents.day > 15) {
