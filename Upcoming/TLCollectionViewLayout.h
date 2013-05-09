@@ -10,8 +10,8 @@
 #import "TLCollectionViewLayoutAttributes.h"
 
 #define NUMBER_OF_ROWS 24
-#define EXPANDED_ROWS  4
-#define MAX_ROW_HEIGHT 38.f
+#define EXPANDED_ROWS  3
+#define MAX_ROW_HEIGHT 44.f
 
 @class TLCollectionViewLayout;
 
