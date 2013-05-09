@@ -329,16 +329,20 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
 
 -(CGRect)collectionView:(UICollectionView *)collectionView frameForHourLineViewInLayout:(TLCollectionViewLayout *)layout {
     NSCalendar *calendar = [NSCalendar currentCalendar];
-    NSDateComponents *components = [calendar components:NSHourCalendarUnit fromDate:[NSDate date]];
+    NSDateComponents *components = [calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
     
     NSInteger currentHour = components.hour;
+    NSInteger currentMinute = components.minute;
     
     // Instead of re-calculating geometry for events, rely on the calculations for hour views. 
     UICollectionViewLayoutAttributes *attributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:currentHour inSection:0]];
     
     CGFloat viewHeight = attributes.size.height;
+    CGFloat minuteAdjustment = attributes.size.height * (CGFloat)(currentMinute / 60);
     
-    return CGRectMake(0, attributes.frame.origin.y, CGRectGetWidth(self.view.bounds), viewHeight);
+    const CGFloat height = 20.0f;
+    
+    return CGRectMake(0, attributes.frame.origin.y + minuteAdjustment + (viewHeight - height) / 2.0f, CGRectGetWidth(self.view.bounds), height);
 }
 
 -(CGFloat)collectionView:(UICollectionView *)collectionView alphaForHourLineViewInLayout:(TLCollectionViewLayout *)layout {
