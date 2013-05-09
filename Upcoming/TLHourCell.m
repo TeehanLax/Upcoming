@@ -20,8 +20,8 @@
 @implementation TLHourCell
 
 -(void)awakeFromNib {
-    [self.background.layer setCornerRadius:3.0f];
-    [self.background.layer setMasksToBounds:YES];
+//    [self.background.layer setCornerRadius:3.0f];
+//    [self.background.layer setMasksToBounds:YES];
 
     [self reset];
 }
@@ -53,7 +53,7 @@
     UICollectionView *collectionView = (UICollectionView *)[self superview];
     NSIndexPath *indexPath = [collectionView indexPathForCell:self];
 
-    CGFloat minSize = (collectionView.frame.size.height - (MAX_ROW_HEIGHT * EXPANDED_ROWS)) / 20;
+    CGFloat minSize = (collectionView.frame.size.height - (MAX_ROW_HEIGHT * EXPANDED_ROWS)) / (NUMBER_OF_ROWS - EXPANDED_ROWS);
     self.minY = minSize * indexPath.item;
     self.maxY = (collectionView.frame.size.height - (minSize * 24)) + self.minY;
 
