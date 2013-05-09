@@ -14,6 +14,7 @@
 #import "TLCalendarSelectCell.h"
 
 #import <ViewUtils.h>
+#import <ReactiveCocoaLayout.h>
 
 const CGFloat kHeaderHeight = 72.0f;
 const CGFloat kUpperHeaderHeight = 52.0f;
@@ -43,6 +44,10 @@ const CGFloat kUpperHeaderHeight = 52.0f;
 @property (nonatomic, weak) IBOutlet TLCalendarDotView *alternateCalendarView;
 @property (nonatomic, strong) RACSubject *alternateEventSubject;
 
+// All-day event properties
+@property (nonatomic, weak) IBOutlet UIPageControl *allDayEventPageControl;
+@property (nonatomic, weak) IBOutlet UIScrollView *allDayEventScrollView;
+@property (nonatomic, strong) NSArray *allDayEventViews;
 
 @property (nonatomic, weak) IBOutlet UIView *tableMaskingView;
 
@@ -74,8 +79,97 @@ const CGFloat kUpperHeaderHeight = 52.0f;
     
     RACSignal *timerSignal = [[RACSignal interval:60] startWith:[NSDate date]];
     
-    // Update our header labels with the next event whenever it changes.
     @weakify(self);
+    
+    RACSignal *todayAllDayEventsSignal = [RACAbleWithStart([EKEventManager sharedInstance], events) map:^id(NSArray *eventArray) {
+        NSArray *allDayEvents = [eventArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(EKEvent *event, NSDictionary *bindings) {
+            return event.isAllDay;
+        }]];
+        return allDayEvents;
+    }];
+    
+    RACSignal *allDayEventSignal = [[RACSignal combineLatest:@[todayAllDayEventsSignal, timerSignal] reduce:^id (NSArray *allDayEventArray, NSDate *fireDate) {
+        return allDayEventArray;
+    }] deliverOn:[RACScheduler mainThreadScheduler]];
+    
+    // Bind the number of pages to the number of all-day events, plus one for the upcoming event
+    RAC(self.allDayEventPageControl.numberOfPages) = [allDayEventSignal map:^id(id value) {
+        return @([value count] + 1);
+    }];
+    
+    // Hide the page control when there is only one page
+    RAC(self.allDayEventPageControl.alpha) = [[allDayEventSignal map:^id(id value) {
+        if ([value count] == 0) return @(0.0f);
+        else return @(1.0f);
+    }] animate];
+    
+    // Bind the content size of the scroll view to a mapping of the number of events. 
+    RAC(self.allDayEventScrollView.contentSize) = [allDayEventSignal map:^id(id value) {
+        @strongify(self);
+        return [NSValue valueWithCGSize:CGSizeMake(CGRectGetWidth(self.allDayEventScrollView.frame) * ([value count] + 1), CGRectGetHeight(self.allDayEventScrollView.frame))];
+    }];
+    
+    // Bind the content offset to the page control's current page, and vice versa
+    [[self.allDayEventPageControl rac_signalForControlEvents:UIControlEventValueChanged] subscribeNext:^(UIPageControl *pageControl) {
+        @strongify(self);
+        [self.allDayEventScrollView scrollRectToVisible:CGRectMake(self.allDayEventPageControl.currentPage * CGRectGetWidth(self.allDayEventScrollView.frame), 0, CGRectGetWidth(self.allDayEventScrollView.frame), CGRectGetHeight(self.allDayEventScrollView.frame)) animated:YES];
+    }];
+    RAC(self.allDayEventPageControl.currentPage) = [[RACAbleWithStart(self.allDayEventScrollView.contentOffset) distinctUntilChanged] map:^id(id value) {
+        @strongify(self);
+        
+        CGPoint contentOffset = [value CGPointValue];
+        NSInteger currentPage = contentOffset.x / CGRectGetWidth(self.allDayEventScrollView.frame);
+        
+        return @(currentPage);
+    }];
+    
+    [allDayEventSignal subscribeNext:^(NSArray *eventArray) {
+        @strongify(self);
+        for (UIView *view in self.allDayEventViews) {
+            [view removeFromSuperview];
+        }
+        self.allDayEventViews = nil;
+        
+        NSMutableArray *mutableArray = [NSMutableArray arrayWithCapacity:eventArray.count];
+        
+        CGFloat width = CGRectGetWidth(self.allDayEventScrollView.frame);
+        CGFloat height = CGRectGetHeight(self.allDayEventScrollView.frame);
+        for (NSInteger i = 0; i < eventArray.count; i++) {
+            EKEvent *event = eventArray[i];
+            UIView *view = [[UIView alloc] initWithFrame:CGRectMake(width * (i+1), 0, width, height)];
+            
+            UILabel *eventNameLabel = [[UILabel alloc] initWithFrame:CGRectOffset(CGRectInset(view.bounds, 0, 20), 0, -5)];
+            eventNameLabel.font = [[UIFont tl_mediumAppFont] fontWithSize:16];
+            eventNameLabel.backgroundColor = [UIColor clearColor];
+            eventNameLabel.text = event.title;
+            eventNameLabel.textColor = [UIColor whiteColor];
+            eventNameLabel.textAlignment = NSTextAlignmentCenter;
+            [view addSubview:eventNameLabel];
+            
+            UILabel *allDayLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+            allDayLabel.font = [[UIFont tl_demiBoldAppFont] fontWithSize:14];
+            allDayLabel.backgroundColor = [UIColor clearColor];
+            allDayLabel.text = NSLocalizedString(@"All Day", @"All Day event byline");
+            allDayLabel.textColor = [UIColor colorWithWhite:1.0f alpha:0.5f];
+            allDayLabel.textAlignment = NSTextAlignmentCenter;
+            [allDayLabel sizeToFit];
+            allDayLabel.center = CGPointMake(width / 2.0f + 5, 55);
+            [view addSubview:allDayLabel];
+            
+            TLCalendarDotView *dotView = [[TLCalendarDotView alloc] initWithFrame:CGRectMake(0, 0, 10, 10)];
+            dotView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
+            dotView.backgroundColor = [UIColor clearColor];
+            dotView.center = CGPointMake(CGRectGetMinX(allDayLabel.frame) - 10, allDayLabel.center.y);
+            [view addSubview:dotView];
+            
+            [mutableArray addObject:view];
+            [self.allDayEventScrollView addSubview:view];
+        }
+        
+        self.allDayEventViews = [NSArray arrayWithArray:mutableArray];
+    }];
+    
+    // Update our header labels with the next event whenever it changes.
     [[[[RACSignal combineLatest:@[RACAbleWithStart([EKEventManager sharedInstance], events), RACAbleWithStart([EKEventManager sharedInstance], nextEvent), timerSignal]
                          reduce:^id (NSArray *eventArray, EKEvent *nextEvent, NSDate *fireDate)
         {
@@ -374,11 +468,14 @@ static CGFloat interAnimationDelay = 0.05f;
 
 -(void)hideHeaderView {
     [UIView animateWithDuration:pullDownAnimationDuration animations:^{
-        self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
+        self.allDayEventScrollView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
+        self.allDayEventPageControl.transform = self.allDayEventScrollView.transform;
     } completion:^(BOOL finished) {
         [UIView animateWithDuration:pullUpAnimationDuration delay:0.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-            self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
+            self.allDayEventScrollView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
+            self.allDayEventPageControl.transform = self.allDayEventScrollView.transform;
         } completion:^(BOOL finished) {
+            [self.allDayEventScrollView setContentOffset:CGPointZero];
             self.headerAlernateDetailView.alpha = 1.0f;
             self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerAlernateDetailView.frame));
             [UIView animateWithDuration:fallDownAnimationDuration delay:interAnimationDelay options:UIViewAnimationOptionCurveEaseOut animations:^{
@@ -401,10 +498,12 @@ static CGFloat interAnimationDelay = 0.05f;
         } completion:^(BOOL finished) {
             self.headerAlernateDetailView.alpha = 0.0f;
             [UIView animateWithDuration:fallDownAnimationDuration delay:interAnimationDelay options:UIViewAnimationOptionCurveEaseOut animations:^{
-                self.headerDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
+                self.allDayEventScrollView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
+                self.allDayEventPageControl.transform = self.allDayEventScrollView.transform;
             } completion:^(BOOL finished) {
                 [UIView animateWithDuration:pullDownAnimationDuration animations:^{
-                    self.headerDetailView.transform = CGAffineTransformIdentity;
+                    self.allDayEventScrollView.transform = CGAffineTransformIdentity;
+                    self.allDayEventPageControl.transform = self.allDayEventScrollView.transform;
                 } completion:nil];
             }];
         }];

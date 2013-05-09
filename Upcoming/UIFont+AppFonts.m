@@ -22,4 +22,8 @@
     return [UIFont fontWithName:@"AvenirNext-Bold" size:[UIFont systemFontSize]];
 }
 
++(UIFont  *)tl_demiBoldAppFont {
+    return [UIFont fontWithName:@"AvenirNext-DemiBold" size:[UIFont systemFontSize]];
+}
+
 @end
