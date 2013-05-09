@@ -23,6 +23,8 @@
 
 @end
 
+
+
 @interface TLEventViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate, TLCollectionViewLayoutDelegate>
 
 @property (nonatomic, weak) id<TLEventViewControllerDelegate> delegate;
@@ -30,5 +32,8 @@
 @property (nonatomic, strong) IBOutlet UICollectionView *collectionView;
 
 @property (nonatomic, strong) TLTouchDownGestureRecognizer *touchDown;
+
+// Determines whether finger is touching or not.
+@property (nonatomic, assign, getter = isTouching) BOOL touching;
 
 @end

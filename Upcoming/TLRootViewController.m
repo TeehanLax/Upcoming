@@ -241,18 +241,18 @@
     }];
     
     // Need to combine latest on the two signals since the footer moves with both
-    RACSignal *footerFrameSignal =
-    [[[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)], [nextApplicableEventSignal startWith:nil]] reduce:^id (NSNumber *headerRatio, NSNumber *footerRatio, EKEvent *nextEvent) {
+    RACSignal *footerFrameSignal = [[[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)], [nextApplicableEventSignal startWith:nil], RACAbleWithStart(self.dayListViewController.touching)] reduce:^id (NSNumber *headerRatio, NSNumber *footerRatio, EKEvent *nextEvent, NSNumber *touchingEventList) {
+        if (touchingEventList.boolValue) {
+            return @(0.0f);
+        }
         if (headerRatio.floatValue > 0) {
             return @(-headerRatio.floatValue);
         }
-        
         if (footerRatio.floatValue > 0) {
             return footerRatio;
         }
-        
         if (nextEvent) {
-            return @(0.25f);    // We have an event tomorrow we'd like to highlight. 0.25 seems reasonable. 
+            return @(0.25f);    // We have an event tomorrow we'd like to highlight. 0.25 seems reasonable.
         }
         
         return @(0);

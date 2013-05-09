@@ -27,8 +27,6 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
 
 // Latest updated location under finder.
 @property (nonatomic, assign) CGPoint location;
-// Determines whether finger is touching or not.
-@property (nonatomic, assign, getter = isTouching) BOOL touching;
 // Latest hour cell index path under user's finger.
 @property (nonatomic, strong) NSIndexPath *indexPathUnderFinger;
 // Latest event under finger (used to play "new event" sound).
