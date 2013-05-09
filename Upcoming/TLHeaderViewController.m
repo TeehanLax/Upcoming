@@ -9,6 +9,7 @@
 #import "TLHeaderViewController.h"
 #import "EKEventManager.h"
 #import "TLLoveButton.h"
+#import "TLEventViewModel.h"
 #import "TLCalendarDotView.h"
 #import "TLCalendarSelectCell.h"
 
@@ -410,10 +411,15 @@ static CGFloat interAnimationDelay = 0.05f;
     }];
 }
 
--(void)updateHour:(NSInteger)hours minute:(NSInteger)minutes event:(EKEvent *)event {
-    self.alternateAbsoluteTimeLabel.text = [NSString stringWithFormat:@"%d:%02d", hours, minutes];
+-(void)updateHour:(NSInteger)hours minute:(NSInteger)minutes event:(TLEventViewModel *)eventViewModel {
+    if (eventViewModel.eventSpan == TLEventViewModelEventSpanTooManyWarning) {
+        [self.alternateEventSubject sendNext:nil];
+    }
+    else {
+        [self.alternateEventSubject sendNext:eventViewModel.event];
+    }
     
-    [self.alternateEventSubject sendNext:event];
+    self.alternateAbsoluteTimeLabel.text = [NSString stringWithFormat:@"%d:%02d", hours, minutes];
 }
 
 -(void)setArrowRotationRatio:(CGFloat)arrowRotationRatio {

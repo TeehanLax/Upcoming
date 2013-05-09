@@ -487,8 +487,8 @@
     [self.headerViewController showHeaderView];
 }
 
--(void)userDidInteractWithDayListView:(TLEventViewController *)controller updateTimeHour:(NSInteger)hour minute:(NSInteger)minute event:(EKEvent *)event {
-    [self.headerViewController updateHour:hour minute:minute event:event];
+-(void)userDidInteractWithDayListView:(TLEventViewController *)controller updateTimeHour:(NSInteger)hour minute:(NSInteger)minute eventViewModel:(TLEventViewModel *)eventViewModel {
+    [self.headerViewController updateHour:hour minute:minute event:eventViewModel];
 }
 
 #pragma mark -TLHeaderViewControllerDelegate Methods

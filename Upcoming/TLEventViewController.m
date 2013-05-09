@@ -30,7 +30,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
 // Latest hour cell index path under user's finger.
 @property (nonatomic, strong) NSIndexPath *indexPathUnderFinger;
 // Latest event under finger (used to play "new event" sound).
-@property (nonatomic, strong) EKEvent *eventUnderFinger;
+@property (nonatomic, strong) TLEventViewModel *eventViewModelUnderFinger;
 
 // Background gradient view for self.view (*not* the collection view's backgroundView).
 @property (nonatomic, strong) TLBackgroundGradientView *backgroundGradientView;
@@ -210,7 +210,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
         self.location = CGPointMake(self.location.x, 0);
     }
     
-    EKEvent *event = [self eventUnderPoint:self.location];
+    TLEventViewModel *eventViewModel = [self eventViewModelUnderPoint:self.location];
     
     NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:self.location];
     UICollectionViewLayoutAttributes *attributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:indexPath];
@@ -234,7 +234,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
          performBatchUpdates:^{
              [self.backgroundGradientView
               setDarkened:YES];
-             self.eventUnderFinger = nil;
+             self.eventViewModelUnderFinger = nil;
              self.indexPathUnderFinger = indexPath;
              self.touching = YES;
              [self.delegate
@@ -246,7 +246,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
                   userDidInteractWithDayListView:self
                   updateTimeHour:hour
                   minute:minute
-                  event:event];
+                  eventViewModel:eventViewModel];
              }
              
              for (NSInteger i = 0; i < 3; i++) {
@@ -264,7 +264,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
     } else if (recognizer.state == UIGestureRecognizerStateChanged) {
         [self.collectionView.collectionViewLayout invalidateLayout];
         
-        if (event != nil) {
+        if (eventViewModel != nil && eventViewModel != self.eventViewModelUnderFinger) {
             [AppDelegate playTouchNewEventSound];
         } else {
             if ([indexPath compare:self.indexPathUnderFinger] != NSOrderedSame) {
@@ -272,17 +272,17 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
                 self.indexPathUnderFinger = indexPath;
             }
         }
-        self.eventUnderFinger = event;
+        self.eventViewModelUnderFinger = eventViewModel;
         
         if (CGRectContainsPoint(recognizer.view.bounds, self.location)) {
-            [self.delegate userDidInteractWithDayListView:self updateTimeHour:hour minute:minute event:event];
+            [self.delegate userDidInteractWithDayListView:self updateTimeHour:hour minute:minute eventViewModel:eventViewModel];
         }
     } else if (recognizer.state == UIGestureRecognizerStateEnded) {
         [self.collectionView
          performBatchUpdates:^{
              [self.backgroundGradientView
               setDarkened:NO];
-             self.eventUnderFinger = nil;
+             self.eventViewModelUnderFinger = nil;
              self.indexPathUnderFinger = nil;
              self.touching = NO;
              [self.delegate
@@ -437,14 +437,13 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
     
     if (self.isTouching) {
         // The user is touching. Either represented by the index path is under the finger (highlighted) or not (unhighlited)
-        if (model.event == self.eventUnderFinger) {
+        if (model == self.eventViewModelUnderFinger) {
             return TLCollectionViewLayoutAttributesBackgroundStateHighlighted;
         } else {
             return TLCollectionViewLayoutAttributesBackgroundStateUnhighlighted;
         }
     } else {
         
-        // TODO: test overlapping events (only one should appear as immediate).
         NSDate *now = [NSDate date];
         if ([model.event.startDate isEarlierThanDate:now] && [model.event.endDate isLaterThanDate:now]) {
             return TLCollectionViewLayoutAttributesBackgroundStateImmediate;
@@ -537,7 +536,13 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
         TLEventSupplementaryView *supplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kEventSupplementaryViewIdentifier forIndexPath:indexPath];
         
         TLEventViewModel *model = self.viewModelArray[indexPath.item];
-        supplementaryView.titleString = model.event.title;
+        
+        if (model.eventSpan == TLEventViewModelEventSpanTooManyWarning) {
+            supplementaryView.titleString = [NSString stringWithFormat:@"%d more events", model.extraEventsCount];
+        }
+        else {
+            supplementaryView.titleString = model.event.title;
+        }
         
         return supplementaryView;
     } else {
@@ -661,16 +666,16 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
     UIGraphicsEndImageContext();
 }
 
--(EKEvent *)eventUnderPoint:(CGPoint)point {
+-(TLEventViewModel *)eventViewModelUnderPoint:(CGPoint)point {
     //Find the event under a specific point
-    EKEvent *eventUnderTouch;
+    TLEventViewModel *eventUnderTouch;
     
     for (NSInteger i = 0; i < self.viewModelArray.count; i++) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:i inSection:0];
         CGRect frame = [self collectionView:self.collectionView layout:(TLCollectionViewLayout *)self.collectionView.collectionViewLayout frameForEventSupplementaryViewAtIndexPath:indexPath];
         
         if (CGRectContainsPoint(frame, point)) {            
-            eventUnderTouch = [self.viewModelArray[i] event];
+            eventUnderTouch = self.viewModelArray[i];
         }
     }
     

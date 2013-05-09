@@ -89,7 +89,7 @@
             break;
         case TLCollectionViewLayoutAttributesAlignmentRight:
             x = 2.0;
-            width = 154.0f;
+            width = 152.0f;
             xOffset = 5.0f;
             break;
     }

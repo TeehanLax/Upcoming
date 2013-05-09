@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @class EKEvent;
-
+@class TLEventViewModel;
 @class TLHeaderViewController;
 
 @protocol TLHeaderViewControllerDelegate <NSObject>
@@ -31,7 +31,7 @@ extern const CGFloat kUpperHeaderHeight;
 -(void)showHeaderView;
 
 // Used when user is interacting with collection view.
--(void)updateHour:(NSInteger)hours minute:(NSInteger)minutes event:(EKEvent *)event;
+-(void)updateHour:(NSInteger)hours minute:(NSInteger)minutes event:(TLEventViewModel *)eventViewModel;
 
 @property (nonatomic, weak) id<TLHeaderViewControllerDelegate> delegate;
 

@@ -12,6 +12,7 @@
 
 @class TLEventViewController;
 @class EKEvent;
+@class TLEventViewModel;
 
 
 @protocol TLEventViewControllerDelegate <NSObject>
@@ -19,7 +20,7 @@
 -(void)userDidBeginInteractingWithDayListViewController:(TLEventViewController *)controller;
 -(void)userDidEndInteractingWithDayListViewController:(TLEventViewController *)controller;
 
--(void)userDidInteractWithDayListView:(TLEventViewController *)controller updateTimeHour:(NSInteger)hour minute:(NSInteger)minute event:(EKEvent *)event;
+-(void)userDidInteractWithDayListView:(TLEventViewController *)controller updateTimeHour:(NSInteger)hour minute:(NSInteger)minute eventViewModel:(TLEventViewModel *)event;
 
 @end
 
