@@ -49,7 +49,6 @@
 }
 
 -(void)setTimeString:(NSString *)timeString {
-    timeString = @"10:00";
     _timeString = timeString;
     self.timeLabel.text = timeString;
 }
