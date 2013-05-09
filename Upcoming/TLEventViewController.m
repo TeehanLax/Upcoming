@@ -40,7 +40,6 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
 // Not completely OK to keep this around, but we can guarantee we only ever want one on screen, so it's OK.
 @property (nonatomic, strong) TLHourLineSupplementaryView *hourSupplementaryView;
 
-@property (nonatomic, strong) NSCalendar *calendar;
 @property (nonatomic, strong) NSDateComponents *currentDateComponents;
 
 @end
@@ -53,10 +52,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-    
-    //TODO: Audo-updating?
-    self.calendar = [NSCalendar currentCalendar];
-    
+        
     EKEventManager *eventManager = [EKEventManager sharedInstance];
     
     // Wrap our eventManager events property as a RACSignal so we can react to changes.
@@ -64,8 +60,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
     
     @weakify(self);
     RAC(self.currentDateComponents) = [[[RACSignal interval:60] startWith:[NSDate date]] map:^id(id value) {
-        @strongify(self);
-        return [self.calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
+        return [[[EKEventManager sharedInstance] calendar] components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
     }];
     
     // Bind our viewModelArray to a mapped newEventSignal
@@ -382,7 +377,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
     if (self.touching) {
         TLEventViewModel *model = self.viewModelArray[indexPath.item];
         
-        NSDateComponents *components = [self.calendar components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
+        NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
         NSInteger hour = components.hour;
         
         return [self alphaForElementInHour:hour];
@@ -395,7 +390,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
     TLEventViewModel *model = self.viewModelArray[indexPath.item];
         
     // Grab the date components from the startDate and use the to find the hour and minutes of the event
-    NSDateComponents *components = [self.calendar components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
+    NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
     NSInteger hour = components.hour;
     
     CGFloat startY = 0;
@@ -412,7 +407,7 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
     }
     
     // Now grab the components of the end hour ...
-    components = [self.calendar components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.endDate];
+    components = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.endDate];
     hour = components.hour;
     
     // And do the same calculation for the max Y.
@@ -524,11 +519,9 @@ static NSString *kHourGutterSupplementaryViewIdentifier = @"HourGutter";
                 }];
             });
             
-            @weakify(self);
             // Finally, bind the value of the supplementary view's timeString property to a mapped signal.
             RAC(self.hourSupplementaryView.timeString) = [updateSubject map:^id (NSDate *date) {
-                @strongify(self);
-                NSDateComponents *components = [self.calendar components:(NSHourCalendarUnit | NSMinuteCalendarUnit)
+                NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:(NSHourCalendarUnit | NSMinuteCalendarUnit)
                                                            fromDate:date];
                 
                 NSInteger hours = components.hour % 12;

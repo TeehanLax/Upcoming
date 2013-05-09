@@ -25,6 +25,8 @@ extern NSString *const EKEventManagerSourcesKeyPath;
 @property (nonatomic, strong) NSMutableArray *sources;
 @property (nonatomic, strong) NSMutableArray *selectedCalendars;
 
+@property (nonatomic, readonly) NSCalendar *calendar;
+
 +(EKEventManager *)sharedInstance;
 -(void)refresh;
 -(void)toggleCalendarWithIdentifier:(NSString *)calendarIdentifier;

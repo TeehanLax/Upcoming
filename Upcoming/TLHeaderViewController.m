@@ -199,7 +199,7 @@ const CGFloat kUpperHeaderHeight = 52.0f;
              return;
          }
          
-         NSCalendar *calendar = [NSCalendar currentCalendar];
+         NSCalendar *calendar = [[EKEventManager sharedInstance] calendar];
          
          unsigned int unitFlags = NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit;
          NSDateComponents *startTimeComponents = [calendar  components:unitFlags

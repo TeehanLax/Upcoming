@@ -90,7 +90,7 @@
 
     RACSignal *nextApplicableEventSignal = [[RACSignal combineLatest:@[filteredUpdateSignal, nextEventSignal] reduce:^id (NSNumber *noFurtherEventsToday, EKEvent *nextEvent) {
         if (noFurtherEventsToday.boolValue) {
-            NSCalendar *calendar = [NSCalendar currentCalendar];
+            NSCalendar *calendar = [[EKEventManager sharedInstance] calendar];
             NSDateComponents *components = [calendar components:NSHourCalendarUnit
                                                        fromDate:nextEvent.startDate];
             

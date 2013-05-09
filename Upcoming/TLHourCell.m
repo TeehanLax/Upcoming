@@ -15,17 +15,11 @@
 
 @interface TLHourCell ()
 
-@property (nonatomic, strong) IBOutlet UILabel *titleLabel;
-
 @end
 
 @implementation TLHourCell
 
 -(void)awakeFromNib {
-    self.titleLabel.clipsToBounds = NO;
-    self.titleLabel.font = [[UIFont tl_mediumAppFont] fontWithSize:14];
-    self.titleLabel.textColor = [UIColor tl_colorFromRGB:0x444444];
-
     [self.background.layer setCornerRadius:3.0f];
     [self.background.layer setMasksToBounds:YES];
 
@@ -33,7 +27,6 @@
 }
 
 -(void)reset {
-    self.titleLabel.text = @"";
     self.backgroundColor = [UIColor clearColor];
     self.contentView.backgroundColor = [UIColor clearColor];
     self.contentView.alpha = 0;
@@ -54,11 +47,6 @@
 
 -(void)drawRect:(CGRect)rect {
     CGFloat alpha = 0.3;
-
-    if (self.titleLabel.text.length > 0) {
-        alpha = 1;
-    }
-
     TLAppDelegate *appDelegate = (TLAppDelegate *)[UIApplication sharedApplication].delegate;
     TLRootViewController *rootViewController = appDelegate.viewController;
 
@@ -90,11 +78,6 @@
     UIGraphicsBeginImageContext(self.backgroundImage.frame.size);
     [img drawAtPoint:CGPointZero blendMode:kCGBlendModeSoftLight alpha:1];
     [aImage drawAtPoint:CGPointZero blendMode:kCGBlendModeSoftLight alpha:alpha];
-
-    if (self.titleLabel.text.length > 0) {
-        // draw the shape again per design
-        [aImage drawAtPoint:CGPointZero blendMode:kCGBlendModeSoftLight alpha:alpha];
-    }
 
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();

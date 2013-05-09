@@ -71,7 +71,7 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     NSDate *endDate = event.endDate;
     
     // Next, transform that data into the information we need to display to the user
-    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSCalendar *calendar = [[EKEventManager sharedInstance] calendar];
     
     unsigned int unitFlags = NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit;
     NSDateComponents *startTimeComponents = [calendar components:unitFlags fromDate:[NSDate date] toDate:startDate options:0];

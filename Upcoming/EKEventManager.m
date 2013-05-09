@@ -27,6 +27,8 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
         return nil;
     }
 
+    _calendar = [NSCalendar autoupdatingCurrentCalendar];
+    
     _store = [[EKEventStore alloc] init];
 
     _sources = [[NSMutableArray alloc] initWithCapacity:0];
@@ -143,9 +145,6 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
     [_events removeAllObjects];
     _nextEvent = nil;
 
-    // Get the appropriate calendar
-    NSCalendar *calendar = [NSCalendar currentCalendar];
-
     NSMutableArray *calendars = nil;
     NSUserDefaults *currentDefaults = [NSUserDefaults standardUserDefaults];
     NSData *dataRepresentingSavedArray = [currentDefaults objectForKey:@"SelectedCalendars"];
@@ -177,19 +176,19 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
 
     // start date - midnight of current day
     NSDateComponents *midnightDate = [[NSDateComponents alloc] init];
-    midnightDate = [calendar components:unitFlags fromDate:[NSDate date]];
+    midnightDate = [self.calendar components:unitFlags fromDate:[NSDate date]];
     midnightDate.hour = 0;
     midnightDate.minute = 0;
     midnightDate.second = 0;
-    NSDate *startDate = [calendar dateFromComponents:midnightDate];
+    NSDate *startDate = [self.calendar dateFromComponents:midnightDate];
 
     // end date - 11:59:59 of current day
     NSDateComponents *endComponents = [[NSDateComponents alloc] init];
-    endComponents = [calendar components:unitFlags fromDate:[NSDate date]];
+    endComponents = [self.calendar components:unitFlags fromDate:[NSDate date]];
     endComponents.hour = 23;
     endComponents.minute = 59;
     endComponents.second = 59;
-    NSDate *endDate = [calendar dateFromComponents:endComponents];
+    NSDate *endDate = [self.calendar dateFromComponents:endComponents];
 
     // Create the predicate from the event store's instance method
     NSPredicate *predicate = [_store predicateForEventsWithStartDate:startDate
