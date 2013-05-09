@@ -8,7 +8,6 @@
 
 #import "TLCollectionViewLayout.h"
 #import "TLHourLineSupplementaryView.h"
-#import "TLHourGutterSupplementaryView.h"
 #import "TLEventSupplementaryView.h"
 
 @implementation TLCollectionViewLayout
@@ -58,10 +57,6 @@
             [array addObject:[self layoutAttributesForSupplementaryViewOfKind:[TLEventSupplementaryView kind] atIndexPath:[NSIndexPath indexPathForItem:i inSection:0]]];
         }
     }
-    
-    for (NSInteger i = 0; i < NUMBER_OF_ROWS; i++) {
-        [array addObject:[self layoutAttributesForSupplementaryViewOfKind:[TLHourGutterSupplementaryView kind] atIndexPath:[NSIndexPath indexPathForItem:i inSection:0]]];
-    }
 
     return array;
 }
@@ -106,21 +101,8 @@
         attributes.alignment = alignment;
         attributes.zIndex = 3;
 
-    } else {
-        CGRect frame = CGRectZero;
-        CGFloat alpha = 0.0f;
-        
-        if ([self.collectionView.delegate conformsToProtocol:@protocol(TLCollectionViewLayoutDelegate)]) {
-            id<TLCollectionViewLayoutDelegate> delegate = (id<TLCollectionViewLayoutDelegate>)self.collectionView.delegate;
-            
-            frame = [delegate collectionView:self.collectionView layout:self frameForHourGutterSupplementaryViewAtIndexPath:indexPath];
-            alpha = [delegate collectionView:self.collectionView layout:self alphaForCellContentAtIndexPath:indexPath];
-        }
-        
-        attributes.frame = frame;
-        attributes.alpha = alpha;
-        attributes.zIndex = 2;
     }
+    
     return attributes;
 }
 

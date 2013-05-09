@@ -18,7 +18,6 @@
 		5E08B6F3173AAD7300FBCBBB /* background-past.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B6EE173AAD7300FBCBBB /* background-past.png */; };
 		5E08B6F4173AAD7300FBCBBB /* background-unhighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B6EF173AAD7300FBCBBB /* background-unhighlighted.png */; };
 		5E08B6F5173AAD7300FBCBBB /* background-highlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B6F0173AAD7300FBCBBB /* background-highlighted.png */; };
-		5E08B6F9173AC09D00FBCBBB /* TLHourGutterSupplementaryView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E08B6F8173AC09D00FBCBBB /* TLHourGutterSupplementaryView.m */; };
 		5E08B700173AD78F00FBCBBB /* splash-1.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B6FA173AD78F00FBCBBB /* splash-1.png */; };
 		5E08B701173AD78F00FBCBBB /* splash-2.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B6FB173AD78F00FBCBBB /* splash-2.png */; };
 		5E08B702173AD78F00FBCBBB /* splash-3.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E08B6FC173AD78F00FBCBBB /* splash-3.png */; };
@@ -95,8 +94,6 @@
 		5E08B6EE173AAD7300FBCBBB /* background-past.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "background-past.png"; path = "Images/background-past.png"; sourceTree = "<group>"; };
 		5E08B6EF173AAD7300FBCBBB /* background-unhighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "background-unhighlighted.png"; path = "Images/background-unhighlighted.png"; sourceTree = "<group>"; };
 		5E08B6F0173AAD7300FBCBBB /* background-highlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "background-highlighted.png"; path = "Images/background-highlighted.png"; sourceTree = "<group>"; };
-		5E08B6F7173AC09D00FBCBBB /* TLHourGutterSupplementaryView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TLHourGutterSupplementaryView.h; sourceTree = "<group>"; };
-		5E08B6F8173AC09D00FBCBBB /* TLHourGutterSupplementaryView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TLHourGutterSupplementaryView.m; sourceTree = "<group>"; };
 		5E08B6FA173AD78F00FBCBBB /* splash-1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "splash-1.png"; path = "Images/SplashImages/splash-1.png"; sourceTree = "<group>"; };
 		5E08B6FB173AD78F00FBCBBB /* splash-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "splash-2.png"; path = "Images/SplashImages/splash-2.png"; sourceTree = "<group>"; };
 		5E08B6FC173AD78F00FBCBBB /* splash-3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "splash-3.png"; path = "Images/SplashImages/splash-3.png"; sourceTree = "<group>"; };
@@ -216,8 +213,6 @@
 				5E18D30B1732D7000010F8FF /* TLHourLineSupplementaryView.m */,
 				5EC7E0011739427C00FB3C55 /* TLEventSupplementaryView.h */,
 				5EC7E0021739427D00FB3C55 /* TLEventSupplementaryView.m */,
-				5E08B6F7173AC09D00FBCBBB /* TLHourGutterSupplementaryView.h */,
-				5E08B6F8173AC09D00FBCBBB /* TLHourGutterSupplementaryView.m */,
 			);
 			name = "UICollectionView Views";
 			sourceTree = "<group>";
@@ -560,7 +555,6 @@
 				5EC7DFFB17381F5600FB3C55 /* TLLoveButton.m in Sources */,
 				5E91A6D0173895AA00CF83D5 /* TLEventViewModel.m in Sources */,
 				5EC7E0031739427D00FB3C55 /* TLEventSupplementaryView.m in Sources */,
-				5E08B6F9173AC09D00FBCBBB /* TLHourGutterSupplementaryView.m in Sources */,
 				5E08B709173AD7B600FBCBBB /* TLSplashViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

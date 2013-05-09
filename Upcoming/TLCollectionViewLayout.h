@@ -31,9 +31,6 @@
 -(TLCollectionViewLayoutAttributesBackgroundState)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout backgroundStateForSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath;
 -(TLCollectionViewLayoutAttributesAlignment)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout alignmentForSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath;
 
-// Methods for hour gutter supplementary views.
--(CGRect)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout frameForHourGutterSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath;
-
 @end
 
 // Most of the logic for the actual layout is in UICollectionViewFlowLayout and delegate
