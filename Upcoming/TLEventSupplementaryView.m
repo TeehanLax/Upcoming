@@ -106,7 +106,7 @@
             break;
     }
     
-    CGRect frame = CGRectMake(x, 2, width, self.frame.size.height - 4);
+    CGRect frame = CGRectMake(x, 0, width, self.frame.size.height);
     CGSize timeSize = [self.timeLabel.text sizeWithFont:self.timeLabel.font];
     
     self.timeLabel.frame = CGRectMake(x + 4, 2, timeSize.width, CGRectGetHeight(frame));
