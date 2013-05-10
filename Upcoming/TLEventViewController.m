@@ -321,6 +321,11 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     CGFloat yDistance = cell.maxY - cell.minY;
     CGFloat yDelta = cell.frame.origin.y - cell.minY;
     
+    // Avoid nan in below calculation
+    if (yDistance == 0) {
+        yDistance = 1.0f;
+    }
+    
     CGRect backgroundImageFrame = cell.backgroundImage.frame;
     backgroundImageFrame.origin.y = (cell.frame.size.height - backgroundImageFrame.size.height) * (yDelta / yDistance);
     cell.backgroundImage.frame = backgroundImageFrame;
@@ -499,6 +504,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
             
             NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSSecondCalendarUnit fromDate:[NSDate date]];
             
+            // TODO: This is negative.
             // Find out when the next minute change is and start a recurring RACSignal when that happens. 
             NSInteger delay = 60 - components.second;
             
@@ -666,7 +672,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     TLAppDelegate *appDelegate = (TLAppDelegate *)[UIApplication sharedApplication].delegate;
     TLRootViewController *rootViewController = appDelegate.viewController;
     UIGraphicsBeginImageContext(self.backgroundGradientView.bounds.size);
-    [self.backgroundGradientView.layer renderInContext:UIGraphicsGetCurrentContext()];
+    [self.backgroundGradientView.gradientLayer renderInContext:UIGraphicsGetCurrentContext()];
     rootViewController.gradientImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
 }

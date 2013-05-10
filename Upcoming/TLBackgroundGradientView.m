@@ -10,8 +10,6 @@
 
 @interface TLBackgroundGradientView ()
 
-// Gradient layer to display the pretty colours.
-@property (nonatomic, strong) CAGradientLayer *gradientLayer;
 // Normal layer to darken the gradient (ie: on touch down).
 @property (nonatomic, strong) CALayer *darkenLayer;
 // Inner shadow view (provided by a png) to give depth to the gradient.
