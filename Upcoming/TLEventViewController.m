@@ -48,6 +48,16 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 
 #pragma mark - View Lifecycle Methods
 
+-(id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (!(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) return nil;
+    
+    RAC(self.currentDateComponents) = [[[RACSignal interval:60] startWith:[NSDate date]] map:^id(id value) {
+        return [[[EKEventManager sharedInstance] calendar] components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
+    }];
+    
+    return self;
+}
+
 -(void)viewDidLoad {
     [super viewDidLoad];
         
@@ -57,10 +67,6 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     RACSignal *newEventsSignal = [RACAbleWithStart(eventManager, events) deliverOn:[RACScheduler mainThreadScheduler]];
     
     @weakify(self);
-    RAC(self.currentDateComponents) = [[[RACSignal interval:60] startWith:[NSDate date]] map:^id(id value) {
-        return [[[EKEventManager sharedInstance] calendar] components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
-    }];
-    
     // Bind our viewModelArray to a mapped newEventSignal
     RAC(self.viewModelArray) = [[[newEventsSignal distinctUntilChanged] map:^id (NSArray *eventsArray) {
         // First, sort the array first by size then by start time.
@@ -494,7 +500,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
             
             RACSubject *updateSubject = [RACSubject subject];
             
-            NSDateComponents *components = self.currentDateComponents;
+            NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSSecondCalendarUnit fromDate:[NSDate date]];
             
             // Find out when the next minute change is and start a recurring RACSignal when that happens. 
             NSInteger delay = 60 - components.second;
