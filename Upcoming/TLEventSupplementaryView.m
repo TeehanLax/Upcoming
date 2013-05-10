@@ -107,9 +107,10 @@
     }
     
     CGRect frame = CGRectMake(x, 2, width, self.frame.size.height - 4);
-    [self.timeLabel sizeToFit];
-    self.timeLabel.frame = CGRectMake(x + 4, 2, CGRectGetWidth(self.timeLabel.frame), CGRectGetHeight(frame));
-    self.titleLabel.frame = CGRectMake(CGRectGetMaxX(self.timeLabel.frame) + 3, 2, CGRectGetWidth(frame) - 3 - CGRectGetMaxX(self.timeLabel.frame), frame.size.height);
+    CGSize timeSize = [self.timeLabel.text sizeWithFont:self.timeLabel.font];
+    
+    self.timeLabel.frame = CGRectMake(x + 4, 2, timeSize.width, CGRectGetHeight(frame));
+    self.titleLabel.frame = CGRectMake(CGRectGetMaxX(self.timeLabel.frame) + 3, 2, CGRectGetWidth(frame) - 3 - CGRectGetMaxX(self.timeLabel.frame), CGRectGetHeight(frame));
     self.backgroundImageView.frame = frame;
 }
 
@@ -121,14 +122,6 @@
 -(void) setTimeString:(NSString *)timeString {
     _timeString = timeString;
     self.timeLabel.text = timeString;
-}
-
--(void)layoutSubviews {
-    [super layoutSubviews];
-}
-
--(void)prepareForReuse {
-    [super prepareForReuse];
 }
 
 @end
