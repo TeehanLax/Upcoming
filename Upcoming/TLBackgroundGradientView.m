@@ -20,8 +20,8 @@
 #define kNormalColors \
     @[(id)[[UIColor colorWithRed:42.0f / 255.0f green:64.0 / 255.0f blue:99.0f / 255.0f alpha:1.0f] CGColor], \
       (id)[[UIColor colorWithRed:79.0f / 255.0f green:122.0f / 255.0f blue:165.0f / 255.0f alpha:1.0f] CGColor], \
-      (id)[[UIColor colorWithRed:163.0f / 255.0f green:219.0f / 255.0f blue:225.0f / 255.0f alpha:1.0f] CGColor], \
-      (id)[[UIColor colorWithRed:217.0f / 255.0f green:236.0f / 255.0f blue:203.0f / 255.0f alpha:1.0f] CGColor], \
+      (id)[[UIColor colorWithRed:163.0f / 255.0f green:219.0f / 255.0f blue:225.0f / 255.0f alpha:0.94f] CGColor], \
+      (id)[[UIColor colorWithRed:217.0f / 255.0f green:236.0f / 255.0f blue:203.0f / 255.0f alpha:0.85f] CGColor], \
       (id)[[UIColor colorWithRed:201.0f / 255.0f green:142.0f / 255.0f blue:131.0f / 255.0f alpha:1.0f] CGColor]];
 
 
@@ -49,6 +49,7 @@
     NSArray *colorsArray = kNormalColors;
 
     self.gradientLayer = [CAGradientLayer layer];
+    self.gradientLayer.contentsScale = 0.0f;
     self.gradientLayer.frame = self.bounds;
     self.gradientLayer.backgroundColor = [[UIColor clearColor] CGColor];
     self.gradientLayer.colors = colorsArray;
