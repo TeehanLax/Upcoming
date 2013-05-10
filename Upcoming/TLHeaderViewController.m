@@ -156,7 +156,7 @@ const CGFloat kUpperHeaderHeight = 52.0f;
             allDayLabel.center = CGPointMake(width / 2.0f + 5, 55);
             [view addSubview:allDayLabel];
             
-            TLCalendarDotView *dotView = [[TLCalendarDotView alloc] initWithFrame:CGRectMake(0, 0, 10, 10)];
+            TLCalendarDotView *dotView = [[TLCalendarDotView alloc] initWithFrame:CGRectMake(0, 0, 8, 8)];
             dotView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
             dotView.center = CGPointMake(CGRectGetMinX(allDayLabel.frame) - 10, allDayLabel.center.y);
             [view addSubview:dotView];
@@ -271,13 +271,13 @@ const CGFloat kUpperHeaderHeight = 52.0f;
          
          self.eventTitleLabel.text = event.title;
          self.eventLocationLabel.text = event.location;
-         self.eventTimeLabel.text = [NSString stringWithFormat:@"%@ – %@",
+         self.eventTimeLabel.text = [[NSString stringWithFormat:@"%@ – %@",
                                      [NSDateFormatter localizedStringFromDate:event.startDate
                                                                     dateStyle:NSDateFormatterNoStyle
                                                                     timeStyle:NSDateFormatterShortStyle],
                                      [NSDateFormatter localizedStringFromDate:event.endDate
                                                                     dateStyle:NSDateFormatterNoStyle
-                                                                    timeStyle:NSDateFormatterShortStyle]];
+                                                                    timeStyle:NSDateFormatterShortStyle]] lowercaseString];
          
          if ([self.eventLocationLabel.text length] > 0) {
              self.eventLocationImageView.alpha = 1.0f;
@@ -300,13 +300,13 @@ const CGFloat kUpperHeaderHeight = 52.0f;
         } else {
             self.alternateEventTitleLabel.text = event.title;
             self.alternateEventLocationLabel.text = event.location;
-            self.alternateEventTimeLabel.text = [NSString stringWithFormat:@"%@ – %@",
-                                                 [NSDateFormatter           localizedStringFromDate:event.startDate
-                                                                                          dateStyle:NSDateFormatterNoStyle
-                                                                                          timeStyle:NSDateFormatterShortStyle],
-                                                 [NSDateFormatter           localizedStringFromDate:event.endDate
-                                                                                          dateStyle:NSDateFormatterNoStyle
-                                                                                          timeStyle:NSDateFormatterShortStyle]];
+            self.alternateEventTimeLabel.text = [[NSString stringWithFormat:@"%@ – %@",
+                                                  [NSDateFormatter localizedStringFromDate:event.startDate
+                                                                                 dateStyle:NSDateFormatterNoStyle
+                                                                                 timeStyle:NSDateFormatterShortStyle],
+                                                  [NSDateFormatter localizedStringFromDate:event.endDate
+                                                                                 dateStyle:NSDateFormatterNoStyle
+                                                                                 timeStyle:NSDateFormatterShortStyle]] lowercaseString];
             
             if ([self.alternateEventLocationLabel.text length] > 0) {
                 self.alternateEventLocationImageView.alpha = 1.0f;
@@ -387,7 +387,7 @@ const CGFloat kUpperHeaderHeight = 52.0f;
     header.backgroundColor = [UIColor clearColor];
     
     const CGFloat leftMargin = 10.0f;
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectInset(header.bounds, leftMargin, 0)];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectOffset(CGRectInset(header.bounds, leftMargin, 0), 0, 5)];
     [label setText:[self tableView:tableView titleForHeaderInSection:section]];
     label.font = [[UIFont tl_mediumAppFont] fontWithSize:16];
     label.backgroundColor = [UIColor clearColor];
@@ -473,15 +473,12 @@ static CGFloat interAnimationDelay = 0.05f;
 -(void)hideHeaderView {
     [UIView animateWithDuration:pullDownAnimationDuration animations:^{
         self.allDayEventScrollView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
-        self.allDayEventPageControl.transform = self.allDayEventScrollView.transform;
     } completion:^(BOOL finished) {
         [UIView animateWithDuration:pullUpAnimationDuration delay:0.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
             self.allDayEventScrollView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerDetailView.frame));
-            self.allDayEventPageControl.transform = self.allDayEventScrollView.transform;
         } completion:^(BOOL finished) {
             [self.allDayEventScrollView setContentOffset:CGPointZero];
             self.headerAlernateDetailView.alpha = 1.0f;
-            self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerAlernateDetailView.frame));
             [UIView animateWithDuration:fallDownAnimationDuration delay:interAnimationDelay options:UIViewAnimationOptionCurveEaseOut animations:^{
                 self.headerAlernateDetailView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
             } completion:^(BOOL finished) {
@@ -503,11 +500,9 @@ static CGFloat interAnimationDelay = 0.05f;
             self.headerAlernateDetailView.alpha = 0.0f;
             [UIView animateWithDuration:fallDownAnimationDuration delay:interAnimationDelay options:UIViewAnimationOptionCurveEaseOut animations:^{
                 self.allDayEventScrollView.transform = CGAffineTransformMakeTranslation(0, pullDownDistance);
-                self.allDayEventPageControl.transform = self.allDayEventScrollView.transform;
             } completion:^(BOOL finished) {
                 [UIView animateWithDuration:pullDownAnimationDuration animations:^{
                     self.allDayEventScrollView.transform = CGAffineTransformIdentity;
-                    self.allDayEventPageControl.transform = self.allDayEventScrollView.transform;
                 } completion:nil];
             }];
         }];

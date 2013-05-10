@@ -26,7 +26,7 @@
 
     //First, create some darkness
     CIFilter *blackGenerator = [CIFilter filterWithName:@"CIConstantColorGenerator"];
-    CIColor *black = [CIColor colorWithString:@"0.0 0.0 0.0 0.85"];
+    CIColor *black = [CIColor colorWithString:@"0.0 0.0 0.0 0.92"];
     [blackGenerator setValue:black forKey:@"inputColor"];
     CIImage *blackImage = [blackGenerator valueForKey:@"outputImage"];
 
