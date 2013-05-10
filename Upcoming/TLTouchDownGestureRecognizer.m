@@ -11,6 +11,21 @@
 
 @implementation TLTouchDownGestureRecognizer
 
+- (id)initWithTarget:(id)target action:(SEL)action {
+    if (self = [super initWithTarget:target action:action]) {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationDidEnterBackground:)
+                                                     name:UIApplicationWillResignActiveNotification
+                                                   object:nil];
+    }
+    
+    return self;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     if (self.state == UIGestureRecognizerStatePossible) {
         self.state = UIGestureRecognizerStateBegan;
@@ -18,6 +33,10 @@
 }
 
 -(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    self.state = UIGestureRecognizerStateEnded;
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
     self.state = UIGestureRecognizerStateEnded;
 }
 
