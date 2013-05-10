@@ -12,7 +12,7 @@
 
 static SystemSoundID touchDownSoundID;
 static SystemSoundID touchUpSoundID;
-static SystemSoundID touchNewHourSoundID;
+//static SystemSoundID touchNewHourSoundID;
 static SystemSoundID touchNewEventSoundID;
 static SystemSoundID pullMenuOutSoundID;
 static SystemSoundID pushMenuInSoundID;
