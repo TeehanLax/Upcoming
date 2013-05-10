@@ -51,8 +51,7 @@
 
 -(void)drawRect:(CGRect)rect {
     CGFloat alpha = 0.1;
-    TLAppDelegate *appDelegate = (TLAppDelegate *)[UIApplication sharedApplication].delegate;
-    TLRootViewController *rootViewController = appDelegate.viewController;
+    TLRootViewController *rootViewController = AppDelegate.viewController;
 
     UICollectionView *collectionView = (UICollectionView *)[self superview];
     NSIndexPath *indexPath = [collectionView indexPathForCell:self];

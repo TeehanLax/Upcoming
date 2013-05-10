@@ -10,6 +10,9 @@
 
 @interface TLBackgroundGradientView : UIView
 
+// Gradient layer to display the pretty colours.
+@property (nonatomic, strong) CAGradientLayer *gradientLayer;
+
 // Change the ratio between normal colours and alerted colours.
 -(void)setAlertRatio:(CGFloat)ratio animated:(BOOL)animated;
 
