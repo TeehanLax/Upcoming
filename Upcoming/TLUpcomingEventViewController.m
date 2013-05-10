@@ -97,9 +97,9 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
         self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", numberOfDays];
         
         if (numberOfDays == 1) {
-            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Day", @"Day unit singular");
+            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"DAY", @"Day unit singular");
         } else {
-            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Days", @"Day unit plural");
+            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"DAYS", @"Day unit plural");
         }
     } else if (startTimeComponents.hour > 0) {
         NSInteger numberOfHours = startTimeComponents.hour;
@@ -111,17 +111,17 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
         self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", numberOfHours];
         
         if (numberOfHours == 1) {
-            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Hour", @"Hour unit singular");
+            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"HOUR", @"Hour unit singular");
         } else {
-            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Hours", @"Hour unit plural");
+            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"HOURS", @"Hour unit plural");
         }
     } else if (startTimeComponents.minute > 0) {
         self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", startTimeComponents.minute];
         
         if (startTimeComponents.minute == 1) {
-            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Minute", @"Minute unit singular");
+            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"MINUTE", @"Minute unit singular");
         } else {
-            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Minutes", @"Minute unit plural");
+            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"MINUTES", @"Minute unit plural");
         }
     }
     
@@ -133,7 +133,7 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     } else {
         NSDateComponents *differenceComponents = [calendar components:NSDayCalendarUnit fromDate:startDate toDate:endDate options:0];
         
-        NSString *startDateString = [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle];
+        NSString *startDateString = [[NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle] lowercaseString];
         
         if (differenceComponents.day > 0) {
             // This event spans multiple days.
@@ -144,11 +144,11 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
                                                          dateStyle:NSDateFormatterShortStyle
                                                          timeStyle:NSDateFormatterNoStyle]];
         } else {
-            timeString = [NSString stringWithFormat:@"%@ – %@",
+            timeString = [[NSString stringWithFormat:@"%@ – %@",
                           startDateString,
                           [NSDateFormatter localizedStringFromDate:endDate
                                                          dateStyle:NSDateFormatterNoStyle
-                                                         timeStyle:NSDateFormatterShortStyle]];
+                                                         timeStyle:NSDateFormatterShortStyle]] lowercaseString];
         }
     }
     

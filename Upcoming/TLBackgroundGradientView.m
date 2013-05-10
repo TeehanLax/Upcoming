@@ -28,7 +28,7 @@
 #define kAlertColors \
     @[(id)[[UIColor colorWithRed:18.0f / 255.0f green:27.0 / 255.0f blue:42.0f / 255.0f alpha:1.0f] CGColor], \
       (id)[[UIColor colorWithRed:53.0f / 255.0f green:81.0f / 255.0f blue:109.0f / 255.0f alpha:1.0f] CGColor], \
-      (id)[[UIColor colorWithRed:184.0f / 255.0f green:226.0f / 255.0f blue:231.0f / 255.0f alpha:1.0f] CGColor], \
+      (id)[[UIColor colorWithRed:165.0f / 255.0f green:203.0f / 255.0f blue:207.0f / 255.0f alpha:1.0f] CGColor], \
       (id)[[UIColor colorWithRed:247.0f / 255.0f green:180.0f / 255.0f blue:180.0f / 255.0f alpha:1.0f] CGColor], \
       (id)[[UIColor colorWithRed:195.0f / 255.0f green:60.0f / 255.0f blue:60.0f / 255.0f alpha:1.0f] CGColor]];
 

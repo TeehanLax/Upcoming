@@ -30,7 +30,7 @@
     [self.contentView addSubview:self.backgroundImageView];
     [self setupCustomColors];
 
-    self.dotView = [[TLCalendarDotView alloc] initWithFrame:CGRectMake(0, 0, 10, 10)];
+    self.dotView = [[TLCalendarDotView alloc] initWithFrame:CGRectMake(0, 0, 8, 8)];
     [self.contentView addSubview:self.dotView];
 
     return self;

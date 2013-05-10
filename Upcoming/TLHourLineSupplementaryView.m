@@ -36,7 +36,7 @@
         self.timeLabel.textColor = [UIColor whiteColor];
         self.timeLabel.clipsToBounds = NO;
         self.timeLabel.lineBreakMode = NSLineBreakByClipping;
-        self.timeLabel.shadowColor = [UIColor colorWithWhite:0.0f alpha:0.2f];
+        self.timeLabel.shadowColor = [UIColor colorWithWhite:0.0f alpha:0.1f];
         self.timeLabel.shadowOffset = CGSizeMake(0, 1);
         [self addSubview:self.timeLabel];
         
@@ -87,7 +87,7 @@ static const CGFloat leftMargin = 12.0f;
         CGContextSaveGState(context);
         {
             CGContextSetLineWidth(context, self.lineHeight);
-            CGContextSetRGBStrokeColor(context, 0.0f, 0.0f, 0.0f, 0.2f);
+            CGContextSetRGBStrokeColor(context, 0.0f, 0.0f, 0.0f, 0.1f);
             CGContextBeginPath(context);
             CGContextMoveToPoint(context, 0, y + 1);
             CGContextAddLineToPoint(context, CGRectGetWidth(self.bounds), y + 1);
