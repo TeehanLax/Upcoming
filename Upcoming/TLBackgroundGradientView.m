@@ -18,10 +18,10 @@
 @end
 
 #define kNormalColors \
-    @[(id)[[UIColor colorWithRed:42.0f / 255.0f green:64.0 / 255.0f blue:99.0f / 255.0f alpha:1.0f] CGColor], \
-      (id)[[UIColor colorWithRed:79.0f / 255.0f green:122.0f / 255.0f blue:165.0f / 255.0f alpha:1.0f] CGColor], \
-      (id)[[UIColor colorWithRed:163.0f / 255.0f green:219.0f / 255.0f blue:225.0f / 255.0f alpha:0.94f] CGColor], \
-      (id)[[UIColor colorWithRed:217.0f / 255.0f green:236.0f / 255.0f blue:203.0f / 255.0f alpha:0.85f] CGColor], \
+    @[(id)[[UIColor colorWithRed:34.0f / 255.0f green:56.0 / 255.0f blue:91.0f / 255.0f alpha:1.0f] CGColor], \
+      (id)[[UIColor colorWithRed:76.0f / 255.0f green:122.0f / 255.0f blue:169.0f / 255.0f alpha:1.0f] CGColor], \
+      (id)[[UIColor colorWithRed:174.0f / 255.0f green:224.0f / 255.0f blue:229.0f / 255.0f alpha:0.94f] CGColor], \
+      (id)[[UIColor colorWithRed:223.0f / 255.0f green:240.0f / 255.0f blue:211.0f / 255.0f alpha:0.85f] CGColor], \
       (id)[[UIColor colorWithRed:201.0f / 255.0f green:142.0f / 255.0f blue:131.0f / 255.0f alpha:1.0f] CGColor]];
 
 
@@ -45,7 +45,7 @@
     self.innerShadowView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     [self addSubview:self.innerShadowView];
 
-    NSArray *locationsArray = @[@(0.0f), @(0.34f), @(0.64f), @(0.76f), @(0.95f)];
+    NSArray *locationsArray = @[@(0.05f), @(0.34f), @(0.64f), @(0.76f), @(0.95f)];
     NSArray *colorsArray = kNormalColors;
 
     self.gradientLayer = [CAGradientLayer layer];
