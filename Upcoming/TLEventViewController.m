@@ -614,17 +614,6 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     
     CGFloat diff = dayLocation - effectiveHour;
     
-    // prevent reducing size of min / max rows
-    if (effectiveHour < EXPANDED_ROWS) {
-        if (diff < 0) {
-            diff = 0;
-        }
-    } else if (effectiveHour > NUMBER_OF_ROWS - EXPANDED_ROWS - 1) {
-        if (diff > 0) {
-            diff = 0;
-        }
-    }
-    
     CGFloat delta = ((EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS);
     
     if (delta < 0) {
