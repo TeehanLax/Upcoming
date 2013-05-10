@@ -289,8 +289,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     } else if (recognizer.state == UIGestureRecognizerStateEnded) {
         [self.collectionView
          performBatchUpdates:^{
-             [self.backgroundGradientView
-              setDarkened:NO];
+             [self.backgroundGradientView setDarkened:NO];
              self.eventViewModelUnderFinger = nil;
              self.indexPathUnderFinger = nil;
              self.touching = NO;
@@ -347,10 +346,8 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     
     CGFloat viewHeight = attributes.size.height;
     CGFloat minuteAdjustment = attributes.size.height * (CGFloat)(currentMinute / 60);
-    
-    const CGFloat height = 20.0f;
-    
-    return CGRectMake(0, attributes.frame.origin.y + minuteAdjustment + (viewHeight - height) / 2.0f, CGRectGetWidth(self.view.bounds), height);
+        
+    return CGRectMake(0, attributes.frame.origin.y + minuteAdjustment - viewHeight / 2.0f, CGRectGetWidth(self.view.bounds), viewHeight);
 }
 
 -(CGFloat)collectionView:(UICollectionView *)collectionView alphaForHourLineViewInLayout:(TLCollectionViewLayout *)layout {
