@@ -33,4 +33,10 @@
     self.backgroundColor = dotColor;
 }
 
+-(void)setBackgroundColor:(UIColor *)backgroundColor {
+    // This looks funny, but basically we only want to display our dotColor as a background colour.
+    // UITableViewCell will try and set this to nil when its selected, so we need this method. 
+    [super setBackgroundColor:_dotColor];
+}
+
 @end

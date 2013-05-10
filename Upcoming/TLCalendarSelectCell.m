@@ -43,7 +43,7 @@
 -(void)layoutSubviews {
     [super layoutSubviews];
 
-    self.dotView.center = CGPointMake(16, CGRectGetMidY(self.bounds));
+    self.dotView.center = CGPointMake(16, lrint(CGRectGetMidY(self.bounds)) - 1);
     self.textLabel.frame = CGRectInset(self.textLabel.frame, 16, 0);
     self.backgroundImageView.frame = CGRectMake(0, 1, 300, 44); // dimensions of the imageView's image
 }
