@@ -435,7 +435,13 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         width /= 2.0f;
     }
     
-    return CGRectMake(x, startY, width, endY - startY);
+    CGFloat height = endY - startY;
+    
+    if (height == 0) {
+        height = CGRectGetHeight(startHourAttributes.frame) / 2.0f;
+    }
+    
+    return CGRectMake(x, startY, width, height);
 }
 
 -(TLCollectionViewLayoutAttributesBackgroundState)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout backgroundStateForSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath {
@@ -504,7 +510,6 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
             
             NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSSecondCalendarUnit fromDate:[NSDate date]];
             
-            // TODO: This is negative.
             // Find out when the next minute change is and start a recurring RACSignal when that happens. 
             NSInteger delay = 60 - components.second;
             
