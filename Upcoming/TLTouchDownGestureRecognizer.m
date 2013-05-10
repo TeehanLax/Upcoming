@@ -22,6 +22,10 @@
     return self;
 }
 
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     if (self.state == UIGestureRecognizerStatePossible) {
         self.state = UIGestureRecognizerStateBegan;
