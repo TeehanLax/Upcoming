@@ -34,6 +34,8 @@
         self.timeLabel.autoresizingMask = UIViewAutoresizingFlexibleHeight;
         self.timeLabel.backgroundColor = [UIColor clearColor];
         self.timeLabel.textColor = [UIColor whiteColor];
+        self.timeLabel.clipsToBounds = NO;
+        self.timeLabel.lineBreakMode = NSLineBreakByClipping;
         self.timeLabel.shadowColor = [UIColor colorWithWhite:0.0f alpha:0.2f];
         self.timeLabel.shadowOffset = CGSizeMake(0, 1);
         [self addSubview:self.timeLabel];
