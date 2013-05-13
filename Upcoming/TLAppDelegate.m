@@ -39,6 +39,21 @@
     self.splashViewController.delegate = self;
     self.splashViewController.view.frame = self.viewController.view.bounds;
     [self.viewController.view addSubview:self.splashViewController.view];
+    
+    NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSMinuteCalendarUnit fromDate:[NSDate date]];
+    NSInteger minutesToNextHour = 60 - components.minute;
+    
+    RACSubject *updateEventSignal = [RACSubject subject];
+    [updateEventSignal subscribeNext:^(NSDate *now) {
+        [[EKEventManager sharedInstance] refresh];
+    }];
+    
+    [[[RACSignal interval:(60 * minutesToNextHour)] take:1] subscribeNext:^(id x) {
+        [updateEventSignal sendNext:x];
+        [[RACSignal interval:3600] subscribeNext:^(id x) {
+            [updateEventSignal sendNext:x];
+        }];
+    }];
 
     [self setupDevice];
 
