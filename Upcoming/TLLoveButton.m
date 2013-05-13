@@ -20,7 +20,7 @@
     self.titleLabel.frame = frame;
 
     frame = self.imageView.frame;
-    frame.origin.x = CGRectGetMaxX(self.titleLabel.frame) + 5.0f;
+    frame.origin.x = CGRectGetMaxX(self.titleLabel.frame) + 8.0f;
     self.imageView.frame = frame;
 }
 
