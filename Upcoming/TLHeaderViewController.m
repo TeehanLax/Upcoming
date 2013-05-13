@@ -179,12 +179,7 @@ const CGFloat kUpperHeaderHeight = 52.0f;
             }];
             
             if (filteredArray.count == 0) {
-                if (nextEvent.isAllDay) {
-                    return  nil;
-                }
-                else {
-                    return nextEvent;
-                }
+                return nextEvent;
             } else {
                 return filteredArray[0];
             }

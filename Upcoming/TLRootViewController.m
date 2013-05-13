@@ -94,7 +94,7 @@
             NSDateComponents *components = [calendar components:NSHourCalendarUnit
                                                        fromDate:nextEvent.startDate];
             
-            if (components.hour < 12 && !nextEvent.isAllDay && [nextEvent.startDate isTomorrow]) {
+            if (components.hour < 12 && [nextEvent.startDate isTomorrow]) {
                 return nextEvent;
             }
         }
