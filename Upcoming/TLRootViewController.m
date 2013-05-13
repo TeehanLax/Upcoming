@@ -323,8 +323,8 @@
          }
      }];
     
-    RACSignal *canOpenMenuSignal = [RACSignal combineLatest:@[[self.headerFinishedTransitionSubject startWith:@(NO)], [self.footerFinishedTransitionSubject startWith:@(NO)]] reduce:^(NSNumber *headerIsOpen, NSNumber *footerIsOpen) {
-        return @(!headerIsOpen.boolValue && !footerIsOpen.boolValue);
+    RACSignal *canOpenMenuSignal = [RACSignal combineLatest:@[[self.headerFinishedTransitionSubject startWith:@(NO)], [self.footerFinishedTransitionSubject startWith:@(NO)], RACAbleWithStart(self.dayListViewController.touching)] reduce:^(NSNumber *headerIsOpen, NSNumber *footerIsOpen, NSNumber *isTouching) {
+        return @(!headerIsOpen.boolValue && !footerIsOpen.boolValue && !isTouching.boolValue);
     }];
     
     RAC(self.panHeaderDownGestureRecognizer.enabled) = canOpenMenuSignal;
