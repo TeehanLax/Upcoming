@@ -350,7 +350,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     UICollectionViewLayoutAttributes *attributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:currentHour inSection:0]];
     
     CGFloat viewHeight = attributes.size.height;
-    CGFloat minuteAdjustment = attributes.size.height * (CGFloat)(currentMinute / 60);
+    CGFloat minuteAdjustment = attributes.size.height * ((CGFloat)currentMinute / 60.0f);
         
     return CGRectMake(0, attributes.frame.origin.y + minuteAdjustment - viewHeight / 2.0f, CGRectGetWidth(self.view.bounds), viewHeight);
 }
