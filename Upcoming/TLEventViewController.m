@@ -381,24 +381,12 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     // Supplementary views' contentViews are visible only while touching. 
     if (self.touching) {
         TLEventViewModel *model = self.viewModelArray[indexPath.item];
-                
-        NSInteger startHour;
-        if ([model.event.startDate isYesterday]) {
-            startHour = 0;
-        }
-        else {
-            NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
-            startHour = components.hour;
-        }
-                
-        NSInteger endHour;
-        if ([model.event.endDate isLaterThanDate:[NSDate date]]) {
-            endHour = NUMBER_OF_ROWS - 1;
-        }
-        else {
-            NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.endDate];
-            endHour = components.hour;
-        }
+        
+        NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.effectiveStartDate];
+        NSInteger startHour = components.hour;
+        
+        components = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.effectiveEndDate];
+        NSInteger endHour = components.hour;
         
         NSInteger hour = 0;
         // Three cases: our finger is above it, below it, or in it
@@ -422,8 +410,8 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     TLEventViewModel *model = self.viewModelArray[indexPath.item];
         
     // Grab the date components from the startDate and use the to find the hour and minutes of the event
-    NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
-    NSInteger hour = components.hour;
+    NSDateComponents *startComponents = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.effectiveStartDate];
+    NSInteger hour = startComponents.hour;
     
     CGFloat startY = 0;
     CGFloat endY = 0;
@@ -434,24 +422,29 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     UICollectionViewLayoutAttributes *startHourAttributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:hour inSection:0]];
     startY = CGRectGetMinY(startHourAttributes.frame);
     
-    if (components.minute >= 30) {
+    if (startComponents.minute >= 30) {
         startY += CGRectGetHeight(startHourAttributes.frame) / 2.0f;
     }
     
     // Now grab the components of the end hour ...
-    components = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.endDate];
-    hour = components.hour;
+    NSDateComponents *endComponents = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.effectiveEndDate];
+    hour = endComponents.hour;
     
     // And do the same calculation for the max Y.
     UICollectionViewLayoutAttributes *endHourAttributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:hour inSection:0]];
     endY = CGRectGetMinY(endHourAttributes.frame);
     
-    if (components.minute >= 30) {
-        endY += CGRectGetHeight(endHourAttributes.frame) / 2.0f;
+    if (endComponents.minute >= 30) {
+        if (endComponents.hour == startComponents.hour) {
+            endY += CGRectGetHeight(endHourAttributes.frame) / 2.0f;
+        }
+        else {
+            endY = CGRectGetMaxY(endHourAttributes.frame);
+        }
     }
     
     // Finally, we need to calculate the X value and the width of the supplementary view.
-    if (model.eventSpan == TLEventViewModelEventSpanFull ||  model.eventSpan == TLEventViewModelEventSpanLeft) {
+    if (model.eventSpan == TLEventViewModelEventSpanFull || model.eventSpan == TLEventViewModelEventSpanLeft) {
         x = 0;
     } else { // implicitly, this is true: (model.eventSpan == TLEventViewModelEventSpanRight || model.eventSpan == TLEventViewModelEventSpanTooManyWarning)
         x = CGRectGetMidX(self.view.bounds) + 1;
@@ -462,18 +455,10 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         width /= 2.0f;
     }
     
-    if ([model.event.startDate isYesterday]) {
-        startY = 0.0f;
-    }
-    
     CGFloat height = endY - startY;
     
     if (height == 0) {
         height = CGRectGetHeight(startHourAttributes.frame) / 2.0f;
-    }
-    
-    if (startY > endY) {
-        height = CGRectGetHeight(self.collectionView.frame) - startY;
     }
     
     return CGRectMake(x, startY, width, height);
@@ -492,13 +477,13 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     } else {
         
         NSDate *now = [NSDate date];
-        if ([model.event.startDate isEarlierThanDate:now] && [model.event.endDate isLaterThanDate:now]) {
+        if ([model.effectiveStartDate isEarlierThanDate:now] && [model.effectiveEndDate isLaterThanDate:now]) {
             return TLCollectionViewLayoutAttributesBackgroundStateImmediate;
         }
-        else if ([model.event.endDate isEarlierThanDate:now]) {
+        else if ([model.effectiveEndDate isEarlierThanDate:now]) {
             return TLCollectionViewLayoutAttributesBackgroundStatePast;
         }
-        else { // implicitly, ([model.event.startDate isLaterThanDate:now]) 
+        else { // implicitly, ([model.effectiveStartDate isLaterThanDate:now]) 
             return TLCollectionViewLayoutAttributesBackgroundStateFuture;
         }
     }
