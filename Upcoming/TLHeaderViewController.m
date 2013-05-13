@@ -77,7 +77,7 @@ const CGFloat kUpperHeaderHeight = 52.0f;
     
     self.view.backgroundColor = [UIColor clearColor];
     
-    RACSignal *timerSignal = [[RACSignal interval:60] startWith:[NSDate date]];
+    RACSignal *timerSignal = [[[RACSignal interval:60] startWith:[NSDate date]] deliverOn:[RACScheduler mainThreadScheduler]];
     
     @weakify(self);
     

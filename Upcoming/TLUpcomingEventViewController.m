@@ -40,9 +40,10 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     // Reload our table view whenever the sources change on the event manager, or every 60 seconds.
     // Throttle the nextEvent so it doesn't go all flashy. 
     RACSignal *nextEventSignal = [[RACAbleWithStart([EKEventManager sharedInstance], nextEvent) deliverOn:[RACScheduler mainThreadScheduler]] throttle:0.25f];
+    RACSignal *timeSignal = [[[RACSignal interval:60] startWith:[NSDate date]] deliverOn:[RACScheduler mainThreadScheduler]];
     
     @weakify(self);
-    [[RACSignal combineLatest:@[[[RACSignal interval:60] startWith:[NSDate date]], nextEventSignal]
+    [[RACSignal combineLatest:@[timeSignal, nextEventSignal]
                       reduce:^id(NSDate *now, EKEvent *nextEvent){
                           return nextEvent;
                       }] subscribeNext:^(EKEvent *event) {

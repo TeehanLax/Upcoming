@@ -51,9 +51,9 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 -(id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if (!(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) return nil;
     
-    RAC(self.currentDateComponents) = [[[RACSignal interval:60] startWith:[NSDate date]] map:^id(id value) {
+    RAC(self.currentDateComponents) = [[[[RACSignal interval:60] startWith:[NSDate date]] map:^id(id value) {
         return [[[EKEventManager sharedInstance] calendar] components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
-    }];
+    }]  deliverOn:[RACScheduler mainThreadScheduler]];
     
     return self;
 }
@@ -521,7 +521,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
                 NSLog(@"Creating initial subscription for supplementary view.");
                 [updateSubject sendNext:[NSDate date]];
                 
-                [[RACSignal interval:60] subscribeNext:^(id x) {
+                [[[RACSignal interval:60] deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(id x) {
                     NSLog(@"Updating minute of supplementary view.");
                     [updateSubject sendNext:x];
                 }];
