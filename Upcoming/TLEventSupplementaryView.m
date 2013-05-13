@@ -114,6 +114,14 @@
     self.backgroundImageView.frame = frame;
 }
 
+-(void)prepareForReuse {
+    [super prepareForReuse];
+    
+    self.backgroundImageView.image = nil;
+    self.timeLabel.text = @"";
+    self.titleLabel.text = @"";
+}
+
 -(void)setTitleString:(NSString *)titleString {
     _titleString = titleString;
     self.titleLabel.text = titleString;
