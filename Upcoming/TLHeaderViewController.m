@@ -279,11 +279,23 @@ const CGFloat kUpperHeaderHeight = 52.0f;
                                                                     dateStyle:NSDateFormatterNoStyle
                                                                     timeStyle:NSDateFormatterShortStyle]] lowercaseString];
          
+         // Need to reset to the identity transform first, otherwise frame property is unreliable.
+         CGAffineTransform transform = CGAffineTransformIdentity;
+         self.eventTimeLabel.transform = transform;
+         self.calendarView.transform = transform;
+         
          if ([self.eventLocationLabel.text length] > 0) {
              self.eventLocationImageView.alpha = 1.0f;
+             
          } else {
              self.eventLocationImageView.alpha = 0.0f;
+             
+             transform = CGAffineTransformMakeTranslation(0, CGRectGetMinY(self.eventLocationLabel.frame) - CGRectGetMinY(self.eventTimeLabel.frame));
+             
          }
+         
+         self.eventTimeLabel.transform = transform;
+         self.calendarView.transform = transform;
          
          self.calendarView.alpha = 1.0f;
          self.calendarView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
@@ -308,11 +320,21 @@ const CGFloat kUpperHeaderHeight = 52.0f;
                                                                                  dateStyle:NSDateFormatterNoStyle
                                                                                  timeStyle:NSDateFormatterShortStyle]] lowercaseString];
             
+            // Need to reset to the identity transform first, otherwise frame property is unreliable.
+            CGAffineTransform transform = CGAffineTransformIdentity;
+            self.alternateEventTimeLabel.transform = transform;
+            self.alternateCalendarView.transform = transform;
+            
             if ([self.alternateEventLocationLabel.text length] > 0) {
                 self.alternateEventLocationImageView.alpha = 1.0f;
             } else {
                 self.alternateEventLocationImageView.alpha = 0.0f;
+                
+                transform = CGAffineTransformMakeTranslation(0, CGRectGetMinY(self.alternateEventLocationLabel.frame) - CGRectGetMinY(self.alternateEventTimeLabel.frame));
             }
+            
+            self.alternateEventTimeLabel.transform = transform;
+            self.alternateCalendarView.transform = transform;
             
             self.alternateCalendarView.alpha = 1.0f;
             self.alternateCalendarView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
