@@ -467,7 +467,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 -(TLCollectionViewLayoutAttributesBackgroundState)collectionView:(UICollectionView *)collectionView layout:(TLCollectionViewLayout *)layout backgroundStateForSupplementaryViewAtIndexPath:(NSIndexPath *)indexPath {
     TLEventViewModel *model = self.viewModelArray[indexPath.item];
     
-    if (self.isTouching) {
+    if (self.touching) {
         // The user is touching. Either represented by the index path is under the finger (highlighted) or not (unhighlited)
         if (model == self.eventViewModelUnderFinger) {
             return TLCollectionViewLayoutAttributesBackgroundStateHighlighted;
