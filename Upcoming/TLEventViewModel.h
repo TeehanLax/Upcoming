@@ -28,4 +28,7 @@ typedef enum : NSInteger {
 // Determine if the event overlaps with another. "Touching" events don't count as overlapping. 
 -(BOOL)overlapsWith:(TLEventViewModel *)otherModel;
 
+@property (nonatomic, readonly) NSDate *effectiveStartDate;
+@property (nonatomic, readonly) NSDate *effectiveEndDate;
+
 @end

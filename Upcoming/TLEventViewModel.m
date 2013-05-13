@@ -45,6 +45,37 @@
     return overlaps;
 }
 
+
+-(NSDate *)effectiveStartDate {
+    if ([self.event.startDate isYesterday] || [self.event.startDate isEarlierThanDate:[NSDate dateYesterday]]) {
+        NSUInteger unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit;
+        NSDateComponents *startComponents = [[[EKEventManager sharedInstance] calendar] components:unitFlags fromDate:[NSDate date]];
+        startComponents.hour = 0;
+        startComponents.minute = 0;
+        startComponents.second = 1;
+        NSDate *startDate = [[[EKEventManager sharedInstance] calendar] dateFromComponents:startComponents];
+        
+        return startDate;
+    }
+    
+    return self.event.startDate;
+}
+
+-(NSDate *)effectiveEndDate {
+    if ([self.event.endDate isTomorrow] || [self.event.startDate isLaterThanDate:[NSDate dateTomorrow]]) {
+        NSUInteger unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit;
+        NSDateComponents *endComponents = [[[EKEventManager sharedInstance] calendar] components:unitFlags fromDate:[NSDate date]];
+        endComponents.hour = 23;
+        endComponents.minute = 59;
+        endComponents.second = 59;
+        NSDate *endDate = [[[EKEventManager sharedInstance] calendar] dateFromComponents:endComponents];
+        
+        return  endDate;
+    }
+    
+    return self.event.endDate;
+}
+
 @end
 
 
