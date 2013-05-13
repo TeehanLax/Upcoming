@@ -64,7 +64,7 @@
         
     switch (layoutAttributes.backgroundState) {
         case TLCollectionViewLayoutAttributesBackgroundStateFuture:
-            self.backgroundImageView.image = [[UIImage imageNamed:@"background-future"] resizableImageWithCapInsets:UIEdgeInsetsMake(3, 3, 3, 3)];
+            self.backgroundImageView.image = [[UIImage imageNamed:@"background-future"] resizableImageWithCapInsets:UIEdgeInsetsMake(3, 3, 5, 3)];
             break;
         case TLCollectionViewLayoutAttributesBackgroundStateUnhighlighted:
             self.backgroundImageView.image = [[UIImage imageNamed:@"background-unhighlighted"] resizableImageWithCapInsets:UIEdgeInsetsMake(3, 3, 3, 3)];
@@ -76,7 +76,7 @@
             self.backgroundImageView.image = [[UIImage imageNamed:@"background-past"] resizableImageWithCapInsets:UIEdgeInsetsMake(3, 3, 3, 3)];
             break;
         case TLCollectionViewLayoutAttributesBackgroundStateImmediate:
-            self.backgroundImageView.image = [[UIImage imageNamed:@"background-immediate"] resizableImageWithCapInsets:UIEdgeInsetsMake(3, 3, 3, 3)];
+            self.backgroundImageView.image = [[UIImage imageNamed:@"background-immediate"] resizableImageWithCapInsets:UIEdgeInsetsMake(3, 3, 5, 3)];
             break;
     }
     
