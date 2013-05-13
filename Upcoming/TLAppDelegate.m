@@ -12,7 +12,6 @@
 #import "TLDefines.h"
 
 #import <TestFlight.h>
-#import <DTFoundation/UIView+DTDebug.h>
 
 #include <sys/types.h>
 #include <sys/sysctl.h>
@@ -29,9 +28,7 @@
     if ([TEST_FLIGHT_TOKEN length] > 0) {
         [TestFlight takeOff:TEST_FLIGHT_TOKEN];
     }
-    
-    [UIView toggleViewMainThreadChecking];
-    
+        
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     self.viewController = [[TLRootViewController alloc] init];
