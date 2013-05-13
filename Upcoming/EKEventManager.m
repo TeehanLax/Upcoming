@@ -174,9 +174,9 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
 
     NSUInteger unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit;
 
-    // start date - midnight of current day
+    // start date - midnight of yesterday
     NSDateComponents *midnightDate = [[NSDateComponents alloc] init];
-    midnightDate = [self.calendar components:unitFlags fromDate:[NSDate date]];
+    midnightDate = [self.calendar components:unitFlags fromDate:[NSDate dateYesterday]];
     midnightDate.hour = 0;
     midnightDate.minute = 0;
     midnightDate.second = 0;
@@ -197,6 +197,9 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
 
     // get today's events
     _events = [NSMutableArray arrayWithArray:[_store eventsMatchingPredicate:predicate]];
+    [_events filterUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(EKEvent *evaluatedObject, NSDictionary *bindings) {
+        return ([evaluatedObject.startDate isToday] || [evaluatedObject.endDate isToday]);
+    }]];
     [_events sortUsingSelector:@selector(compareStartDateWithEvent:)];
     [self didChangeValueForKey:EKEventManagerEventsKeyPath];
 

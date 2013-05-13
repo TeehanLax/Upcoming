@@ -381,11 +381,24 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     // Supplementary views' contentViews are visible only while touching. 
     if (self.touching) {
         TLEventViewModel *model = self.viewModelArray[indexPath.item];
-        
-        NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
-        NSInteger startHour = components.hour;
-        components = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.endDate];
-        NSInteger endHour = components.hour;
+                
+        NSInteger startHour;
+        if ([model.event.startDate isYesterday]) {
+            startHour = 0;
+        }
+        else {
+            NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
+            startHour = components.hour;
+        }
+                
+        NSInteger endHour;
+        if ([model.event.endDate isLaterThanDate:[NSDate date]]) {
+            endHour = NUMBER_OF_ROWS - 1;
+        }
+        else {
+            NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.endDate];
+            endHour = components.hour;
+        }
         
         NSInteger hour = 0;
         // Three cases: our finger is above it, below it, or in it
@@ -449,10 +462,18 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         width /= 2.0f;
     }
     
+    if ([model.event.startDate isYesterday]) {
+        startY = 0.0f;
+    }
+    
     CGFloat height = endY - startY;
     
     if (height == 0) {
         height = CGRectGetHeight(startHourAttributes.frame) / 2.0f;
+    }
+    
+    if (startY > endY) {
+        height = CGRectGetHeight(self.collectionView.frame) - startY;
     }
     
     return CGRectMake(x, startY, width, height);
