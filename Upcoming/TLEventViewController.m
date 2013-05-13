@@ -383,7 +383,21 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         TLEventViewModel *model = self.viewModelArray[indexPath.item];
         
         NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.startDate];
-        NSInteger hour = components.hour;
+        NSInteger startHour = components.hour;
+        components = [[[EKEventManager sharedInstance] calendar] components:NSHourCalendarUnit | NSMinuteCalendarUnit fromDate:model.event.endDate];
+        NSInteger endHour = components.hour;
+        
+        NSInteger hour = 0;
+        // Three cases: our finger is above it, below it, or in it
+        if (self.indexPathUnderFinger.item < startHour) {
+            hour = startHour;
+        }
+        else if (self.indexPathUnderFinger.item > endHour) {
+            hour = endHour;
+        }
+        else {
+            hour = self.indexPathUnderFinger.item;
+        }
         
         return [self alphaForElementInHour:hour];
     } else {
@@ -615,9 +629,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 -(CGFloat)alphaForElementInHour:(NSInteger)hour {
     CGFloat dayLocation = (self.location.y / self.collectionView.frame.size.height) * 24;
     
-    CGFloat effectiveHour = hour;
-    
-    CGFloat diff = dayLocation - effectiveHour;
+    CGFloat diff = dayLocation - hour;
     
     CGFloat delta = ((EXPANDED_ROWS - fabsf(diff)) / EXPANDED_ROWS);
     
