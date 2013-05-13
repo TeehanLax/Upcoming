@@ -34,6 +34,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 @property (nonatomic, strong) TLBackgroundGradientView *backgroundGradientView;
 // View model currently being displayed *as supplementary views* by the collection view. 
 @property (nonatomic, strong) NSArray *viewModelArray;
+@property (nonatomic, strong) TLEventViewModel *immediateModel;
 
 // Not completely OK to keep this around, but we can guarantee we only ever want one on screen, so it's OK.
 @property (nonatomic, strong) TLHourLineSupplementaryView *hourSupplementaryView;
@@ -170,6 +171,16 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     [RACAble(self.viewModelArray) subscribeNext:^(id x) {
         [self.collectionView reloadData];
         [self.collectionView.collectionViewLayout invalidateLayout];
+    }];
+    
+    RAC(self.immediateModel) = [[RACSignal combineLatest:@[RACAbleWithStart(self.viewModelArray), [RACSignal interval:60]] reduce:^id(NSArray *array, NSDate *fireDate){
+        return array;
+    }] map:^id(NSArray *viewModelArray) {
+        NSArray *array = [viewModelArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(TLEventViewModel *evaluatedObject, NSDictionary *bindings) {
+            return [evaluatedObject.event.endDate isLaterThanDate:[NSDate date]];
+        }]];
+        
+        return array.count > 0 ? array[0] : nil;
     }];
     
     // Register our reusable views for the collection view
@@ -477,7 +488,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     } else {
         
         NSDate *now = [NSDate date];
-        if ([model.effectiveStartDate isEarlierThanDate:now] && [model.effectiveEndDate isLaterThanDate:now]) {
+        if (model == self.immediateModel) {
             return TLCollectionViewLayoutAttributesBackgroundStateImmediate;
         }
         else if ([model.effectiveEndDate isEarlierThanDate:now]) {
