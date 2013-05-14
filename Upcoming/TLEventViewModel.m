@@ -58,7 +58,7 @@
         return startDate;
     }
     
-    return self.event.startDate;
+    return [self.event.startDate dateByRoundingDownToNearestHalfHour];
 }
 
 -(NSDate *)effectiveEndDate {
@@ -73,7 +73,7 @@
         return  endDate;
     }
     
-    return self.event.endDate;
+    return [self.event.endDate dateByRoundingUpToNearestHalfHour];
 }
 
 @end
