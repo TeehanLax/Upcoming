@@ -171,6 +171,8 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
         }
     }
 
+    NSLog(@"LOADING EVENTS.");
+    
     // no calendars selected. Empty views
     if (calendars == nil || [calendars count] == 0) {
         [self didChangeValueForKey:EKEventManagerEventsKeyPath];
@@ -216,22 +218,12 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
                                                                calendars:calendars];
 
     // Fetch all events that match the predicate
-    NSMutableArray *nextEvents = [NSMutableArray array];
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        [_store enumerateEventsMatchingPredicate:nextPredicate
-                                      usingBlock:^(EKEvent *event, BOOL *stop) {
-                                          if (event) {
-                                          [nextEvents addObject:event];
-                                          }
-                                      }];
-        [nextEvents sortUsingSelector:@selector(compareStartDateWithEvent:)];
-
-        if ([nextEvents count] > 0) {
-            _nextEvent = nextEvents[0];
-        }
-        
-        [self didChangeValueForKey:EKEventManagerNextEventKeyPath];
-    });
+    NSArray *nextEvents = [[_store eventsMatchingPredicate:nextPredicate] sortedArrayUsingSelector:@selector(compareStartDateWithEvent:)];
+    
+    if ([nextEvents count] > 0) {
+        _nextEvent = nextEvents[0];
+    }
+    [self didChangeValueForKey:EKEventManagerNextEventKeyPath];
 }
 
 #pragma mark Overriden methods

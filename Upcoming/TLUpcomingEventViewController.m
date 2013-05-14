@@ -37,16 +37,9 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     self.backgroundImageView.layer.shadowPath = [[UIBezierPath bezierPathWithRect:self.backgroundImageView.bounds] CGPath];
     self.backgroundImageView.layer.shadowRadius = 22.0f;
     
-    // Reload our table view whenever the sources change on the event manager, or every 60 seconds.
-    // Throttle the nextEvent so it doesn't go all flashy. 
-    RACSignal *newEventsSignal = [[[EKEventManager sharedInstance] nextEventSignal] throttle:0.25f];
-    RACSignal *timeSignal = [[[RACSignal interval:60] startWith:[NSDate date]] deliverOn:[RACScheduler mainThreadScheduler]];
+    // Throttle the nextEvent so it doesn't go all flashy.
+    RACSignal *nextEventSignal = [[[EKEventManager sharedInstance] nextEventSignal] throttle:0.25f];
     
-    
-    RACSignal *nextEventSignal = [RACSignal combineLatest:@[timeSignal, newEventsSignal]
-                      reduce:^id(NSDate *now, EKEvent *nextEvent){
-                          return nextEvent;
-                      }];
     RAC(self.eventNameLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
         return event == nil ? NSLocalizedString(@"No upcoming event", @"Empty upcoming event message") : event.title;
     }];
