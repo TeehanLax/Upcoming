@@ -168,8 +168,17 @@ const CGFloat kUpperHeaderHeight = 52.0f;
         self.allDayEventViews = [NSArray arrayWithArray:mutableArray];
     }];
     
+    RACSignal *eventsSignal = [RACAbleWithStart([EKEventManager sharedInstance], events) map:^id(id value) {
+        // Need to do this because value will be nil sometimes.
+        return [[EKEventManager sharedInstance] events];
+    }];
+    
+    RACSignal *nextEventSignal = [RACAbleWithStart([EKEventManager sharedInstance], nextEvent) map:^id(id value) {
+        return [[EKEventManager sharedInstance] nextEvent];
+    }];
+    
     // Update our header labels with the next event whenever it changes.
-    [[[[RACSignal combineLatest:@[RACAbleWithStart([EKEventManager sharedInstance], events), RACAbleWithStart([EKEventManager sharedInstance], nextEvent), timerSignal]
+    [[[[RACSignal combineLatest:@[eventsSignal, nextEventSignal, timerSignal]
                          reduce:^id (NSArray *eventArray, EKEvent *nextEvent, NSDate *fireDate)
         {
             NSArray *filteredArray = [[eventArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL (EKEvent *event, NSDictionary *bindings) {
