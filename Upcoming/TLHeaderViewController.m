@@ -325,6 +325,7 @@ const CGFloat kUpperHeaderHeight = 52.0f;
     }];
     
     RACSignal *eventNowHiddenSignal = [nextEventSignal map:^id(EKEvent *event) {
+        if (event == nil) return @(YES);
         
         NSCalendar *calendar = [[EKEventManager sharedInstance] calendar];
         
