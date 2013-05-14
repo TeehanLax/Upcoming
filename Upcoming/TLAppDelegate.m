@@ -43,14 +43,12 @@
     NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSMinuteCalendarUnit fromDate:[NSDate date]];
     NSInteger minutesToNextHour = 60 - components.minute;
     
-    RACSignal *updateEventSignal = [[[[RACSignal interval:(60 * minutesToNextHour)] take:1] concat:[RACSignal defer:^RACSignal *{
+    [[[[[RACSignal interval:(60 * minutesToNextHour)] take:1] concat:[RACSignal defer:^RACSignal *{
         return [RACSignal interval:3600];
-    }]] deliverOn:[RACScheduler mainThreadScheduler]];
-    
-    [updateEventSignal subscribeNext:^(NSDate *now) {
+    }]] deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(NSDate *now) {
         [[EKEventManager sharedInstance] refresh];
     }];
-    
+       
 
     [self setupDevice];
 

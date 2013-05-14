@@ -61,12 +61,9 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 -(void)viewDidLoad {
     [super viewDidLoad];
     
-    // Wrap our eventManager events property as a RACSignal so we can react to changes.
-    RACSignal *newEventsSignal = [[EKEventManager sharedInstance] eventsSignal];
-    
     @weakify(self);
     // Bind our viewModelArray to a mapped newEventSignal
-    RAC(self.viewModelArray) = [[[newEventsSignal distinctUntilChanged] map:^id (NSArray *eventsArray) {
+    RAC(self.viewModelArray) = [[[[[EKEventManager sharedInstance] eventsSignal] distinctUntilChanged] map:^id (NSArray *eventsArray) {
         // First, sort the array first by size then by start time.
         
         NSArray *sortedArray = [eventsArray sortedArrayUsingComparator:^NSComparisonResult (EKEvent *obj1, EKEvent *obj2) {

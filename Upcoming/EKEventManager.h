@@ -20,8 +20,8 @@ extern NSString *const EKEventManagerSourcesKeyPath;
 @property (nonatomic, strong) RACSignal *eventsSignal;
 @property (nonatomic, strong) RACSignal *nextEventSignal;
 
-@property (nonatomic, strong) NSMutableArray *sources;
-@property (nonatomic, strong) NSMutableArray *selectedCalendars;
+@property (nonatomic, readonly) NSMutableArray *sources;
+@property (nonatomic, readonly) NSMutableArray *selectedCalendars;
 
 @property (nonatomic, readonly) NSCalendar *calendar;
 

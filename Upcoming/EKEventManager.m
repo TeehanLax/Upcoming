@@ -43,8 +43,8 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
                                                  name:EKEventStoreChangedNotification
                                                object:_store];
 
-    _eventsSignal = [[RACAble(self.events) deliverOn:[RACScheduler mainThreadScheduler]] startWith:nil];
-    _nextEventSignal = [[RACAble(self.nextEvent) deliverOn:[RACScheduler mainThreadScheduler]] startWith:nil];
+    _eventsSignal = [RACAble(self.events) startWith:nil];
+    _nextEventSignal = [RACAble(self.nextEvent) startWith:nil];
     
     return self;
 }
@@ -60,18 +60,29 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
 }
 
 -(void)promptForAccess {
-    [_store requestAccessToEntityType:EKEntityTypeEvent
-                           completion:^(BOOL granted, NSError *error) {
-                               [self willChangeValueForKey:EKEventManagerAccessibleKeyPath];
-                               _accessible = granted;
-                               [self didChangeValueForKey:EKEventManagerAccessibleKeyPath];
-                               
-                               if (_accessible) {
-                                   // load events
-                                   [_store reset];
-                                   [self refresh];
-                               }
-                           }];
+    if ([EKEventStore authorizationStatusForEntityType:EKEntityTypeEvent] != EKAuthorizationStatusAuthorized) {
+        [_store requestAccessToEntityType:EKEntityTypeEvent completion:^(BOOL granted, NSError *error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self willChangeValueForKey:EKEventManagerAccessibleKeyPath];
+                _accessible = granted;
+                [self didChangeValueForKey:EKEventManagerAccessibleKeyPath];
+                
+                if (_accessible) {
+                    // need to set these to nil before resetting the store.
+                    [self willChangeValueForKey:EKEventManagerEventsKeyPath];
+                    _events = nil;
+                    [self didChangeValueForKey:EKEventManagerEventsKeyPath];
+                    [self willChangeValueForKey:EKEventManagerNextEventKeyPath];
+                    _nextEvent = nil;
+                    [self didChangeValueForKey:EKEventManagerNextEventKeyPath];
+                    
+                    // load events
+                    [_store reset];
+                    [self refresh];
+                }
+            });
+        }];
+    }
 }
 
 -(void)refresh {
@@ -89,7 +100,7 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
     [[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:_selectedCalendars] forKey:@"SelectedCalendars"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 
-    [self refresh];
+        [self refresh];
 }
 
 #pragma mark Internal methods
