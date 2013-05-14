@@ -18,6 +18,10 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
 -(void)loadEvents;
 -(void)resetSources;
 
+@property (nonatomic, strong) NSMutableArray *events;
+@property (nonatomic, strong) EKEvent *nextEvent;
+
+
 @end
 
 @implementation EKEventManager
@@ -39,7 +43,9 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
                                                  name:EKEventStoreChangedNotification
                                                object:_store];
 
-
+    _eventsSignal = [[RACAble(self.events) deliverOn:[RACScheduler mainThreadScheduler]] startWith:nil];
+    _nextEventSignal = [[RACAble(self.nextEvent) deliverOn:[RACScheduler mainThreadScheduler]] startWith:nil];
+    
     return self;
 }
 

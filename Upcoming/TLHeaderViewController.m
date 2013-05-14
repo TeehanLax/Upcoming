@@ -81,7 +81,7 @@ const CGFloat kUpperHeaderHeight = 52.0f;
     
     @weakify(self);
     
-    RACSignal *todayAllDayEventsSignal = [RACAbleWithStart([EKEventManager sharedInstance], events) map:^id(NSArray *eventArray) {
+    RACSignal *todayAllDayEventsSignal = [[[EKEventManager sharedInstance] eventsSignal] map:^id(NSArray *eventArray) {
         NSArray *allDayEvents = [eventArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(EKEvent *event, NSDictionary *bindings) {
             return event.isAllDay;
         }]];
@@ -169,7 +169,9 @@ const CGFloat kUpperHeaderHeight = 52.0f;
     }];
     
     // Update our header labels with the next event whenever it changes.
-    RACSignal *nextEventSignal = [[[RACSignal combineLatest:@[RACAbleWithStart([EKEventManager sharedInstance], events), RACAbleWithStart([EKEventManager sharedInstance], nextEvent), timerSignal] reduce:^id (NSArray *eventArray, EKEvent *nextEvent, NSDate *fireDate){
+    EKEventManager *eventManager = [EKEventManager sharedInstance];
+    
+    RACSignal *nextEventSignal = [[RACSignal combineLatest:@[eventManager.eventsSignal, eventManager.nextEventSignal, timerSignal] reduce:^id (NSArray *eventArray, EKEvent *nextEvent, NSDate *fireDate){
         NSArray *filteredArray = [[eventArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL (EKEvent *event, NSDictionary *bindings) {
             return [event.endDate isLaterThanDate:[NSDate date]] && !event.isAllDay;
         }]] sortedArrayUsingComparator:^NSComparisonResult (id obj1, id obj2) {
@@ -186,7 +188,7 @@ const CGFloat kUpperHeaderHeight = 52.0f;
         } else {
             return filteredArray[0];
         }
-    }] deliverOn:[RACScheduler mainThreadScheduler]] throttle:0.25f];
+    }] throttle:0.25f];
     
     RAC(self.eventTitleLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
         return event == nil ? NSLocalizedString(@"No Upcoming Event", @"No upcoming event header text") : event.title;

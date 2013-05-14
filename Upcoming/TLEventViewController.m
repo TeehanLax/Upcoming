@@ -64,7 +64,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     EKEventManager *eventManager = [EKEventManager sharedInstance];
     
     // Wrap our eventManager events property as a RACSignal so we can react to changes.
-    RACSignal *newEventsSignal = [RACAbleWithStart(eventManager, events) deliverOn:[RACScheduler mainThreadScheduler]];
+    RACSignal *newEventsSignal = [[EKEventManager sharedInstance] eventsSignal];
     
     @weakify(self);
     // Bind our viewModelArray to a mapped newEventSignal
@@ -184,16 +184,50 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     self.touchDown.delaysTouchesEnded = NO;
     [self.collectionView addGestureRecognizer:self.touchDown];
     
-    // Updat eour background gradient every minute. 
-    [[[RACSignal interval:60.0f] deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(id x) {
-        @strongify(self);
-        [self updateBackgroundGradient];
+    [[[EKEventManager sharedInstance] eventsSignal] subscribeNext:^(NSArray *eventArray) {
+        
+        CGFloat soonestEvent = NSIntegerMax;
+        
+        for (EKEvent *event in eventArray) {
+            if (!event.isAllDay) {
+                if ([event.startDate isEarlierThanDate:[NSDate date]] && ![event.endDate isEarlierThanDate:[NSDate date]]) {
+                    // There's an event going on NOW.
+                    soonestEvent = 0;
+                } else if (![event.startDate isEarlierThanDate:[NSDate date]]) {
+                    NSTimeInterval interval = [event.startDate timeIntervalSinceNow];
+                    NSInteger numberOfMinutes = interval / 60;
+                    
+                    soonestEvent = MIN(soonestEvent, numberOfMinutes);
+                }
+            }
+        }
+        
+        const CGFloat fadeTime = 30.0f;
+        
+        if (soonestEvent == 0) {
+            [self.backgroundGradientView setAlertRatio:1.0f animated:YES];
+        } else if (soonestEvent > fadeTime) {
+            [self.backgroundGradientView setAlertRatio:0.0f animated:YES];
+        } else {
+            CGFloat ratio = (fadeTime - soonestEvent) / fadeTime;
+            
+            [self.backgroundGradientView setAlertRatio:ratio animated:YES];
+        }
+        
+        // Save copy of gradient as image.
+        TLAppDelegate *appDelegate = (TLAppDelegate *)[UIApplication sharedApplication].delegate;
+        TLRootViewController *rootViewController = appDelegate.viewController;
+        UIGraphicsBeginImageContext(self.backgroundGradientView.bounds.size);
+        [self.backgroundGradientView.gradientLayer renderInContext:UIGraphicsGetCurrentContext()];
+        rootViewController.gradientImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
     }];
 }
 
 -(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
     [self.collectionView reloadData];
-    [self updateBackgroundGradient];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -637,46 +671,6 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     return delta;
 }
 
--(void)updateBackgroundGradient {
-    // Determine if the soonest event is within a half hour to change the colour of the background gradient.
-    NSArray *events = [[EKEventManager sharedInstance] events];
-    
-    CGFloat soonestEvent = NSIntegerMax;
-    
-    for (EKEvent *event in events) {
-        if (!event.isAllDay) {
-            if ([event.startDate isEarlierThanDate:[NSDate date]] && ![event.endDate isEarlierThanDate:[NSDate date]]) {
-                // There's an event going on NOW.
-                soonestEvent = 0;
-            } else if (![event.startDate isEarlierThanDate:[NSDate date]]) {
-                NSTimeInterval interval = [event.startDate timeIntervalSinceNow];
-                NSInteger numberOfMinutes = interval / 60;
-                
-                soonestEvent = MIN(soonestEvent, numberOfMinutes);
-            }
-        }
-    }
-    
-    const CGFloat fadeTime = 30.0f;
-    
-    if (soonestEvent == 0) {
-        [self.backgroundGradientView setAlertRatio:1.0f animated:YES];
-    } else if (soonestEvent > fadeTime) {
-        [self.backgroundGradientView setAlertRatio:0.0f animated:YES];
-    } else {
-        CGFloat ratio = (fadeTime - soonestEvent) / fadeTime;
-        
-        [self.backgroundGradientView setAlertRatio:ratio animated:YES];
-    }
-    
-    // Save copy of gradient as image.
-    TLAppDelegate *appDelegate = (TLAppDelegate *)[UIApplication sharedApplication].delegate;
-    TLRootViewController *rootViewController = appDelegate.viewController;
-    UIGraphicsBeginImageContext(self.backgroundGradientView.bounds.size);
-    [self.backgroundGradientView.gradientLayer renderInContext:UIGraphicsGetCurrentContext()];
-    rootViewController.gradientImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-}
 
 -(TLEventViewModel *)eventViewModelUnderPoint:(CGPoint)point {
     //Find the event under a specific point
