@@ -526,7 +526,6 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         if (!self.hourSupplementaryView) {
             self.hourSupplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kHourSupplementaryViewIdentifier forIndexPath:indexPath];
             
-            RACSubject *updateSubject = [RACSubject subject];
             
             NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSSecondCalendarUnit fromDate:[NSDate date]];
             
@@ -535,20 +534,12 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
             
             NSLog(@"Scheduling subscription every minute for supplementary view in %d seconds", delay);
             
-            double delayInSeconds = delay;
-            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-            dispatch_after(popTime, dispatch_get_main_queue(), ^(void) {
-                NSLog(@"Creating initial subscription for supplementary view.");
-                [updateSubject sendNext:[NSDate date]];
-                
-                [[[RACSignal interval:60] deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(id x) {
-                    NSLog(@"Updating minute of supplementary view.");
-                    [updateSubject sendNext:x];
-                }];
-            });
+            RACSignal *updateSignal = [[[[[RACSignal interval:delay] take:1] concat:[RACSignal defer:^RACSignal *{
+                return [RACSignal interval:60];
+            }]] deliverOn:[RACScheduler mainThreadScheduler]] startWith:[NSDate date]];
             
             // Finally, bind the value of the supplementary view's timeString property to a mapped signal.
-            RAC(self.hourSupplementaryView.timeString) = [updateSubject map:^id (NSDate *date) {
+            RAC(self.hourSupplementaryView.timeString) = [updateSignal map:^id (NSDate *date) {
                 NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:(NSHourCalendarUnit | NSMinuteCalendarUnit)
                                                            fromDate:date];
                 
@@ -561,8 +552,6 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
                 
                 return [NSString stringWithFormat:@"%d:%02d", hours, components.minute];
             }];
-            
-            [updateSubject sendNext:[NSDate date]];
         }
         
         return self.hourSupplementaryView;
