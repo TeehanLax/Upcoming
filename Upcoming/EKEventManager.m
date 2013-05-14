@@ -222,8 +222,9 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
 
         if ([nextEvents count] > 0) {
             _nextEvent = nextEvents[0];
-            [self didChangeValueForKey:EKEventManagerNextEventKeyPath];
         }
+        
+        [self didChangeValueForKey:EKEventManagerNextEventKeyPath];
     });
 }
 
