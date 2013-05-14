@@ -60,8 +60,6 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-        
-    EKEventManager *eventManager = [EKEventManager sharedInstance];
     
     // Wrap our eventManager events property as a RACSignal so we can react to changes.
     RACSignal *newEventsSignal = [[EKEventManager sharedInstance] eventsSignal];
@@ -184,8 +182,9 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     self.touchDown.delaysTouchesEnded = NO;
     [self.collectionView addGestureRecognizer:self.touchDown];
     
+    
     [[[EKEventManager sharedInstance] eventsSignal] subscribeNext:^(NSArray *eventArray) {
-        
+        @strongify(self);
         CGFloat soonestEvent = NSIntegerMax;
         
         for (EKEvent *event in eventArray) {
