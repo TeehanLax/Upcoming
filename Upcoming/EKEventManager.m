@@ -200,11 +200,12 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
     NSPredicate *predicate = [_store predicateForEventsWithStartDate:startDate
                                                              endDate:endDate
                                                            calendars:calendars];
-
+    
     // get today's events
     _events = [NSMutableArray arrayWithArray:[_store eventsMatchingPredicate:predicate]];
     [_events filterUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(EKEvent *evaluatedObject, NSDictionary *bindings) {
-        return ([evaluatedObject.startDate isToday] || [evaluatedObject.endDate isToday]);
+        // need the check for subtracting one second so that events that ended at midnight (technical today) don't show up.
+        return ([evaluatedObject.startDate isToday] || ([evaluatedObject.endDate isToday] && ![[evaluatedObject.endDate dateByAddingTimeInterval:-1] isYesterday]));
     }]];
     [_events sortUsingSelector:@selector(compareStartDateWithEvent:)];
     [self didChangeValueForKey:EKEventManagerEventsKeyPath];
@@ -227,8 +228,9 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
 
         if ([nextEvents count] > 0) {
             _nextEvent = nextEvents[0];
-            [self didChangeValueForKey:EKEventManagerNextEventKeyPath];
         }
+        
+        [self didChangeValueForKey:EKEventManagerNextEventKeyPath];
     });
 }
 
