@@ -37,145 +37,182 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     self.backgroundImageView.layer.shadowPath = [[UIBezierPath bezierPathWithRect:self.backgroundImageView.bounds] CGPath];
     self.backgroundImageView.layer.shadowRadius = 22.0f;
     
-    // Reload our table view whenever the sources change on the event manager, or every 60 seconds.
-    // Throttle the nextEvent so it doesn't go all flashy. 
-    RACSignal *nextEventSignal = [[RACAbleWithStart([EKEventManager sharedInstance], nextEvent) deliverOn:[RACScheduler mainThreadScheduler]] throttle:0.25f];
-    RACSignal *timeSignal = [[[RACSignal interval:60] startWith:[NSDate date]] deliverOn:[RACScheduler mainThreadScheduler]];
+    // Throttle the nextEvent so it doesn't go all flashy.
+    RACSignal *nextEventSignal = [[[EKEventManager sharedInstance] nextEventSignal] throttle:0.25f];
     
-    @weakify(self);
-    [[RACSignal combineLatest:@[timeSignal, nextEventSignal]
-                      reduce:^id(NSDate *now, EKEvent *nextEvent){
-                          // The KVO is returning nil for some reason. 
-                          return [[EKEventManager sharedInstance] nextEvent];
-                      }] subscribeNext:^(EKEvent *event) {
-                          @strongify(self);
-                          
-                          if (event == nil) {
-                              self.eventNameLabel.text = NSLocalizedString(@"No upcoming event", @"Empty upcoming event message");
-                              self.eventLocationLabel.text = @"";
-                              self.eventTimeLabel.text = @"";
-                              self.eventRelativeTimeLabel.text = @"";
-                              self.eventRelativeTimeUnitLabel.text = @"";
-                              self.eventLocationImageView.alpha = 0.0f;
-                              self.calendarView.alpha = 0.0f;
-                          } else {
-                              [self reloadData:event];
-                          }
-                      }];
-}
+    RAC(self.eventNameLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
+        return event == nil ? NSLocalizedString(@"No upcoming event", @"Empty upcoming event message") : event.title;
+    }];
 
--(void)reloadData:(EKEvent *)event {
-    // First, extract relevent data out of the event
-    NSString *title = event.title;
-    NSString *location = event.location;
-    NSDate *startDate = event.startDate;
-    NSDate *endDate = event.endDate;
+    RAC(self.eventLocationLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
+        return event.location.length == 0 ? @"" : event.location;
+    }];
     
-    // Next, transform that data into the information we need to display to the user
-    NSCalendar *calendar = [[EKEventManager sharedInstance] calendar];
+    RAC(self.eventLocationImageView.alpha) = [nextEventSignal map:^id(EKEvent *event) {
+        return event.location.length == 0 ? @(0.0f) : @(1.0f);
+    }];
     
-    unsigned int unitFlags = NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit;
-    NSDateComponents *startTimeComponents = [calendar components:unitFlags fromDate:[NSDate date] toDate:startDate options:0];
-    
-    // Check for descending unit lengths being greater than zero for the largest, non-zero component.
-    if (startTimeComponents.month > 0) {
-        NSInteger numberOfMonths = startTimeComponents.month;
+    RAC(self.eventTimeLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
+        if (!event) return @"";
+        NSDate *startDate = event.startDate;
+        NSDate *endDate = event.endDate;
+        BOOL isAllDayEvent = event.isAllDay;
         
-        if (startTimeComponents.day > 15) {
-            numberOfMonths++;
-        }
+        // Next, transform that data into the information we need to display to the user
+        NSCalendar *calendar = [[EKEventManager sharedInstance] calendar];
         
-        self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", numberOfMonths];
+        NSString *timeString;
+        NSString *dateString;
         
-        if (numberOfMonths == 1) {
-            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Month", @"Month unit singular");
+        if (isAllDayEvent) {
+            timeString = NSLocalizedString(@"All Day", @"All day date string");
         } else {
-            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"Months", @"Month unit plural");
+            NSDateComponents *differenceComponents = [calendar components:NSDayCalendarUnit fromDate:startDate toDate:endDate options:0];
+            
+            NSString *startDateString = [[NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle] lowercaseString];
+            
+            if (differenceComponents.day > 0) {
+                // This event spans multiple days.
+                
+                timeString = [NSString stringWithFormat:@"%@ – %@",
+                              startDateString,
+                              [NSDateFormatter localizedStringFromDate:endDate
+                                                             dateStyle:NSDateFormatterShortStyle
+                                                             timeStyle:NSDateFormatterNoStyle]];
+            } else {
+                timeString = [[NSString stringWithFormat:@"%@ – %@",
+                               startDateString,
+                               [NSDateFormatter localizedStringFromDate:endDate
+                                                              dateStyle:NSDateFormatterNoStyle
+                                                              timeStyle:NSDateFormatterShortStyle]] lowercaseString];
+            }
         }
-    } else if (startTimeComponents.day > 0) {
-        NSInteger numberOfDays = [[NSDate date] daysBeforeDate:event.startDate];
         
-        self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", numberOfDays];
-        
-        if (numberOfDays == 1) {
-            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"DAY", @"Day unit singular");
+        if ([startDate isToday]) {
+            // This shouldn't really happen, but we'll check just in case
+            dateString = NSLocalizedString(@"Today", @"Today time string");
+        } else if ([startDate isTomorrow]) {
+            dateString = NSLocalizedString(@"Tomorrow", @"Tomorrow time string");
+        } else if ([startDate daysAfterDate:[NSDate date]] < 7) {
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            dateFormatter.locale = [NSLocale currentLocale];
+            dateFormatter.dateFormat = @"EEEE";
+            dateString = [dateFormatter stringFromDate:event.startDate];
         } else {
-            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"DAYS", @"Day unit plural");
-        }
-    } else if (startTimeComponents.hour > 0) {
-        NSInteger numberOfHours = startTimeComponents.hour;
-        
-        if (startTimeComponents.minute > 30) {
-            numberOfHours++;
+            dateString = [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterNoStyle];
         }
         
-        self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", numberOfHours];
+        return [NSString stringWithFormat:@"%@, %@", dateString, timeString];
+    }];
+    
+    RAC(self.eventRelativeTimeLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
+        if (!event) return @"";
+        NSDate *startDate = event.startDate;        
         
-        if (numberOfHours == 1) {
-            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"HOUR", @"Hour unit singular");
-        } else {
-            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"HOURS", @"Hour unit plural");
+        // Next, transform that data into the information we need to display to the user
+        NSCalendar *calendar = [[EKEventManager sharedInstance] calendar];
+        
+        unsigned int unitFlags = NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit;
+        NSDateComponents *startTimeComponents = [calendar components:unitFlags fromDate:[NSDate date] toDate:startDate options:0];
+        
+        NSString *eventRelativeTime = @"";
+        
+        // Check for descending unit lengths being greater than zero for the largest, non-zero component.
+        if (startTimeComponents.month > 0) {
+            NSInteger numberOfMonths = startTimeComponents.month;
+            
+            if (startTimeComponents.day > 15) {
+                numberOfMonths++;
+            }
+            
+            eventRelativeTime = [NSString stringWithFormat:@"%d", numberOfMonths];
+            
+        } else if (startTimeComponents.day > 0) {
+            NSInteger numberOfDays = [[NSDate date] daysBeforeDate:event.startDate];
+            
+            eventRelativeTime = [NSString stringWithFormat:@"%d", numberOfDays];
+            
+        } else if (startTimeComponents.hour > 0) {
+            NSInteger numberOfHours = startTimeComponents.hour;
+            
+            if (startTimeComponents.minute > 30) {
+                numberOfHours++;
+            }
+            
+            eventRelativeTime = [NSString stringWithFormat:@"%d", numberOfHours];
+            
+        } else if (startTimeComponents.minute > 0) {
+            eventRelativeTime = [NSString stringWithFormat:@"%d", startTimeComponents.minute];
         }
-    } else if (startTimeComponents.minute > 0) {
-        self.eventRelativeTimeLabel.text = [NSString stringWithFormat:@"%d", startTimeComponents.minute];
         
-        if (startTimeComponents.minute == 1) {
-            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"MINUTE", @"Minute unit singular");
-        } else {
-            self.eventRelativeTimeUnitLabel.text = NSLocalizedString(@"MINUTES", @"Minute unit plural");
+        return eventRelativeTime;
+    }];
+    
+    RAC(self.eventRelativeTimeUnitLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
+        if (!event) return @"";
+        NSDate *startDate = event.startDate;        
+        
+        // Next, transform that data into the information we need to display to the user
+        NSCalendar *calendar = [[EKEventManager sharedInstance] calendar];
+        
+        unsigned int unitFlags = NSMonthCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit;
+        NSDateComponents *startTimeComponents = [calendar components:unitFlags fromDate:[NSDate date] toDate:startDate options:0];
+        
+        NSString *eventRelativeTimeUnit = @"";
+        
+        // Check for descending unit lengths being greater than zero for the largest, non-zero component.
+        if (startTimeComponents.month > 0) {
+            NSInteger numberOfMonths = startTimeComponents.month;
+            
+            if (startTimeComponents.day > 15) {
+                numberOfMonths++;
+            }
+                        
+            if (numberOfMonths == 1) {
+                eventRelativeTimeUnit = NSLocalizedString(@"Month", @"Month unit singular");
+            } else {
+                eventRelativeTimeUnit = NSLocalizedString(@"Months", @"Month unit plural");
+            }
+        } else if (startTimeComponents.day > 0) {
+            NSInteger numberOfDays = [[NSDate date] daysBeforeDate:event.startDate];
+            
+            if (numberOfDays == 1) {
+                eventRelativeTimeUnit = NSLocalizedString(@"DAY", @"Day unit singular");
+            } else {
+                eventRelativeTimeUnit = NSLocalizedString(@"DAYS", @"Day unit plural");
+            }
+        } else if (startTimeComponents.hour > 0) {
+            NSInteger numberOfHours = startTimeComponents.hour;
+            
+            if (startTimeComponents.minute > 30) {
+                numberOfHours++;
+            }
+            
+            if (numberOfHours == 1) {
+                eventRelativeTimeUnit = NSLocalizedString(@"HOUR", @"Hour unit singular");
+            } else {
+                eventRelativeTimeUnit = NSLocalizedString(@"HOURS", @"Hour unit plural");
+            }
+        } else if (startTimeComponents.minute > 0) {
+            
+            if (startTimeComponents.minute == 1) {
+                eventRelativeTimeUnit = NSLocalizedString(@"MINUTE", @"Minute unit singular");
+            } else {
+                eventRelativeTimeUnit = NSLocalizedString(@"MINUTES", @"Minute unit plural");
+            }
         }
-    }
-    
-    NSString *timeString;
-    NSString *dateString;
-    
-    NSDateComponents *differenceComponents = [calendar components:NSDayCalendarUnit fromDate:startDate toDate:endDate options:0];
-    
-    NSString *startDateString = [[NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle] lowercaseString];
-    
-    if (differenceComponents.day > 0) {
-        // This event spans multiple days.
         
-        timeString = [NSString stringWithFormat:@"%@ – %@",
-                      startDateString,
-                      [NSDateFormatter localizedStringFromDate:endDate
-                                                     dateStyle:NSDateFormatterShortStyle
-                                                     timeStyle:NSDateFormatterNoStyle]];
-    } else {
-        timeString = [[NSString stringWithFormat:@"%@ – %@",
-                       startDateString,
-                       [NSDateFormatter localizedStringFromDate:endDate
-                                                      dateStyle:NSDateFormatterNoStyle
-                                                      timeStyle:NSDateFormatterShortStyle]] lowercaseString];
-    }
+        return eventRelativeTimeUnit;
+        
+    }];
     
-    if ([startDate isToday]) {
-        // This shouldn't really happen, but we'll check just in case
-        dateString = NSLocalizedString(@"Today", @"Today time string");
-    } else if ([startDate isTomorrow]) {
-        dateString = NSLocalizedString(@"Tomorrow", @"Tomorrow time string");
-    } else if ([startDate daysAfterDate:[NSDate date]] < 7) {
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        dateFormatter.locale = [NSLocale currentLocale];
-        dateFormatter.dateFormat = @"EEEE";
-        dateString = [dateFormatter stringFromDate:event.startDate];
-    } else {
-        dateString = [NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterNoStyle];
-    }
+    RAC(self.calendarView.alpha) = [nextEventSignal map:^id(id value) {
+        return value == nil ? @(0.0f) : @(1.0f);
+    }];
     
-    self.eventTimeLabel.text = [NSString stringWithFormat:@"%@, %@", dateString, timeString];
-    
-    self.eventNameLabel.text = title;
-    self.eventLocationLabel.text = location;
-    
-    if ([location length] > 0) {
-        self.eventLocationImageView.alpha = 1.0f;
-    } else {
-        self.eventLocationImageView.alpha = 0.0f;
-    }
-    
-    self.calendarView.alpha = 1.0f;
-    self.calendarView.dotColor = [UIColor colorWithCGColor:event.calendar.CGColor];
+    RAC(self.calendarView.dotColor) = [nextEventSignal map:^id(EKEvent *event) {
+        return [UIColor colorWithCGColor:event.calendar.CGColor];
+    }];    
 }
 
 @end

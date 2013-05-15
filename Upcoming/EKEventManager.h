@@ -10,8 +10,6 @@
 #import <EventKit/EventKit.h>
 
 extern NSString *const EKEventManagerAccessibleKeyPath;
-extern NSString *const EKEventManagerEventsKeyPath;
-extern NSString *const EKEventManagerNextEventKeyPath;
 extern NSString *const EKEventManagerSourcesKeyPath;
 
 @interface EKEventManager : NSObject
@@ -19,11 +17,11 @@ extern NSString *const EKEventManagerSourcesKeyPath;
 @property (nonatomic, strong) EKEventStore *store;
 
 @property (nonatomic, assign) BOOL accessible;
-@property (nonatomic, strong) NSMutableArray *events;
-@property (nonatomic, strong) EKEvent *nextEvent;
+@property (nonatomic, strong) RACSignal *eventsSignal;
+@property (nonatomic, strong) RACSignal *nextEventSignal;
 
-@property (nonatomic, strong) NSMutableArray *sources;
-@property (nonatomic, strong) NSMutableArray *selectedCalendars;
+@property (nonatomic, readonly) NSMutableArray *sources;
+@property (nonatomic, readonly) NSMutableArray *selectedCalendars;
 
 @property (nonatomic, readonly) NSCalendar *calendar;
 

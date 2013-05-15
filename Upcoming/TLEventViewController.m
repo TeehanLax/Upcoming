@@ -61,15 +61,10 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-        
-    EKEventManager *eventManager = [EKEventManager sharedInstance];
-    
-    // Wrap our eventManager events property as a RACSignal so we can react to changes.
-    RACSignal *newEventsSignal = [RACAbleWithStart(eventManager, events) deliverOn:[RACScheduler mainThreadScheduler]];
     
     @weakify(self);
     // Bind our viewModelArray to a mapped newEventSignal
-    RAC(self.viewModelArray) = [[[newEventsSignal distinctUntilChanged] map:^id (NSArray *eventsArray) {
+    RAC(self.viewModelArray) = [[[[[EKEventManager sharedInstance] eventsSignal] distinctUntilChanged] map:^id (NSArray *eventsArray) {
         // First, sort the array first by size then by start time.
         
         NSArray *sortedArray = [eventsArray sortedArrayUsingComparator:^NSComparisonResult (EKEvent *obj1, EKEvent *obj2) {
@@ -195,16 +190,51 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     self.touchDown.delaysTouchesEnded = NO;
     [self.collectionView addGestureRecognizer:self.touchDown];
     
-    // Updat eour background gradient every minute. 
-    [[[RACSignal interval:60.0f] deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(id x) {
+    
+    [[[EKEventManager sharedInstance] eventsSignal] subscribeNext:^(NSArray *eventArray) {
         @strongify(self);
-        [self updateBackgroundGradient];
+        CGFloat soonestEvent = NSIntegerMax;
+        
+        for (EKEvent *event in eventArray) {
+            if (!event.isAllDay) {
+                if ([event.startDate isEarlierThanDate:[NSDate date]] && ![event.endDate isEarlierThanDate:[NSDate date]]) {
+                    // There's an event going on NOW.
+                    soonestEvent = 0;
+                } else if (![event.startDate isEarlierThanDate:[NSDate date]]) {
+                    NSTimeInterval interval = [event.startDate timeIntervalSinceNow];
+                    NSInteger numberOfMinutes = interval / 60;
+                    
+                    soonestEvent = MIN(soonestEvent, numberOfMinutes);
+                }
+            }
+        }
+        
+        const CGFloat fadeTime = 30.0f;
+        
+        if (soonestEvent == 0) {
+            [self.backgroundGradientView setAlertRatio:1.0f animated:YES];
+        } else if (soonestEvent > fadeTime) {
+            [self.backgroundGradientView setAlertRatio:0.0f animated:YES];
+        } else {
+            CGFloat ratio = (fadeTime - soonestEvent) / fadeTime;
+            
+            [self.backgroundGradientView setAlertRatio:ratio animated:YES];
+        }
+        
+        // Save copy of gradient as image.
+        TLAppDelegate *appDelegate = (TLAppDelegate *)[UIApplication sharedApplication].delegate;
+        TLRootViewController *rootViewController = appDelegate.viewController;
+        UIGraphicsBeginImageContext(self.backgroundGradientView.bounds.size);
+        [self.backgroundGradientView.gradientLayer renderInContext:UIGraphicsGetCurrentContext()];
+        rootViewController.gradientImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
     }];
 }
 
 -(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
     [self.collectionView reloadData];
-    [self updateBackgroundGradient];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -537,7 +567,6 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         if (!self.hourSupplementaryView) {
             self.hourSupplementaryView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:kHourSupplementaryViewIdentifier forIndexPath:indexPath];
             
-            RACSubject *updateSubject = [RACSubject subject];
             
             NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:NSSecondCalendarUnit fromDate:[NSDate date]];
             
@@ -546,20 +575,12 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
             
             NSLog(@"Scheduling subscription every minute for supplementary view in %d seconds", delay);
             
-            double delayInSeconds = delay;
-            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-            dispatch_after(popTime, dispatch_get_main_queue(), ^(void) {
-                NSLog(@"Creating initial subscription for supplementary view.");
-                [updateSubject sendNext:[NSDate date]];
-                
-                [[[RACSignal interval:60] deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(id x) {
-                    NSLog(@"Updating minute of supplementary view.");
-                    [updateSubject sendNext:x];
-                }];
-            });
+            RACSignal *updateSignal = [[[[[RACSignal interval:delay] take:1] concat:[RACSignal defer:^RACSignal *{
+                return [RACSignal interval:60];
+            }]] deliverOn:[RACScheduler mainThreadScheduler]] startWith:[NSDate date]];
             
             // Finally, bind the value of the supplementary view's timeString property to a mapped signal.
-            RAC(self.hourSupplementaryView.timeString) = [updateSubject map:^id (NSDate *date) {
+            RAC(self.hourSupplementaryView.timeString) = [updateSignal map:^id (NSDate *date) {
                 NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:(NSHourCalendarUnit | NSMinuteCalendarUnit)
                                                            fromDate:date];
                 
@@ -572,8 +593,6 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
                 
                 return [NSString stringWithFormat:@"%d:%02d", hours, components.minute];
             }];
-            
-            [updateSubject sendNext:[NSDate date]];
         }
         
         return self.hourSupplementaryView;
@@ -659,46 +678,6 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     return delta;
 }
 
--(void)updateBackgroundGradient {
-    // Determine if the soonest event is within a half hour to change the colour of the background gradient.
-    NSArray *events = [[EKEventManager sharedInstance] events];
-    
-    CGFloat soonestEvent = NSIntegerMax;
-    
-    for (EKEvent *event in events) {
-        if (!event.isAllDay) {
-            if ([event.startDate isEarlierThanDate:[NSDate date]] && ![event.endDate isEarlierThanDate:[NSDate date]]) {
-                // There's an event going on NOW.
-                soonestEvent = 0;
-            } else if (![event.startDate isEarlierThanDate:[NSDate date]]) {
-                NSTimeInterval interval = [event.startDate timeIntervalSinceNow];
-                NSInteger numberOfMinutes = interval / 60;
-                
-                soonestEvent = MIN(soonestEvent, numberOfMinutes);
-            }
-        }
-    }
-    
-    const CGFloat fadeTime = 30.0f;
-    
-    if (soonestEvent == 0) {
-        [self.backgroundGradientView setAlertRatio:1.0f animated:YES];
-    } else if (soonestEvent > fadeTime) {
-        [self.backgroundGradientView setAlertRatio:0.0f animated:YES];
-    } else {
-        CGFloat ratio = (fadeTime - soonestEvent) / fadeTime;
-        
-        [self.backgroundGradientView setAlertRatio:ratio animated:YES];
-    }
-    
-    // Save copy of gradient as image.
-    TLAppDelegate *appDelegate = (TLAppDelegate *)[UIApplication sharedApplication].delegate;
-    TLRootViewController *rootViewController = appDelegate.viewController;
-    UIGraphicsBeginImageContext(self.backgroundGradientView.bounds.size);
-    [self.backgroundGradientView.gradientLayer renderInContext:UIGraphicsGetCurrentContext()];
-    rootViewController.gradientImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-}
 
 -(TLEventViewModel *)eventViewModelUnderPoint:(CGPoint)point {
     //Find the event under a specific point
