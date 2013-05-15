@@ -43,7 +43,7 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     RAC(self.eventNameLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
         return event == nil ? NSLocalizedString(@"No upcoming event", @"Empty upcoming event message") : event.title;
     }];
-    
+
     RAC(self.eventLocationLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
         return event.location.length == 0 ? @"" : event.location;
     }];
