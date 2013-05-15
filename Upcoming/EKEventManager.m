@@ -214,7 +214,7 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
         [_store enumerateEventsMatchingPredicate:nextPredicate
                                       usingBlock:^(EKEvent *event, BOOL *stop) {
-                                          if (event) {
+                                          if (event && !event.isAllDay) {
                                           [nextEvents addObject:event];
                                           }
                                       }];

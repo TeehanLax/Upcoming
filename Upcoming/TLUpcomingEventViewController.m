@@ -45,7 +45,8 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     @weakify(self);
     [[RACSignal combineLatest:@[timeSignal, nextEventSignal]
                       reduce:^id(NSDate *now, EKEvent *nextEvent){
-                          return nextEvent;
+                          // The KVO is returning nil for some reason. 
+                          return [[EKEventManager sharedInstance] nextEvent];
                       }] subscribeNext:^(EKEvent *event) {
                           @strongify(self);
                           
@@ -67,7 +68,6 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     // First, extract relevent data out of the event
     NSString *title = event.title;
     NSString *location = event.location;
-    BOOL isAllDayEvent = event.isAllDay;
     NSDate *startDate = event.startDate;
     NSDate *endDate = event.endDate;
     
@@ -129,28 +129,24 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     NSString *timeString;
     NSString *dateString;
     
-    if (isAllDayEvent) {
-        timeString = NSLocalizedString(@"All Day", @"All day date string");
+    NSDateComponents *differenceComponents = [calendar components:NSDayCalendarUnit fromDate:startDate toDate:endDate options:0];
+    
+    NSString *startDateString = [[NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle] lowercaseString];
+    
+    if (differenceComponents.day > 0) {
+        // This event spans multiple days.
+        
+        timeString = [NSString stringWithFormat:@"%@ – %@",
+                      startDateString,
+                      [NSDateFormatter localizedStringFromDate:endDate
+                                                     dateStyle:NSDateFormatterShortStyle
+                                                     timeStyle:NSDateFormatterNoStyle]];
     } else {
-        NSDateComponents *differenceComponents = [calendar components:NSDayCalendarUnit fromDate:startDate toDate:endDate options:0];
-        
-        NSString *startDateString = [[NSDateFormatter localizedStringFromDate:startDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle] lowercaseString];
-        
-        if (differenceComponents.day > 0) {
-            // This event spans multiple days.
-            
-            timeString = [NSString stringWithFormat:@"%@ – %@",
-                          startDateString,
-                          [NSDateFormatter localizedStringFromDate:endDate
-                                                         dateStyle:NSDateFormatterShortStyle
-                                                         timeStyle:NSDateFormatterNoStyle]];
-        } else {
-            timeString = [[NSString stringWithFormat:@"%@ – %@",
-                          startDateString,
-                          [NSDateFormatter localizedStringFromDate:endDate
-                                                         dateStyle:NSDateFormatterNoStyle
-                                                         timeStyle:NSDateFormatterShortStyle]] lowercaseString];
-        }
+        timeString = [[NSString stringWithFormat:@"%@ – %@",
+                       startDateString,
+                       [NSDateFormatter localizedStringFromDate:endDate
+                                                      dateStyle:NSDateFormatterNoStyle
+                                                      timeStyle:NSDateFormatterShortStyle]] lowercaseString];
     }
     
     if ([startDate isToday]) {
