@@ -168,7 +168,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         [self.collectionView.collectionViewLayout invalidateLayout];
     }];
     
-    RAC(self.immediateModel) = [[RACSignal combineLatest:@[RACAbleWithStart(self.viewModelArray), [RACSignal interval:60]] reduce:^id(NSArray *array, NSDate *fireDate){
+    RAC(self.immediateModel) = [[RACSignal combineLatest:@[RACAbleWithStart(self.viewModelArray), [[RACSignal interval:60] startWith:[NSDate date]]] reduce:^id(NSArray *array, NSDate *fireDate){
         return array;
     }] map:^id(NSArray *viewModelArray) {
         NSArray *array = [viewModelArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(TLEventViewModel *evaluatedObject, NSDictionary *bindings) {
@@ -176,6 +176,11 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         }]];
         
         return array.count > 0 ? array[0] : nil;
+    }];
+    
+    [RACAble(self.immediateModel) subscribeNext:^(id x) {
+        [self.collectionView reloadData];
+        [self.collectionView.collectionViewLayout invalidateLayout];
     }];
     
     // Register our reusable views for the collection view
