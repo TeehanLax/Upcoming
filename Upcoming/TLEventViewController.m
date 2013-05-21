@@ -659,7 +659,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         size = minSize;
     }
     
-    return size;
+    return roundf(size);
 }
 
 -(CGFloat)alphaForElementInHour:(NSInteger)hour {
