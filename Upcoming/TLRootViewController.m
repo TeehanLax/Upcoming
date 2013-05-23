@@ -13,7 +13,6 @@
 #import "UIImage+Blur.h"
 #import "EKEventManager.h"
 
-#import <BlocksKit.h>
 #import <ReactiveCocoaLayout.h>
 
 @interface TLRootViewController ()
@@ -31,7 +30,8 @@
 @property (nonatomic, strong) UIPanGestureRecognizer *panHeaderUpGestureRecognizer;
 @property (nonatomic, strong) UIPanGestureRecognizer *panFooterUpGestureRecognizer;
 
-// Two subjects used to receive translations from the gesture recognizers
+// A subject used to receive translations from two different gesture recognizers
+// It's helpful to have this as a subject so we can access it from the move-up button, as well. 
 @property (nonatomic, strong) RACSubject *headerPanSubject;
 
 // Used to receive ratios of translation for changing the alpha of the overlay view which covers the day list view
@@ -40,7 +40,6 @@
 
 // Used to enable/disable gesture recognizers and view interactivity
 @property (nonatomic, strong) RACSubject *headerFinishedTransitionSubject;
-@property (nonatomic, strong) RACSubject *footerFinishedTransitionSubject;
 
 
 @end
@@ -214,10 +213,6 @@
     
     RAC(self.headerViewController.view.frame) = headerFrameSignal;
     
-    
-    
-    
-    
     // These subjects are responsible for mapping this value to other signals and state (ugh).
     self.headerFinishedTransitionSubject = [RACReplaySubject subject];
     [self.headerFinishedTransitionSubject
@@ -235,20 +230,9 @@
               sendNext:menuIsOpenNumber];
          }
      }];
-    
-    self.footerFinishedTransitionSubject = [RACReplaySubject subject];
-    [self.footerFinishedTransitionSubject subscribeNext:^(NSNumber *menuIsOpenNumber) {
-         @strongify(self);
-         
-         BOOL menuIsOpen = menuIsOpenNumber.boolValue;
-         
-         if (!menuIsOpen) {
-             [self.dayListAndHeaderOverlaySubject sendNext:@(NO)];
-         }
-     }];
-    
-    RACSignal *canOpenMenuSignal = [RACSignal combineLatest:@[[self.headerFinishedTransitionSubject startWith:@(NO)], [self.footerFinishedTransitionSubject startWith:@(NO)], RACAbleWithStart(self.dayListViewController.touching)] reduce:^(NSNumber *headerIsOpen, NSNumber *footerIsOpen, NSNumber *isTouching) {
-        return @(!headerIsOpen.boolValue && !footerIsOpen.boolValue && !isTouching.boolValue);
+        
+    RACSignal *canOpenMenuSignal = [RACSignal combineLatest:@[[self.headerFinishedTransitionSubject startWith:@(NO)], RACAbleWithStart(self.dayListViewController.touching)] reduce:^(NSNumber *headerIsOpen,  NSNumber *isTouching) {
+        return @(!headerIsOpen.boolValue && !isTouching.boolValue);
     }];
     
     RAC(self.panHeaderDownGestureRecognizer.enabled) = canOpenMenuSignal;
@@ -264,7 +248,7 @@
             [self.dayListAndHeaderOverlaySubject sendNext:@(YES)];
         }
         else if (recognizer.state == UIGestureRecognizerStateEnded) {
-            [self.footerFinishedTransitionSubject sendNext:@(NO)];
+            [self.dayListAndHeaderOverlaySubject sendNext:@(NO)];
         }
     }];
     
@@ -341,10 +325,68 @@
     
     RAC(self.footerViewController.view.frame) = footerFrameSignal;
     
+    // This is the number of points beyond which the user need to move their finger in order to trigger the menu moving down.
+    const CGFloat kMoveDownThreshold = 30.0f;
     
+    self.panHeaderDownGestureRecognizer = [[UIPanGestureRecognizer alloc] init];
+    [self.panHeaderDownGestureRecognizer.rac_gestureSignal subscribeNext:^(UIPanGestureRecognizer *recognizer) {
+        CGPoint translation = [recognizer translationInView:self.view];
+        
+        if (recognizer.state == UIGestureRecognizerStateBegan) {
+            [self.dayListOverlaySubject sendNext:@(YES)];
+        } else if (recognizer.state == UIGestureRecognizerStateChanged) {
+            [self.headerPanSubject sendNext:@(translation.y)];
+        } else if (recognizer.state == UIGestureRecognizerStateEnded) {
+            // Determine the direction the finger is moving and ensure if it was moving down, that it exceeds the minimum threshold for opening the menu.
+            BOOL movingDown = ([recognizer velocityInView:self.view].y > 0 && translation.y > kMoveDownThreshold);
+            
+            // Animate the change
+            [UIView animateWithDuration:0.25f animations:^{
+                if (movingDown) {
+                    [self.headerPanSubject sendNext:@(kMaximumHeaderTranslationThreshold)];
+                } else {
+                    [self.headerPanSubject sendNext:@(0)];
+                }
+            } completion:^(BOOL finished) {
+                [self.headerFinishedTransitionSubject sendNext:@(movingDown)];
+            }];
+        }
+    }];
+    
+    self.panHeaderUpGestureRecognizer = [[UIPanGestureRecognizer alloc] init];
+    [self.panHeaderUpGestureRecognizer.rac_gestureSignal subscribeNext:^(UIPanGestureRecognizer *recognizer) {
+        @strongify(self);
+        CGPoint translation = [recognizer translationInView:self.view];
+        
+        if (recognizer.state == UIGestureRecognizerStateChanged) {
+            [self.headerPanSubject sendNext:@(kMaximumHeaderTranslationThreshold + translation.y)];
+        } else if (recognizer.state == UIGestureRecognizerStateEnded) {
+            // Determine the direction the finger is moving
+            BOOL movingDown = ([recognizer velocityInView:self.view].y > 0);
+            
+            // Animate the change
+            [UIView animateWithDuration:0.25f animations:^{
+                if (movingDown) {
+                    [self.headerPanSubject sendNext:@(kMaximumHeaderTranslationThreshold)];
+                } else {
+                    [self.headerPanSubject sendNext:@(0)];
+                }
+            } completion:^(BOOL finished) {
+                [self.headerFinishedTransitionSubject sendNext:@(movingDown)];
+            }];
+        }
+    }];
+    
+    // Finally, add our gesture recognizers to their appropriate views. 
     self.panFooterUpGestureRecognizer.delegate = self;
     [self.view addGestureRecognizer:self.panFooterUpGestureRecognizer];
     [self.dayListViewController.touchDown requireGestureRecognizerToFail:self.panFooterUpGestureRecognizer];
+    
+    self.panHeaderUpGestureRecognizer.delegate = self;
+    [self.headerViewController.view addGestureRecognizer:self.panHeaderUpGestureRecognizer];
+    
+    self.panHeaderDownGestureRecognizer.delegate = self;
+    [self.headerViewController.view addGestureRecognizer:self.panHeaderDownGestureRecognizer];
     
     return self;
 }
@@ -368,71 +410,8 @@
     self.dayListOverlayView = [[UIImageView alloc] init];
     self.dayListOverlayView.backgroundColor = [UIColor colorWithWhite:0.0f alpha:0.4f];
     self.dayListOverlayView.frame = self.view.frame;
+    self.dayListOverlayView.alpha = 0.0f;
     self.dayListOverlayView.userInteractionEnabled = YES; //this will absorb any interaction while in the view hierarchy
-}
-
--(void)viewDidLoad {
-    [super viewDidLoad];
-    
-    // Set up our gesture recognizers.
-    // These mostly grab their translations and feed them into the appropriate subjects.
-    
-    // This is the number of points beyond which the user need to move their finger in order to trigger the menu moving down.
-    const CGFloat kMoveDownThreshold = 30.0f;
-    
-    self.panHeaderDownGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
-        UIPanGestureRecognizer *recognizer = (UIPanGestureRecognizer *)sender;
-        
-        CGPoint translation = [recognizer translationInView:self.view];
-        
-        if (state == UIGestureRecognizerStateBegan) {
-            [self.dayListOverlaySubject sendNext:@(YES)];
-        } else if (state == UIGestureRecognizerStateChanged) {
-            [self.headerPanSubject sendNext:@(translation.y)];
-        } else if (state == UIGestureRecognizerStateEnded) {
-            // Determine the direction the finger is moving and ensure if it was moving down, that it exceeds the minimum threshold for opening the menu.
-            BOOL movingDown = ([recognizer velocityInView:self.view].y > 0 && translation.y > kMoveDownThreshold);
-            
-            // Animate the change
-            [UIView animateWithDuration:0.25f animations:^{
-                if (movingDown) {
-                    [self.headerPanSubject sendNext:@(kMaximumHeaderTranslationThreshold)];
-                } else {
-                    [self.headerPanSubject sendNext:@(0)];
-                }
-            } completion:^(BOOL finished) {
-                [self.headerFinishedTransitionSubject sendNext:@(movingDown)];
-            }];
-        }
-    }];
-    self.panHeaderDownGestureRecognizer.delegate = self;
-    [self.headerViewController.view addGestureRecognizer:self.panHeaderDownGestureRecognizer];
-    
-    self.panHeaderUpGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
-        UIPanGestureRecognizer *recognizer = (UIPanGestureRecognizer *)sender;
-        
-        CGPoint translation = [recognizer translationInView:self.view];
-        
-        if (state == UIGestureRecognizerStateChanged) {
-            [self.headerPanSubject sendNext:@(kMaximumHeaderTranslationThreshold + translation.y)];
-        } else if (state == UIGestureRecognizerStateEnded) {
-            // Determine the direction the finger is moving
-            BOOL movingDown = ([recognizer velocityInView:self.view].y > 0);
-            
-            // Animate the change
-            [UIView animateWithDuration:0.25f animations:^{
-                if (movingDown) {
-                    [self.headerPanSubject sendNext:@(kMaximumHeaderTranslationThreshold)];
-                } else {
-                    [self.headerPanSubject sendNext:@(0)];
-                }
-            } completion:^(BOOL finished) {
-                [self.headerFinishedTransitionSubject sendNext:@(movingDown)];
-            }];
-        }
-    }];
-    self.panHeaderUpGestureRecognizer.delegate = self;
-    [self.headerViewController.view addGestureRecognizer:self.panHeaderUpGestureRecognizer];
 }
 
 -(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
@@ -466,11 +445,9 @@
 
 -(void)userDidTapDismissHeaderButton {
     [UIView animateWithDuration:0.5f animations:^{
-        [self.headerPanSubject
-         sendNext:@(0)];
+        [self.headerPanSubject sendNext:@(0)];
     } completion:^(BOOL finished) {
-        [self.headerFinishedTransitionSubject
-         sendNext:@(NO)];
+        [self.headerFinishedTransitionSubject sendNext:@(NO)];
     }];
 }
 
