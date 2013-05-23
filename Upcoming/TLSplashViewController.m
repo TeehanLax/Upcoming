@@ -96,16 +96,12 @@
             }];
         }];
         
-        [UIView animateWithDuration:0.1f delay:(i * 0.1f) options:UIViewAnimationOptionCurveEaseInOut animations:^{
-            imageView.transform = CGAffineTransformMakeTranslation(-10, 0);
+        [UIView animateWithDuration:0.4f delay:(i * 0.1f) options:UIViewAnimationOptionCurveEaseIn animations:^{
+            imageView.transform = CGAffineTransformMakeTranslation(CGRectGetWidth(imageView.frame), 0);
         } completion:^(BOOL finished) {
-            [UIView animateWithDuration:0.4f delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
-                imageView.transform = CGAffineTransformMakeTranslation(CGRectGetWidth(imageView.frame), 0);
-            } completion:^(BOOL finished) {
-                if (i == 5) {
-                    [self.delegate splashScreenControllerFinishedTransition:self];
-                }
-            }];
+            if (i == 5) {
+                [self.delegate splashScreenControllerFinishedTransition:self];
+            }
         }];
     }
 }
