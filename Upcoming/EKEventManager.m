@@ -156,12 +156,6 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
 }
 
 -(void)loadEvents {
-    [self willChangeValueForKey:EKEventManagerEventsKeyPath];
-    [self willChangeValueForKey:EKEventManagerNextEventKeyPath];
-
-    [_events removeAllObjects];
-    _nextEvent = nil;
-
     NSMutableArray *calendars = nil;
     NSUserDefaults *currentDefaults = [NSUserDefaults standardUserDefaults];
     NSData *dataRepresentingSavedArray = [currentDefaults objectForKey:@"SelectedCalendars"];
@@ -186,55 +180,74 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
     
     // no calendars selected. Empty views
     if (calendars == nil || [calendars count] == 0) {
+        
+        [self willChangeValueForKey:EKEventManagerEventsKeyPath];
+        [self willChangeValueForKey:EKEventManagerNextEventKeyPath];
+        
+        [_events removeAllObjects];
+        _nextEvent = nil;
+        
         [self didChangeValueForKey:EKEventManagerEventsKeyPath];
         [self didChangeValueForKey:EKEventManagerNextEventKeyPath];
+        
         return;
     }
-
-    NSUInteger unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit;
-
-    // start date - midnight of yesterday
-    NSDateComponents *midnightDate = [[NSDateComponents alloc] init];
-    midnightDate = [self.calendar components:unitFlags fromDate:[NSDate dateYesterday]];
-    midnightDate.hour = 0;
-    midnightDate.minute = 0;
-    midnightDate.second = 0;
-    NSDate *startDate = [self.calendar dateFromComponents:midnightDate];
-
-    // end date - 11:59:59 of current day
-    NSDateComponents *endComponents = [[NSDateComponents alloc] init];
-    endComponents = [self.calendar components:unitFlags fromDate:[NSDate date]];
-    endComponents.hour = 23;
-    endComponents.minute = 59;
-    endComponents.second = 59;
-    NSDate *endDate = [self.calendar dateFromComponents:endComponents];
-
-    // Create the predicate from the event store's instance method
-    NSPredicate *predicate = [_store predicateForEventsWithStartDate:startDate
-                                                             endDate:endDate
-                                                           calendars:calendars];
-    
-    // get today's events
-    _events = [NSMutableArray arrayWithArray:[_store eventsMatchingPredicate:predicate]];
-    [_events filterUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(EKEvent *evaluatedObject, NSDictionary *bindings) {
-        // need the check for subtracting one second so that events that ended at midnight (technical today) don't show up.
-        return ([evaluatedObject.startDate isToday] || ([evaluatedObject.endDate isToday] && ![[evaluatedObject.endDate dateByAddingTimeInterval:-1] isYesterday]));
-    }]];
-    [_events sortUsingSelector:@selector(compareStartDateWithEvent:)];
-    [self didChangeValueForKey:EKEventManagerEventsKeyPath];
-
-    // find next event
-    NSPredicate *nextPredicate = [_store predicateForEventsWithStartDate:endDate
-                                                                 endDate:[NSDate distantFuture]
+        
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        NSUInteger unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit |  NSDayCalendarUnit;
+        
+        // start date - midnight of yesterday
+        NSDateComponents *midnightDate = [[NSDateComponents alloc] init];
+        midnightDate = [self.calendar components:unitFlags fromDate:[NSDate dateYesterday]];
+        midnightDate.hour = 0;
+        midnightDate.minute = 0;
+        midnightDate.second = 0;
+        NSDate *startDate = [self.calendar dateFromComponents:midnightDate];
+        
+        // end date - 11:59:59 of current day
+        NSDateComponents *endComponents = [[NSDateComponents alloc] init];
+        endComponents = [self.calendar components:unitFlags fromDate:[NSDate date]];
+        endComponents.hour = 23;
+        endComponents.minute = 59;
+        endComponents.second = 59;
+        NSDate *endDate = [self.calendar dateFromComponents:endComponents];
+        
+        // Create the predicate from the event store's instance method
+        NSPredicate *predicate = [_store predicateForEventsWithStartDate:startDate
+                                                                 endDate:endDate
                                                                calendars:calendars];
-
-    // Fetch all events that match the predicate
-    NSArray *nextEvents = [[_store eventsMatchingPredicate:nextPredicate] sortedArrayUsingSelector:@selector(compareStartDateWithEvent:)];
-    
-    if ([nextEvents count] > 0) {
-        _nextEvent = nextEvents[0];
-    }
-    [self didChangeValueForKey:EKEventManagerNextEventKeyPath];
+        
+        // get today's events
+        NSMutableArray *todaysEventsArray = [NSMutableArray arrayWithArray:[_store eventsMatchingPredicate:predicate]];
+        [todaysEventsArray filterUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(EKEvent *evaluatedObject, NSDictionary *bindings) {
+            // need the check for subtracting one second so that events that ended at midnight (technical today) don't show up.
+            return ([evaluatedObject.startDate isToday] || ([evaluatedObject.endDate isToday] && ![[evaluatedObject.endDate dateByAddingTimeInterval:-1] isYesterday]));
+        }]];
+        [todaysEventsArray sortUsingSelector:@selector(compareStartDateWithEvent:)];
+        
+        
+        // find next event
+        NSPredicate *nextPredicate = [_store predicateForEventsWithStartDate:endDate
+                                                                     endDate:[NSDate distantFuture]
+                                                                   calendars:calendars];
+        
+        // Fetch all events that match the predicate
+        NSArray *nextEventsArray = [[_store eventsMatchingPredicate:nextPredicate] sortedArrayUsingSelector:@selector(compareStartDateWithEvent:)];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self willChangeValueForKey:EKEventManagerEventsKeyPath];
+            _events = todaysEventsArray;
+            [self didChangeValueForKey:EKEventManagerNextEventKeyPath];
+            
+            [self willChangeValueForKey:EKEventManagerNextEventKeyPath];
+            if ([nextEventsArray count] > 0) {
+                _nextEvent = nextEventsArray[0];
+            }
+            else {
+                _nextEvent = nil;
+            }
+            [self didChangeValueForKey:EKEventManagerEventsKeyPath];
+        });
+    });
 }
 
 #pragma mark Overriden methods
