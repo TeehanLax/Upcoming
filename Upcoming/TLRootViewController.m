@@ -33,11 +33,10 @@
 
 // Two subjects used to receive translations from the gesture recognizers
 @property (nonatomic, strong) RACSubject *headerPanSubject;
-@property (nonatomic, strong) RACSubject *footerPanSubject;
 
 // Used to receive ratios of translation for changing the alpha of the overlay view which covers the day list view
-@property (nonatomic, strong) RACSubject *dayListAndHeaderOverlaySubject;
 @property (nonatomic, strong) RACSubject *dayListOverlaySubject;
+@property (nonatomic, strong) RACSubject *dayListAndHeaderOverlaySubject;
 
 // Used to enable/disable gesture recognizers and view interactivity
 @property (nonatomic, strong) RACSubject *headerFinishedTransitionSubject;
@@ -134,50 +133,45 @@
      }];
     
     self.dayListAndHeaderOverlaySubject = [RACSubject subject];
-    [self.dayListAndHeaderOverlaySubject
-     subscribeNext:^(id x) {
-         @strongify(self);
-         
-         if ([x boolValue]) {
-             // Using 1.0 scale here because after blurring, we won't need the extra (Retina) pixels.
-             
-             // First grab the image of the day list view
-             UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 1);
-             [self.dayListViewController.view.layer
-              renderInContext:UIGraphicsGetCurrentContext()];
-             UIImage *dayListImage = UIGraphicsGetImageFromCurrentImageContext();
-             UIGraphicsEndImageContext();
-             
-             // The grab the image of the header view
-             UIGraphicsBeginImageContextWithOptions(self.headerViewController.view.bounds.size, NO, 1);
-             CGContextConcatCTM(UIGraphicsGetCurrentContext(), CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerViewController.view.bounds) + kHeaderHeight));
-             [self.headerViewController.view.layer
-              renderInContext:UIGraphicsGetCurrentContext()];
-             UIImage *headerImage = UIGraphicsGetImageFromCurrentImageContext();
-             UIGraphicsEndImageContext();
-             
-             // Finally, composite the two images together.
-             UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 1);
-             [dayListImage drawInRect:self.view.bounds];
-             [headerImage drawInRect:self.headerViewController.view.bounds];
-             UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-             
-             UIGraphicsEndImageContext();
-             
-             self.dayListOverlayView.image = [UIImage darkenedAndBlurredImageForImage:image];
-             
-             [self.view
-              insertSubview:self.dayListOverlayView
-              aboveSubview:self.headerViewController.view];
-             
-             [AppDelegate playPullMenuOutSound];
-         } else if (self.dayListOverlayView.superview) {
-             self.dayListOverlayView.image = nil;
-             [self.dayListOverlayView removeFromSuperview];
-             [self.headerViewController scrollTableViewToTop];
-             [AppDelegate playPushMenuInSound];
-         }
-     }];
+    [self.dayListAndHeaderOverlaySubject subscribeNext:^(id x) {
+        @strongify(self);
+        
+        if ([x boolValue]) {
+            // Using 1.0 scale here because after blurring, we won't need the extra (Retina) pixels.
+            
+            // First grab the image of the day list view
+            UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 1);
+            [self.dayListViewController.view.layer renderInContext:UIGraphicsGetCurrentContext()];
+            UIImage *dayListImage = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            
+            // The grab the image of the header view
+            UIGraphicsBeginImageContextWithOptions(self.headerViewController.view.bounds.size, NO, 1);
+            CGContextConcatCTM(UIGraphicsGetCurrentContext(), CGAffineTransformMakeTranslation(0, -CGRectGetHeight(self.headerViewController.view.bounds) + kHeaderHeight));
+            [self.headerViewController.view.layer renderInContext:UIGraphicsGetCurrentContext()];
+            UIImage *headerImage = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+            
+            // Finally, composite the two images together.
+            UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 1);
+            [dayListImage drawInRect:self.view.bounds];
+            [headerImage drawInRect:self.headerViewController.view.bounds];
+            UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+            
+            UIGraphicsEndImageContext();
+            
+            self.dayListOverlayView.image = [UIImage darkenedAndBlurredImageForImage:image];
+            
+            [self.view insertSubview:self.dayListOverlayView aboveSubview:self.headerViewController.view];
+            
+            [AppDelegate playPullMenuOutSound];
+        } else if (self.dayListOverlayView.superview) {
+            self.dayListOverlayView.image = nil;
+            [self.dayListOverlayView removeFromSuperview];
+            [self.headerViewController scrollTableViewToTop];
+            [AppDelegate playPushMenuInSound];
+        }
+    }];
     
     
     //These subjects are responsible for calculating the frame of the header and footer
@@ -220,12 +214,67 @@
     
     RAC(self.headerViewController.view.frame) = headerFrameSignal;
     
-    self.footerPanSubject = [RACSubject subject];
     
-    RACSignal *footerOpenRatioSubject = [self.footerPanSubject map:^id (id translation) {
-        @strongify(self);
+    
+    
+    
+    // These subjects are responsible for mapping this value to other signals and state (ugh).
+    self.headerFinishedTransitionSubject = [RACReplaySubject subject];
+    [self.headerFinishedTransitionSubject
+     subscribeNext:^(NSNumber *menuIsOpenNumber) {
+         @strongify(self);
+         
+         BOOL menuIsOpen = menuIsOpenNumber.boolValue;
+         
+         if (menuIsOpen) {
+             [self.headerViewController flashScrollBars];
+         }
+         
+         if (!menuIsOpen) {
+             [self.dayListOverlaySubject
+              sendNext:menuIsOpenNumber];
+         }
+     }];
+    
+    self.footerFinishedTransitionSubject = [RACReplaySubject subject];
+    [self.footerFinishedTransitionSubject subscribeNext:^(NSNumber *menuIsOpenNumber) {
+         @strongify(self);
+         
+         BOOL menuIsOpen = menuIsOpenNumber.boolValue;
+         
+         if (!menuIsOpen) {
+             [self.dayListAndHeaderOverlaySubject sendNext:@(NO)];
+         }
+     }];
+    
+    RACSignal *canOpenMenuSignal = [RACSignal combineLatest:@[[self.headerFinishedTransitionSubject startWith:@(NO)], [self.footerFinishedTransitionSubject startWith:@(NO)], RACAbleWithStart(self.dayListViewController.touching)] reduce:^(NSNumber *headerIsOpen, NSNumber *footerIsOpen, NSNumber *isTouching) {
+        return @(!headerIsOpen.boolValue && !footerIsOpen.boolValue && !isTouching.boolValue);
+    }];
+    
+    RAC(self.panHeaderDownGestureRecognizer.enabled) = canOpenMenuSignal;
+    RAC(self.panFooterUpGestureRecognizer.enabled) = canOpenMenuSignal;
+    RAC(self.dayListViewController.view.userInteractionEnabled) = canOpenMenuSignal;
+    RAC(self.panHeaderUpGestureRecognizer.enabled) = self.headerFinishedTransitionSubject;
+    
+    // Finally, set up the gesture recognizers
+    self.panFooterUpGestureRecognizer = [[UIPanGestureRecognizer alloc] init];
+    RACSignal *footerPanSignal = self.panFooterUpGestureRecognizer.rac_gestureSignal;
+    [footerPanSignal subscribeNext:^(UIPanGestureRecognizer *recognizer) {
+        if (recognizer.state == UIGestureRecognizerStateBegan) {
+            [self.dayListAndHeaderOverlaySubject sendNext:@(YES)];
+        }
+        else if (recognizer.state == UIGestureRecognizerStateEnded) {
+            [self.footerFinishedTransitionSubject sendNext:@(NO)];
+        }
+    }];
+    
+    
+    RACSignal *footerOpenRatioSubject = [footerPanSignal map:^id (UIPanGestureRecognizer *recognizer) {        
+        CGFloat verticalTranslation = 0.0f;
         
-        CGFloat verticalTranslation = [translation floatValue];
+        if (recognizer.state == UIGestureRecognizerStateChanged) {
+            verticalTranslation = [recognizer translationInView:recognizer.view].y;
+        }
         
         CGFloat targetTranslation = kMaximumFooterTranslationThreshold;
         CGFloat effectiveRatio = 0.0f;
@@ -240,6 +289,25 @@
         
         return @(effectiveRatio);
     }];
+    
+    // This subject is responsible for calculating the alpha value of the overlay view
+    RACSignal *dayListBlurSubject = [[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)]] reduce:^id (NSNumber *headerRatio, NSNumber *footerRatio) {
+        return @(MAX(headerRatio.floatValue, footerRatio.floatValue));
+    }] map:^id (id value) {
+        // This is the ratio of the movement. 0 is full sized and 1 is fully shrunk.
+        CGFloat ratio = [value floatValue];
+        
+        if (ratio > 1.0f) {
+            ratio = 1.0f;
+        } else if (ratio < 0.0f) {
+            ratio = 0.0f;
+        }
+        
+        return @(ratio);
+    }];
+    
+    RAC(self.dayListOverlayView.alpha) = [dayListBlurSubject animateWithDuration:0.1f];
+    
     
     // Need to combine latest on the two signals since the footer moves with both
     RACSignal *footerFrameSignal = [[[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)], [nextApplicableEventSignal startWith:nil], RACAbleWithStart(self.dayListViewController.touching)] reduce:^id (NSNumber *headerRatio, NSNumber *footerRatio, EKEvent *nextEvent, NSNumber *touchingEventList) {
@@ -274,64 +342,9 @@
     RAC(self.footerViewController.view.frame) = footerFrameSignal;
     
     
-    // This subject is responsible for calculating the alpha value of the overlay view
-    RACSignal *dayListBlurSubject = [[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)]] reduce:^id (NSNumber *headerRatio, NSNumber *footerRatio) {
-        return @(MAX(headerRatio.floatValue, footerRatio.floatValue));
-    }] map:^id (id value) {
-        // This is the ratio of the movement. 0 is full sized and 1 is fully shrunk.
-        CGFloat ratio = [value floatValue];
-        
-        if (ratio > 1.0f) {
-            ratio = 1.0f;
-        } else if (ratio < 0.0f) {
-            ratio = 0.0f;
-        }
-        
-        return @(ratio);
-    }];
-    
-    RAC(self.dayListOverlayView.alpha) = dayListBlurSubject;
-    
-    
-    // These subjects are responsible for mapping this value to other signals and state (ugh).
-    self.headerFinishedTransitionSubject = [RACReplaySubject subject];
-    [self.headerFinishedTransitionSubject
-     subscribeNext:^(NSNumber *menuIsOpenNumber) {
-         @strongify(self);
-         
-         BOOL menuIsOpen = menuIsOpenNumber.boolValue;
-         
-         if (menuIsOpen) {
-             [self.headerViewController flashScrollBars];
-         }
-         
-         if (!menuIsOpen) {
-             [self.dayListOverlaySubject
-              sendNext:menuIsOpenNumber];
-         }
-     }];
-    
-    self.footerFinishedTransitionSubject = [RACReplaySubject subject];
-    [self.footerFinishedTransitionSubject
-     subscribeNext:^(NSNumber *menuIsOpenNumber) {
-         @strongify(self);
-         
-         BOOL menuIsOpen = menuIsOpenNumber.boolValue;
-         
-         if (!menuIsOpen) {
-             [self.dayListAndHeaderOverlaySubject
-              sendNext:menuIsOpenNumber];
-         }
-     }];
-    
-    RACSignal *canOpenMenuSignal = [RACSignal combineLatest:@[[self.headerFinishedTransitionSubject startWith:@(NO)], [self.footerFinishedTransitionSubject startWith:@(NO)], RACAbleWithStart(self.dayListViewController.touching)] reduce:^(NSNumber *headerIsOpen, NSNumber *footerIsOpen, NSNumber *isTouching) {
-        return @(!headerIsOpen.boolValue && !footerIsOpen.boolValue && !isTouching.boolValue);
-    }];
-    
-    RAC(self.panHeaderDownGestureRecognizer.enabled) = canOpenMenuSignal;
-    RAC(self.panFooterUpGestureRecognizer.enabled) = canOpenMenuSignal;
-    RAC(self.dayListViewController.view.userInteractionEnabled) = canOpenMenuSignal;
-    RAC(self.panHeaderUpGestureRecognizer.enabled) = self.headerFinishedTransitionSubject;
+    self.panFooterUpGestureRecognizer.delegate = self;
+    [self.view addGestureRecognizer:self.panFooterUpGestureRecognizer];
+    [self.dayListViewController.touchDown requireGestureRecognizerToFail:self.panFooterUpGestureRecognizer];
     
     return self;
 }
@@ -373,11 +386,9 @@
         CGPoint translation = [recognizer translationInView:self.view];
         
         if (state == UIGestureRecognizerStateBegan) {
-            [self.dayListOverlaySubject
-             sendNext:@(YES)];
+            [self.dayListOverlaySubject sendNext:@(YES)];
         } else if (state == UIGestureRecognizerStateChanged) {
-            [self.headerPanSubject
-             sendNext:@(translation.y)];
+            [self.headerPanSubject sendNext:@(translation.y)];
         } else if (state == UIGestureRecognizerStateEnded) {
             // Determine the direction the finger is moving and ensure if it was moving down, that it exceeds the minimum threshold for opening the menu.
             BOOL movingDown = ([recognizer velocityInView:self.view].y > 0 && translation.y > kMoveDownThreshold);
@@ -385,15 +396,12 @@
             // Animate the change
             [UIView animateWithDuration:0.25f animations:^{
                 if (movingDown) {
-                    [self.headerPanSubject
-                     sendNext:@(kMaximumHeaderTranslationThreshold)];
+                    [self.headerPanSubject sendNext:@(kMaximumHeaderTranslationThreshold)];
                 } else {
-                    [self.headerPanSubject
-                     sendNext:@(0)];
+                    [self.headerPanSubject sendNext:@(0)];
                 }
             } completion:^(BOOL finished) {
-                [self.headerFinishedTransitionSubject
-                 sendNext:@(movingDown)];
+                [self.headerFinishedTransitionSubject sendNext:@(movingDown)];
             }];
         }
     }];
@@ -406,8 +414,7 @@
         CGPoint translation = [recognizer translationInView:self.view];
         
         if (state == UIGestureRecognizerStateChanged) {
-            [self.headerPanSubject
-             sendNext:@(kMaximumHeaderTranslationThreshold + translation.y)];
+            [self.headerPanSubject sendNext:@(kMaximumHeaderTranslationThreshold + translation.y)];
         } else if (state == UIGestureRecognizerStateEnded) {
             // Determine the direction the finger is moving
             BOOL movingDown = ([recognizer velocityInView:self.view].y > 0);
@@ -415,54 +422,17 @@
             // Animate the change
             [UIView animateWithDuration:0.25f animations:^{
                 if (movingDown) {
-                    [self.headerPanSubject
-                     sendNext:@(kMaximumHeaderTranslationThreshold)];
+                    [self.headerPanSubject sendNext:@(kMaximumHeaderTranslationThreshold)];
                 } else {
-                    [self.headerPanSubject
-                     sendNext:@(0)];
+                    [self.headerPanSubject sendNext:@(0)];
                 }
             } completion:^(BOOL finished) {
-                [self.headerFinishedTransitionSubject
-                 sendNext:@(movingDown)];
+                [self.headerFinishedTransitionSubject sendNext:@(movingDown)];
             }];
         }
     }];
     self.panHeaderUpGestureRecognizer.delegate = self;
     [self.headerViewController.view addGestureRecognizer:self.panHeaderUpGestureRecognizer];
-    
-    self.panFooterUpGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithHandler:^(UIGestureRecognizer *sender, UIGestureRecognizerState state, CGPoint location) {
-        UIPanGestureRecognizer *recognizer = (UIPanGestureRecognizer *)sender;
-        
-        CGPoint translation = [recognizer translationInView:self.view];
-        
-        if (state == UIGestureRecognizerStateBegan) {
-            [self.dayListAndHeaderOverlaySubject
-             sendNext:@(YES)];
-        } else if (state == UIGestureRecognizerStateChanged) {
-            [self.footerPanSubject
-             sendNext:@(translation.y)];
-        } else if (state == UIGestureRecognizerStateEnded) {
-            // Determine the direction the finger is moving and ensure if it was moving down, that it exceeds the minimum threshold for opening the menu.
-            BOOL movingUp = NO; //[recognizer velocityInView:self.view].y < 0;
-            
-            // Animate the change
-            [UIView animateWithDuration:0.25f animations:^{
-                if (movingUp) {
-                    [self.footerPanSubject
-                     sendNext:@(kMaximumFooterTranslationThreshold)];
-                } else {
-                    [self.footerPanSubject
-                     sendNext:@(0)];
-                }
-            } completion:^(BOOL finished) {
-                [self.footerFinishedTransitionSubject
-                 sendNext:@(movingUp)];
-            }];
-        }
-    }];
-    self.panFooterUpGestureRecognizer.delegate = self;
-    [self.view addGestureRecognizer:self.panFooterUpGestureRecognizer];
-    [self.dayListViewController.touchDown requireGestureRecognizerToFail:self.panFooterUpGestureRecognizer];
 }
 
 -(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
