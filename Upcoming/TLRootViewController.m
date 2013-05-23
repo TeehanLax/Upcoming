@@ -330,6 +330,7 @@
     
     self.panHeaderDownGestureRecognizer = [[UIPanGestureRecognizer alloc] init];
     [self.panHeaderDownGestureRecognizer.rac_gestureSignal subscribeNext:^(UIPanGestureRecognizer *recognizer) {
+        @strongify(self);
         CGPoint translation = [recognizer translationInView:self.view];
         
         if (recognizer.state == UIGestureRecognizerStateBegan) {
