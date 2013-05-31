@@ -1,7 +1,7 @@
 Upcoming
 ========
 
-This is the Upcoming T+L iOS app (get it?).
+This is the Upcoming [T+L Labs](http://labs.teehanlax.com/projec/upcoming) iOS app (get it?).
 
 Building
 ----------------
@@ -15,5 +15,3 @@ Once that's finished, clone the repository and open the directory with the sourc
     pod install
 
 This will install the external libraries that we depend on. 
-
-Finally, you can build and run on the iOS simulator. 
