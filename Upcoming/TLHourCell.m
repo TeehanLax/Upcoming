@@ -60,8 +60,7 @@
     self.minY = minSize * indexPath.item;
     self.maxY = (collectionView.frame.size.height - (minSize * 24)) + self.minY;
 
-    CGRect backgroundImageFrame = self.backgroundImage.frame;
-    backgroundImageFrame.size.height = self.maxY - self.minY;
+    CGRect backgroundImageFrame = self.contentView.frame;
     self.backgroundImage.frame = backgroundImageFrame;
 
     CGRect imageRect = CGRectMake(0, 0, self.backgroundImage.frame.size.width, self.backgroundImage.frame.size.height);

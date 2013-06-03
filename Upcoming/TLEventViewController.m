@@ -382,8 +382,12 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     }
     
     CGFloat effectiveHour = indexPath.item;
-        
-    return CGSizeMake(CGRectGetWidth(self.view.bounds), [self heightForHour:effectiveHour]);
+    
+    CGSize size = CGSizeMake(CGRectGetWidth(self.view.bounds), [self heightForHour:effectiveHour]);
+    
+//    NSLog(@"%@", NSStringFromCGSize(size));
+    
+    return size;
 }
 
 -(CGRect)collectionView:(UICollectionView *)collectionView frameForHourLineViewInLayout:(TLCollectionViewLayout *)layout {

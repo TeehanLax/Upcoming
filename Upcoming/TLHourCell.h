@@ -13,8 +13,8 @@
 @property (nonatomic, strong) IBOutlet UIView *background;
 @property (nonatomic, strong) IBOutlet UIImageView *backgroundImage;
 
-@property (nonatomic, assign) float minY;
-@property (nonatomic, assign) float maxY;
+@property (nonatomic, assign) CGFloat minY;
+@property (nonatomic, assign) CGFloat maxY;
 
 -(void)setHour:(NSInteger)hour;
 
