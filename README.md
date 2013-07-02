@@ -1,7 +1,9 @@
 Upcoming
 ========
 
-This is the Upcoming [T+L Labs](http://labs.teehanlax.com/projec/upcoming) iOS app (get it?).
+This is the Upcoming [T+L Labs](http://labs.teehanlax.com/project/upcoming) iOS app.
+
+![](http://raw.github.com/TeehanLax/Upcoming/master/githubImage.jpg?login=AshFurrow&token=527541cd5badad51529364639c103ff6)
 
 Building
 ----------------
