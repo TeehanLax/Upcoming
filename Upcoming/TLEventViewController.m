@@ -164,6 +164,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     
     // Whenever our viewModelArray changes, reload our data and invalidate the layout. 
     [RACAble(self.viewModelArray) subscribeNext:^(id x) {
+        @strongify(self);
         [self.collectionView reloadData];
         [self.collectionView.collectionViewLayout invalidateLayout];
     }];
@@ -179,6 +180,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     }];
     
     [RACAble(self.immediateModel) subscribeNext:^(id x) {
+        @strongify(self);
         [self.collectionView reloadData];
         [self.collectionView.collectionViewLayout invalidateLayout];
     }];
