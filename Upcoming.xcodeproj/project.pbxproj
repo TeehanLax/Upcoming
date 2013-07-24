@@ -680,7 +680,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Upcoming/Upcoming-Prefix.pch";
 				INFOPLIST_FILE = "Upcoming/Upcoming-Info.plist";
-				LIBRARY_SEARCH_PATHS = "$(PODS_ROOT)/TestFlightSDK";
+				LIBRARY_SEARCH_PATHS = "\"$(PODS_ROOT)/TestFlightSDK\"";
 				PRODUCT_NAME = Upcoming;
 				WRAPPER_EXTENSION = app;
 			};
@@ -694,7 +694,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Upcoming/Upcoming-Prefix.pch";
 				INFOPLIST_FILE = "Upcoming/Upcoming-Info.plist";
-				LIBRARY_SEARCH_PATHS = "$(PODS_ROOT)/TestFlightSDK";
+				LIBRARY_SEARCH_PATHS = "\"$(PODS_ROOT)/TestFlightSDK\"";
 				PRODUCT_NAME = Upcoming;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
