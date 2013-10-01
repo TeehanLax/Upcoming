@@ -40,19 +40,19 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
     // Throttle the nextEvent so it doesn't go all flashy.
     RACSignal *nextEventSignal = [[[EKEventManager sharedInstance] nextEventSignal] throttle:0.25f];
     
-    RAC(self.eventNameLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
+    RAC(self.eventNameLabel, text) = [nextEventSignal map:^id(EKEvent *event) {
         return event == nil ? NSLocalizedString(@"No upcoming event", @"Empty upcoming event message") : event.title;
     }];
 
-    RAC(self.eventLocationLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
+    RAC(self.eventLocationLabel, text) = [nextEventSignal map:^id(EKEvent *event) {
         return event.location.length == 0 ? @"" : event.location;
     }];
     
-    RAC(self.eventLocationImageView.alpha) = [nextEventSignal map:^id(EKEvent *event) {
+    RAC(self.eventLocationImageView, alpha) = [nextEventSignal map:^id(EKEvent *event) {
         return event.location.length == 0 ? @(0.0f) : @(1.0f);
     }];
     
-    RAC(self.eventTimeLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
+    RAC(self.eventTimeLabel, text) = [nextEventSignal map:^id(EKEvent *event) {
         if (!event) return @"";
         NSDate *startDate = event.startDate;
         NSDate *endDate = event.endDate;
@@ -105,7 +105,7 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
         return [NSString stringWithFormat:@"%@, %@", dateString, timeString];
     }];
     
-    RAC(self.eventRelativeTimeLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
+    RAC(self.eventRelativeTimeLabel, text) = [nextEventSignal map:^id(EKEvent *event) {
         if (!event) return @"";
         NSDate *startDate = event.startDate;        
         
@@ -148,7 +148,7 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
         return eventRelativeTime;
     }];
     
-    RAC(self.eventRelativeTimeUnitLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
+    RAC(self.eventRelativeTimeUnitLabel, text) = [nextEventSignal map:^id(EKEvent *event) {
         if (!event) return @"";
         NSDate *startDate = event.startDate;        
         
@@ -206,11 +206,11 @@ const CGFloat TLUpcomingEventViewControllerTotalHeight = 82.0f;
         
     }];
     
-    RAC(self.calendarView.alpha) = [nextEventSignal map:^id(id value) {
+    RAC(self.calendarView, alpha) = [nextEventSignal map:^id(id value) {
         return value == nil ? @(0.0f) : @(1.0f);
     }];
     
-    RAC(self.calendarView.dotColor) = [nextEventSignal map:^id(EKEvent *event) {
+    RAC(self.calendarView, dotColor) = [nextEventSignal map:^id(EKEvent *event) {
         return [UIColor colorWithCGColor:event.calendar.CGColor];
     }];    
 }

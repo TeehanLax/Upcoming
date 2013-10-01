@@ -194,7 +194,7 @@
         return @(effectiveRatio);
     }];
     
-    RAC(self.headerViewController.arrowRotationRatio) = headerOpenRatioSubject;
+    RAC(self.headerViewController, arrowRotationRatio) = headerOpenRatioSubject;
     
     RACSignal *headerFrameSignal = [headerOpenRatioSubject map:^id (id value) {
         // This is the ratio of the movement. 0 is closed and 1 is open.
@@ -211,7 +211,7 @@
         return [NSValue valueWithCGRect:headerFrame];
     }];
     
-    RAC(self.headerViewController.view.frame) = headerFrameSignal;
+    RAC(self.headerViewController.view, frame) = headerFrameSignal;
     
     // These subjects are responsible for mapping this value to other signals and state (ugh).
     self.headerFinishedTransitionSubject = [RACReplaySubject subject];
@@ -231,14 +231,14 @@
          }
      }];
         
-    RACSignal *canOpenMenuSignal = [RACSignal combineLatest:@[[self.headerFinishedTransitionSubject startWith:@(NO)], RACAbleWithStart(self.dayListViewController.touching)] reduce:^(NSNumber *headerIsOpen,  NSNumber *isTouching) {
+    RACSignal *canOpenMenuSignal = [RACSignal combineLatest:@[[self.headerFinishedTransitionSubject startWith:@(NO)], RACObserve(self.dayListViewController, touching)] reduce:^(NSNumber *headerIsOpen,  NSNumber *isTouching) {
         return @(!headerIsOpen.boolValue && !isTouching.boolValue);
     }];
     
-    RAC(self.panHeaderDownGestureRecognizer.enabled) = canOpenMenuSignal;
-    RAC(self.panFooterUpGestureRecognizer.enabled) = canOpenMenuSignal;
-    RAC(self.dayListViewController.view.userInteractionEnabled) = canOpenMenuSignal;
-    RAC(self.panHeaderUpGestureRecognizer.enabled) = self.headerFinishedTransitionSubject;
+    RAC(self.panHeaderDownGestureRecognizer, enabled) = canOpenMenuSignal;
+    RAC(self.panFooterUpGestureRecognizer, enabled) = canOpenMenuSignal;
+    RAC(self.dayListViewController.view, userInteractionEnabled) = canOpenMenuSignal;
+    RAC(self.panHeaderUpGestureRecognizer, enabled) = self.headerFinishedTransitionSubject;
     
     // Finally, set up the gesture recognizers
     self.panFooterUpGestureRecognizer = [[UIPanGestureRecognizer alloc] init];
@@ -290,11 +290,11 @@
         return @(ratio);
     }];
     
-    RAC(self.dayListOverlayView.alpha) = [dayListBlurSubject animateWithDuration:0.1f];
+    RAC(self.dayListOverlayView, alpha) = [dayListBlurSubject animateWithDuration:0.1f];
     
     
     // Need to combine latest on the two signals since the footer moves with both
-    RACSignal *footerFrameSignal = [[[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)], [nextApplicableEventSignal startWith:nil], RACAbleWithStart(self.dayListViewController.touching)] reduce:^id (NSNumber *headerRatio, NSNumber *footerRatio, EKEvent *nextEvent, NSNumber *touchingEventList) {
+    RACSignal *footerFrameSignal = [[[RACSignal combineLatest:@[[headerOpenRatioSubject startWith:@(0)], [footerOpenRatioSubject startWith:@(0)], [nextApplicableEventSignal startWith:nil], RACObserve(self.dayListViewController, touching)] reduce:^id (NSNumber *headerRatio, NSNumber *footerRatio, EKEvent *nextEvent, NSNumber *touchingEventList) {
         if (touchingEventList.boolValue) {
             return @(0.0f);
         }
@@ -323,7 +323,7 @@
         return [NSValue valueWithCGRect:footerFrame];
     }] animateWithDuration:0.1f];
     
-    RAC(self.footerViewController.view.frame) = footerFrameSignal;
+    RAC(self.footerViewController.view, frame) = footerFrameSignal;
     
     // This is the number of points beyond which the user need to move their finger in order to trigger the menu moving down.
     const CGFloat kMoveDownThreshold = 30.0f;
