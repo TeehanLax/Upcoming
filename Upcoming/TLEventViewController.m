@@ -52,9 +52,9 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 -(id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if (!(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) return nil;
     
-    RAC(self, currentDateComponents) = [[[[RACSignal interval:60] startWith:[NSDate date]] map:^id(id value) {
+    RAC(self, currentDateComponents) = [[[RACSignal interval:60 onScheduler:[RACScheduler mainThreadScheduler]] startWith:[NSDate date]] map:^id(id value) {
         return [[[EKEventManager sharedInstance] calendar] components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
-    }]  deliverOn:[RACScheduler mainThreadScheduler]];
+    }];
     
     return self;
 }
@@ -169,7 +169,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         [self.collectionView.collectionViewLayout invalidateLayout];
     }];
     
-    RAC(self, immediateModel) = [[RACSignal combineLatest:@[RACObserve(self, viewModelArray), [[RACSignal interval:60] startWith:[NSDate date]]] reduce:^id(NSArray *array, NSDate *fireDate){
+    RAC(self, immediateModel) = [[RACSignal combineLatest:@[RACObserve(self, viewModelArray), [[RACSignal interval:60 onScheduler:[RACScheduler mainThreadScheduler]] startWith:[NSDate date]]] reduce:^id(NSArray *array, NSDate *fireDate){
         return array;
     }] map:^id(NSArray *viewModelArray) {
         NSArray *array = [viewModelArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(TLEventViewModel *evaluatedObject, NSDictionary *bindings) {
@@ -586,9 +586,9 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
             
             NSLog(@"Scheduling subscription every minute for supplementary view in %d seconds", delay);
             
-            RACSignal *updateSignal = [[[[[RACSignal interval:delay] take:1] concat:[RACSignal defer:^RACSignal *{
-                return [RACSignal interval:60];
-            }]] deliverOn:[RACScheduler mainThreadScheduler]] startWith:[NSDate date]];
+            RACSignal *updateSignal = [[[[RACSignal interval:delay onScheduler:[RACScheduler mainThreadScheduler]] take:1] concat:[RACSignal defer:^RACSignal *{
+                return [RACSignal interval:60 onScheduler:[RACScheduler mainThreadScheduler]];
+            }]]startWith:[NSDate date]];
             
             // Finally, bind the value of the supplementary view's timeString property to a mapped signal.
             RAC(self.hourSupplementaryView, timeString) = [updateSignal map:^id (NSDate *date) {

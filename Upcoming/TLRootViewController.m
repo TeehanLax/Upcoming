@@ -72,7 +72,7 @@
 
     // If there are no remaining events in the day *and* the event occurs the first thing in the
     // day tomorrow (ie: before noon), then move it up.
-    RACSignal *filteredUpdateSignal = [[[RACSignal combineLatest:@[[[RACSignal interval:60.0f] startWith:[NSDate date]], [[EKEventManager sharedInstance] eventsSignal]] reduce:^id(NSDate *now, NSArray *eventArray){
+    RACSignal *filteredUpdateSignal = [[RACSignal combineLatest:@[[[RACSignal interval:60.0f onScheduler:[RACScheduler mainThreadScheduler]] startWith:[NSDate date]], [[EKEventManager sharedInstance] eventsSignal]] reduce:^id(NSDate *now, NSArray *eventArray){
         return eventArray;
     }] map:^id (NSArray *eventArray) {
         NSDate *now = [NSDate date];
@@ -80,7 +80,7 @@
             return [event.startDate isLaterThanDate:now];
         }]];
         return @(upcomingEvents.count == 0);
-    }] deliverOn:[RACScheduler mainThreadScheduler]];
+    }];
 
     // Have to map - value in the filter block is nil for some reason.
     RACSignal *nextEventSignal = [[[EKEventManager sharedInstance] nextEventSignal] filter:^BOOL (id value) {

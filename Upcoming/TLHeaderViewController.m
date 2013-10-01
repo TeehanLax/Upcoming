@@ -64,7 +64,7 @@ const CGFloat kUpperHeaderHeight = 52.0f;
     
     // Reload our table view whenever the sources change on the event manager
     @weakify(self);
-    [[RACObserve([EKEventManager sharedInstance], sources) deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(id x) {
+    [RACObserve([EKEventManager sharedInstance], sources) subscribeNext:^(id x) {
         @strongify(self);
         [self.calendarTableView reloadData];
     }];
@@ -77,7 +77,7 @@ const CGFloat kUpperHeaderHeight = 52.0f;
     
     self.view.backgroundColor = [UIColor clearColor];
     
-    RACSignal *timerSignal = [[[RACSignal interval:60] startWith:[NSDate date]] deliverOn:[RACScheduler mainThreadScheduler]];
+    RACSignal *timerSignal = [[RACSignal interval:60 onScheduler:[RACScheduler mainThreadScheduler]] startWith:[NSDate date]];
     
     @weakify(self);
     
@@ -88,9 +88,9 @@ const CGFloat kUpperHeaderHeight = 52.0f;
         return allDayEvents;
     }];
     
-    RACSignal *allDayEventSignal = [[RACSignal combineLatest:@[todayAllDayEventsSignal, timerSignal] reduce:^id (NSArray *allDayEventArray, NSDate *fireDate) {
+    RACSignal *allDayEventSignal = [RACSignal combineLatest:@[todayAllDayEventsSignal, timerSignal] reduce:^id (NSArray *allDayEventArray, NSDate *fireDate) {
         return allDayEventArray;
-    }] deliverOn:[RACScheduler mainThreadScheduler]];
+    }];
     
     // Bind the number of pages to the number of all-day events, plus one for the upcoming event
     RAC(self.allDayEventPageControl, numberOfPages) = [allDayEventSignal map:^id(id value) {
