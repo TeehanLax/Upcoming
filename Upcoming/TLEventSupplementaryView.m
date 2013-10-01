@@ -107,7 +107,7 @@
     }
     
     CGRect frame = CGRectMake(x, 0, width, self.frame.size.height);
-    CGSize timeSize = [self.timeLabel.text sizeWithFont:self.timeLabel.font];
+    CGSize timeSize = [self.timeLabel.text boundingRectWithSize:self.bounds.size options:0 attributes:@{NSFontAttributeName: self.timeLabel.font} context:nil].size;
     
     self.timeLabel.frame = CGRectMake(x + 4, 2, timeSize.width, CGRectGetHeight(frame));
     self.titleLabel.frame = CGRectMake(CGRectGetMaxX(self.timeLabel.frame) + 3, 2, CGRectGetWidth(frame) - 3 - CGRectGetMaxX(self.timeLabel.frame), CGRectGetHeight(frame));

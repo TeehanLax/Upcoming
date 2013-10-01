@@ -39,7 +39,7 @@
     //Third, blur the image
     CIFilter *blurFilter = [CIFilter filterWithName:@"CIGaussianBlur"];
     [blurFilter setDefaults];
-    [blurFilter setValue:@(2 * scaleFactor) forKey:@"inputRadius"];
+    [blurFilter setValue:@(40 * scaleFactor) forKey:@"inputRadius"];
     [blurFilter setValue:darkenedImage forKey:kCIInputImageKey];
     CIImage *blurredImage = [blurFilter outputImage];
 
