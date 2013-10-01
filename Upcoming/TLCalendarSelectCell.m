@@ -22,7 +22,7 @@
     if (!(self = [super initWithStyle:style reuseIdentifier:reuseIdentifier])) {
         return nil;
     }
-
+    
     self.backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
     self.backgroundView.backgroundColor = [UIColor clearColor];
 
@@ -30,7 +30,7 @@
     [self.contentView addSubview:self.backgroundImageView];
     [self setupCustomColors];
 
-    self.dotView = [[TLCalendarDotView alloc] initWithFrame:CGRectMake(0, 0, 8, 8)];
+    self.dotView = [[TLCalendarDotView alloc] initWithFrame:CGRectMake(10, 0, 8, 8)];
     [self.contentView addSubview:self.dotView];
 
     return self;
@@ -43,9 +43,9 @@
 -(void)layoutSubviews {
     [super layoutSubviews];
 
-    self.dotView.center = CGPointMake(16, lrint(CGRectGetMidY(self.bounds)) - 1);
+    self.dotView.center = CGPointMake(21, lrint(CGRectGetMidY(self.bounds)) - 1);
     self.textLabel.frame = CGRectInset(self.textLabel.frame, 16, 0);
-    self.backgroundImageView.frame = CGRectMake(0, 1, 300, 44); // dimensions of the imageView's image
+    self.backgroundImageView.frame = CGRectMake(10, 1, 300, 44); // dimensions of the imageView's image
 }
 
 #pragma mark - Overridden Properties
@@ -59,7 +59,7 @@
 #pragma mark - Private Methods
 
 -(void)setupCustomColors {
-    self.backgroundColor = [UIColor darkGrayColor];
+    self.backgroundColor = [UIColor clearColor];
     self.textLabel.textColor = [UIColor whiteColor];
     self.textLabel.backgroundColor = [UIColor clearColor];
     self.textLabel.font = [[UIFont tl_appFont] fontWithSize:14];

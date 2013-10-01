@@ -8,5 +8,6 @@ pod 'ReactiveCocoaLayout', '0.4'
 pod 'BlocksKit', '1.8.1'
 pod 'NSDate-Extensions', '0.0.1'
 pod 'libextobjc', '0.3'
+pod 'Reveal-iOS-SDK', '0.9.1'
 
 inhibit_all_warnings!

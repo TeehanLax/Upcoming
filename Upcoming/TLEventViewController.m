@@ -591,7 +591,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
             }]]startWith:[NSDate date]];
             
             // Finally, bind the value of the supplementary view's timeString property to a mapped signal.
-            RAC(self.hourSupplementaryView, timeString) = [updateSignal map:^id (NSDate *date) {
+            RAC(self, hourSupplementaryView.timeString) = [updateSignal map:^id (NSDate *date) {
                 NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:(NSHourCalendarUnit | NSMinuteCalendarUnit)
                                                            fromDate:date];
                 

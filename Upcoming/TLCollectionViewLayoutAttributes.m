@@ -20,4 +20,9 @@
     return otherAttributes;
 }
 
+-(BOOL)isEqual:(TLCollectionViewLayoutAttributes *)object {
+    BOOL selfEqual = self.contentAlpha == object.contentAlpha && self.backgroundState == object.backgroundState && self.alignment == object.alignment;
+    return [super isEqual:object] && selfEqual;
+}
+
 @end
