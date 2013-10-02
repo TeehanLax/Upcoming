@@ -64,7 +64,7 @@ const CGFloat kUpperHeaderHeight = 52.0f;
     
     // Reload our table view whenever the sources change on the event manager
     @weakify(self);
-    [[RACAble([EKEventManager sharedInstance], sources) deliverOn:[RACScheduler mainThreadScheduler]] subscribeNext:^(id x) {
+    [RACObserve([EKEventManager sharedInstance], sources) subscribeNext:^(id x) {
         @strongify(self);
         [self.calendarTableView reloadData];
     }];
@@ -76,8 +76,9 @@ const CGFloat kUpperHeaderHeight = 52.0f;
     [super viewDidLoad];
     
     self.view.backgroundColor = [UIColor clearColor];
+    self.calendarTableView.backgroundColor = [UIColor clearColor];
     
-    RACSignal *timerSignal = [[[RACSignal interval:60] startWith:[NSDate date]] deliverOn:[RACScheduler mainThreadScheduler]];
+    RACSignal *timerSignal = [[RACSignal interval:60 onScheduler:[RACScheduler mainThreadScheduler]] startWith:[NSDate date]];
     
     @weakify(self);
     
@@ -88,23 +89,23 @@ const CGFloat kUpperHeaderHeight = 52.0f;
         return allDayEvents;
     }];
     
-    RACSignal *allDayEventSignal = [[RACSignal combineLatest:@[todayAllDayEventsSignal, timerSignal] reduce:^id (NSArray *allDayEventArray, NSDate *fireDate) {
+    RACSignal *allDayEventSignal = [RACSignal combineLatest:@[todayAllDayEventsSignal, timerSignal] reduce:^id (NSArray *allDayEventArray, NSDate *fireDate) {
         return allDayEventArray;
-    }] deliverOn:[RACScheduler mainThreadScheduler]];
+    }];
     
     // Bind the number of pages to the number of all-day events, plus one for the upcoming event
-    RAC(self.allDayEventPageControl.numberOfPages) = [allDayEventSignal map:^id(id value) {
+    RAC(self, allDayEventPageControl.numberOfPages) = [allDayEventSignal map:^id(id value) {
         return @([value count] + 1);
     }];
     
     // Hide the page control when there is only one page
-    RAC(self.allDayEventPageControl.alpha) = [[allDayEventSignal map:^id(id value) {
+    RAC(self, allDayEventPageControl.alpha) = [[allDayEventSignal map:^id(id value) {
         if ([value count] == 0) return @(0.0f);
         else return @(1.0f);
     }] animate];
     
     // Bind the content size of the scroll view to a mapping of the number of events. 
-    RAC(self.allDayEventScrollView.contentSize) = [allDayEventSignal map:^id(id value) {
+    RAC(self, allDayEventScrollView.contentSize) = [allDayEventSignal map:^id(id value) {
         @strongify(self);
         return [NSValue valueWithCGSize:CGSizeMake(CGRectGetWidth(self.allDayEventScrollView.frame) * ([value count] + 1), CGRectGetHeight(self.allDayEventScrollView.frame))];
     }];
@@ -114,7 +115,7 @@ const CGFloat kUpperHeaderHeight = 52.0f;
         @strongify(self);
         [self.allDayEventScrollView scrollRectToVisible:CGRectMake(self.allDayEventPageControl.currentPage * CGRectGetWidth(self.allDayEventScrollView.frame), 0, CGRectGetWidth(self.allDayEventScrollView.frame), CGRectGetHeight(self.allDayEventScrollView.frame)) animated:YES];
     }];
-    RAC(self.allDayEventPageControl.currentPage) = [[RACAbleWithStart(self.allDayEventScrollView.contentOffset) distinctUntilChanged] map:^id(id value) {
+    RAC(self, allDayEventPageControl.currentPage) = [[RACObserve(self.allDayEventScrollView, contentOffset) distinctUntilChanged] map:^id(id value) {
         @strongify(self);
         
         CGPoint contentOffset = [value CGPointValue];
@@ -190,19 +191,19 @@ const CGFloat kUpperHeaderHeight = 52.0f;
         }
     }] throttle:0.25f];
     
-    RAC(self.eventTitleLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
+    RAC(self, eventTitleLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
         return event == nil ? NSLocalizedString(@"No Upcoming Event", @"No upcoming event header text") : event.title;
     }];
     
-    RAC(self.eventLocationLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
+    RAC(self, eventLocationLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
         return event == nil ? @"" : event.location;
     }];
     
-    RAC(self.eventLocationImageView.alpha) = [nextEventSignal map:^id(EKEvent *event) {
+    RAC(self, eventLocationImageView.alpha) = [nextEventSignal map:^id(EKEvent *event) {
         return event.location.length == 0 ? @(0.0f) : @(1.0f);
     }];
     
-    RAC(self.eventTimeLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
+    RAC(self, eventTimeLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
         if (!event) return @"";
         
         return [[NSString stringWithFormat:@"%@ – %@",
@@ -219,7 +220,7 @@ const CGFloat kUpperHeaderHeight = 52.0f;
         }
     };
     
-    RAC(self.eventRelativeTimeLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
+    RAC(self, eventRelativeTimeLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
         if (!event) return @"";
         
         NSCalendar *calendar = [[EKEventManager sharedInstance] calendar];
@@ -261,7 +262,7 @@ const CGFloat kUpperHeaderHeight = 52.0f;
         return eventRelativeTime;
     }];
     
-    RAC(self.eventRelativeTimeUnitLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
+    RAC(self, eventRelativeTimeUnitLabel.text) = [nextEventSignal map:^id(EKEvent *event) {
         if (event == nil) return @"";
         
         NSCalendar *calendar = [[EKEventManager sharedInstance] calendar];
@@ -316,11 +317,11 @@ const CGFloat kUpperHeaderHeight = 52.0f;
         return eventRelativeTimeUnit;
     }];
     
-    RAC(self.calendarView.alpha) = [nextEventSignal map:^id(EKEvent *event) {
+    RAC(self, calendarView.alpha) = [nextEventSignal map:^id(EKEvent *event) {
         return event == nil ? @(0.0f) : @(1.0f);
     }];
     
-    RAC(self.calendarView.dotColor) = [nextEventSignal map:^id(EKEvent *event) {
+    RAC(self, calendarView.dotColor) = [nextEventSignal map:^id(EKEvent *event) {
         return [UIColor colorWithCGColor:event.calendar.CGColor];
     }];
     
@@ -340,28 +341,28 @@ const CGFloat kUpperHeaderHeight = 52.0f;
         }
     }];
     
-    RAC(self.eventNowLabel.hidden) = eventNowHiddenSignal;
-    RAC(self.eventRelativeTimeUnitLabel.hidden) = [eventNowHiddenSignal not];
+    RAC(self, eventNowLabel.hidden) = eventNowHiddenSignal;
+    RAC(self, eventRelativeTimeUnitLabel.hidden) = [eventNowHiddenSignal not];
     
-    RAC(self.eventTimeLabel.transform) = [nextEventSignal map:transformBlock];
-    RAC(self.calendarView.transform) = [nextEventSignal map:transformBlock];
+    RAC(self, eventTimeLabel.transform) = [nextEventSignal map:transformBlock];
+    RAC(self, calendarView.transform) = [nextEventSignal map:transformBlock];
     
     // This subject is sent new items in updateHour:minute:event:
     self.alternateEventSubject = [RACSubject subject];
     
-    RAC(self.alternateEventTitleLabel.text) = [self.alternateEventSubject map:^id(EKEvent *event) {
+    RAC(self, alternateEventTitleLabel.text) = [self.alternateEventSubject map:^id(EKEvent *event) {
         return event == nil ? @"" : event.title;
     }];
     
-    RAC(self.alternateEventLocationLabel.text) = [self.alternateEventSubject map:^id(EKEvent *event) {
+    RAC(self, alternateEventLocationLabel.text) = [self.alternateEventSubject map:^id(EKEvent *event) {
         return event.location.length == 0 ? @"" : event.location;
     }];
     
-    RAC(self.alternateEventLocationImageView.alpha) = [self.alternateEventSubject map:^id(EKEvent *event) {
+    RAC(self, alternateEventLocationImageView.alpha) = [self.alternateEventSubject map:^id(EKEvent *event) {
         return event.location.length == 0 ? @(0.0f) : @(1.0f);
     }];
     
-    RAC(self.alternateEventTimeLabel.text) = [self.alternateEventSubject map:^id(EKEvent *event) {
+    RAC(self, alternateEventTimeLabel.text) = [self.alternateEventSubject map:^id(EKEvent *event) {
         if (event == nil) return @"";
         
         return [[NSString stringWithFormat:@"%@ – %@",
@@ -369,16 +370,16 @@ const CGFloat kUpperHeaderHeight = 52.0f;
                  [NSDateFormatter localizedStringFromDate:event.endDate dateStyle:NSDateFormatterNoStyle timeStyle:NSDateFormatterShortStyle]] lowercaseString];
     }];
     
-    RAC(self.alternateCalendarView.alpha) = [self.alternateEventSubject map:^id(EKEvent *event) {
+    RAC(self, alternateCalendarView.alpha) = [self.alternateEventSubject map:^id(EKEvent *event) {
         return event == nil ? @(0.0f) : @(1.0f);
     }];
     
-    RAC(self.alternateCalendarView.dotColor) = [self.alternateEventSubject map:^id(EKEvent *event) {
+    RAC(self, alternateCalendarView.dotColor) = [self.alternateEventSubject map:^id(EKEvent *event) {
         return [UIColor colorWithCGColor:event.calendar.CGColor];
     }];
     
-    RAC(self.alternateEventTimeLabel.transform) = [self.alternateEventSubject map:transformBlock];
-    RAC(self.alternateCalendarView.transform) = [self.alternateEventSubject map:transformBlock];
+    RAC(self, alternateEventTimeLabel.transform) = [self.alternateEventSubject map:transformBlock];
+    RAC(self, alternateCalendarView.transform) = [self.alternateEventSubject map:transformBlock];
     
     [[self.alternateEventSubject distinctUntilChanged] subscribeNext:^(EKEvent *event) {
         [self.headerAlernateDetailView crossfadeWithDuration:0.1f];

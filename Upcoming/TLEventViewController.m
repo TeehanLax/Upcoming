@@ -52,9 +52,9 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
 -(id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if (!(self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) return nil;
     
-    RAC(self.currentDateComponents) = [[[[RACSignal interval:60] startWith:[NSDate date]] map:^id(id value) {
+    RAC(self, currentDateComponents) = [[[RACSignal interval:60 onScheduler:[RACScheduler mainThreadScheduler]] startWith:[NSDate date]] map:^id(id value) {
         return [[[EKEventManager sharedInstance] calendar] components:(NSHourCalendarUnit | NSMinuteCalendarUnit) fromDate:[NSDate date]];
-    }]  deliverOn:[RACScheduler mainThreadScheduler]];
+    }];
     
     return self;
 }
@@ -64,7 +64,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     
     @weakify(self);
     // Bind our viewModelArray to a mapped newEventSignal
-    RAC(self.viewModelArray) = [[[[[EKEventManager sharedInstance] eventsSignal] distinctUntilChanged] map:^id (NSArray *eventsArray) {
+    RAC(self, viewModelArray) = [[[[[EKEventManager sharedInstance] eventsSignal] distinctUntilChanged] map:^id (NSArray *eventsArray) {
         // First, sort the array first by size then by start time.
         
         NSArray *sortedArray = [eventsArray sortedArrayUsingComparator:^NSComparisonResult (EKEvent *obj1, EKEvent *obj2) {
@@ -163,13 +163,13 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
     }];
     
     // Whenever our viewModelArray changes, reload our data and invalidate the layout. 
-    [RACAble(self.viewModelArray) subscribeNext:^(id x) {
+    [RACObserve(self, viewModelArray) subscribeNext:^(id x) {
         @strongify(self);
         [self.collectionView reloadData];
         [self.collectionView.collectionViewLayout invalidateLayout];
     }];
     
-    RAC(self.immediateModel) = [[RACSignal combineLatest:@[RACAbleWithStart(self.viewModelArray), [[RACSignal interval:60] startWith:[NSDate date]]] reduce:^id(NSArray *array, NSDate *fireDate){
+    RAC(self, immediateModel) = [[RACSignal combineLatest:@[RACObserve(self, viewModelArray), [[RACSignal interval:60 onScheduler:[RACScheduler mainThreadScheduler]] startWith:[NSDate date]]] reduce:^id(NSArray *array, NSDate *fireDate){
         return array;
     }] map:^id(NSArray *viewModelArray) {
         NSArray *array = [viewModelArray filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(TLEventViewModel *evaluatedObject, NSDictionary *bindings) {
@@ -179,7 +179,7 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
         return array.count > 0 ? array[0] : nil;
     }];
     
-    [RACAble(self.immediateModel) subscribeNext:^(id x) {
+    [RACObserve(self, immediateModel) subscribeNext:^(id x) {
         @strongify(self);
         [self.collectionView reloadData];
         [self.collectionView.collectionViewLayout invalidateLayout];
@@ -586,12 +586,12 @@ static NSString *kEventSupplementaryViewIdentifier = @"EventView";
             
             NSLog(@"Scheduling subscription every minute for supplementary view in %d seconds", delay);
             
-            RACSignal *updateSignal = [[[[[RACSignal interval:delay] take:1] concat:[RACSignal defer:^RACSignal *{
-                return [RACSignal interval:60];
-            }]] deliverOn:[RACScheduler mainThreadScheduler]] startWith:[NSDate date]];
+            RACSignal *updateSignal = [[[[RACSignal interval:delay onScheduler:[RACScheduler mainThreadScheduler]] take:1] concat:[RACSignal defer:^RACSignal *{
+                return [RACSignal interval:60 onScheduler:[RACScheduler mainThreadScheduler]];
+            }]]startWith:[NSDate date]];
             
             // Finally, bind the value of the supplementary view's timeString property to a mapped signal.
-            RAC(self.hourSupplementaryView.timeString) = [updateSignal map:^id (NSDate *date) {
+            RAC(self, hourSupplementaryView.timeString) = [updateSignal map:^id (NSDate *date) {
                 NSDateComponents *components = [[[EKEventManager sharedInstance] calendar] components:(NSHourCalendarUnit | NSMinuteCalendarUnit)
                                                            fromDate:date];
                 

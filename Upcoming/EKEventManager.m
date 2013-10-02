@@ -43,8 +43,8 @@ NSString *const EKEventManagerSourcesKeyPath = @"sources";
                                                  name:EKEventStoreChangedNotification
                                                object:_store];
 
-    _eventsSignal = [RACAble(self.events) startWith:nil];
-    _nextEventSignal = [RACAble(self.nextEvent) startWith:nil];
+    _eventsSignal = [[RACObserve(self, events) skip:1] startWith:nil];
+    _nextEventSignal = [[RACObserve(self, nextEvent) skip:1] startWith:nil];
     
     return self;
 }
