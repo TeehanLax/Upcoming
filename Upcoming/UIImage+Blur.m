@@ -3,7 +3,7 @@
 //  Upcoming
 //
 //  Created by Ash Furrow on 2013-04-23.
-//  Copyright (c) 2013 Teehan+Lax. All rights reserved.
+//  Originally created by Bryan Clark https://github.com/bryanjclark/ios-darken-image-with-cifilter
 //
 
 #import "UIImage+Blur.h"
